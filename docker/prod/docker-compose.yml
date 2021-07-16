@@ -1,0 +1,38 @@
+version: "3.9"
+services:
+  web-next-prod:
+    image: "next-prod"
+    restart: always
+    
+    depends_on:
+      - mongo-prod
+    environment:
+      WAIT_HOSTS: mongo-prod:27017
+      WAIT_HOSTS_TIMEOUT: 120
+
+    links:
+      - "mongo-prod:mongo-prod"
+
+  mongo-prod:
+    image: mongo
+    command: [--auth]
+    restart: always
+
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: /run/secrets/mongo_root_user
+      MONGO_INITDB_ROOT_PASSWORD: /run/secrets/mongo_root_pass
+    volumes:
+      - ../../initMongo.js:/docker-entrypoint-initdb.d/init-mongo.js:ro
+      - ../../mongo/data:/data/db
+    secrets:
+      - mongo_root_user
+      - mongo_root_pass
+
+  
+
+secrets:
+  mongo_root_user:
+    file: ../../mongo/auth/root/user
+  mongo_root_pass:
+    file: ../../mongo/auth/root/pass
+
