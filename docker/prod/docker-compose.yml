@@ -11,7 +11,7 @@ services:
       WAIT_HOSTS_TIMEOUT: 120
 
     links:
-      - "mongo-prod:mongo-prod"
+      - "mongo-prod:db"
 
   mongo-prod:
     image: mongo

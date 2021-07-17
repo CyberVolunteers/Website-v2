@@ -1,6 +1,0 @@
-[submodule "microservices/auth-microservice"]
-	path = microservices/auth-microservice
-	url = git@github.com:CyberVolunteers/auth-microservice.git
-[submodule "microservices/email"]
-	path = microservices/email
-	url = git@github.com:CyberVolunteers/email.git

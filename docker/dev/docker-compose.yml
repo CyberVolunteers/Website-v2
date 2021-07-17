@@ -4,6 +4,9 @@ services:
     image: "next-dev"
     restart: always
 
+    ports: 
+      - "3000:3000"
+
     volumes:
         - ../../next/:/usr/app
     
@@ -14,15 +17,11 @@ services:
       WAIT_HOSTS_TIMEOUT: 120
 
     links:
-      - "mongo-dev:mongo-dev"
+      - "mongo-dev:db"
 
   mongo-dev:
     image: mongo
-    command: [--auth]
     restart: always
-
-    ports: 
-      - "3000:3000"
 
     environment:
       MONGO_INITDB_ROOT_USERNAME: /run/secrets/mongo_root_user
