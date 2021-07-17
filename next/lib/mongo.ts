@@ -1,10 +1,10 @@
 import { dbServer, dbName } from "./config"
-import * as mongoose from "mongoose"
+import { connect, Mongoose } from "mongoose"
 
 
 interface MongoConnectionDetails {
-    instance: mongoose.Mongoose | null,
-    promise: Promise<mongoose.Mongoose> | null
+    instance: Mongoose | null,
+    promise: Promise<Mongoose> | null
 }
 const mongoConnectionDetails: MongoConnectionDetails = {
     instance: null,
@@ -14,7 +14,7 @@ const mongoConnectionDetails: MongoConnectionDetails = {
 async function getNewMongo() {
     console.log(`mongodb://${dbServer}/${dbName}`)
     console.log(process.env.MONGO_USERNAME, process.env.MONGO_PASSWORD)
-    return await mongoose.connect(`mongodb://${dbServer}/${dbName}`, {
+    return await connect(`mongodb://${dbServer}/${dbName}`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         useFindAndModify: false,

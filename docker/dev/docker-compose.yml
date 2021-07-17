@@ -21,6 +21,7 @@ services:
 
   mongo-dev:
     image: mongo
+    command: [--auth]
     restart: always
 
     environment:
