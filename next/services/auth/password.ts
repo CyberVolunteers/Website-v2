@@ -1,5 +1,5 @@
 import { genSalt, hash as genHash, getRounds, compare } from "bcrypt";
-import { minBcryptRounds } from "../lib/config"
+import { minBcryptRounds } from "../config/server/password"
 
 export const hash = async function (input: string) {
     const salt = await genSalt(minBcryptRounds);

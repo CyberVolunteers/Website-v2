@@ -1,4 +1,4 @@
-import { dbServer, dbName } from "../config"
+import { dbServer, dbName } from "../config/server/mongo"
 import { connect, Mongoose } from "mongoose"
 import Models from "./mongoModels"
 

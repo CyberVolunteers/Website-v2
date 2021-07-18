@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { getMongo } from "../../lib/mongoUtils/mongo"
-import Models from "../../lib/mongoUtils/mongoModels"
+import { getMongo } from "../../services/mongo/mongo"
+import Models from "../../services/mongo/mongoModels"
 
 const { User } = Models;
 
