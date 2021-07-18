@@ -1,6 +1,6 @@
-import { dbServer, dbName } from "./config"
+import { dbServer, dbName } from "../config"
 import { connect, Mongoose } from "mongoose"
-
+import Models from "./mongoModels"
 
 interface MongoConnectionDetails {
     instance: Mongoose | null,
@@ -12,8 +12,6 @@ const mongoConnectionDetails: MongoConnectionDetails = {
 }
 
 async function getNewMongo() {
-    console.log(`mongodb://${dbServer}/${dbName}`)
-    console.log(process.env.MONGO_USERNAME, process.env.MONGO_PASSWORD)
     return await connect(`mongodb://${dbServer}/${dbName}`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
