@@ -9,9 +9,31 @@ export const users: FieldConstraintsCollection = {
         },
     },
     optional: {
+        number: {
+            adminLevel: { default: 0 }
+        },
         boolean: {
             isEmailVerified: { default: false },
-            isAdmin: { default: false }
         }
     },
 };
+
+export const organisations: FieldConstraintsCollection = {
+    required: {
+        string: {
+            passwordHash: { exactLength: 60 }
+        },
+        boolean: {
+            isEmailVerified: { default: false },
+            isCharityVerified: { default: false }
+        }
+    }
+}
+
+export const listings: FieldConstraintsCollection = {
+    required: {
+        number: {
+            requestedNumVolunteers: {},
+        },
+    },
+}

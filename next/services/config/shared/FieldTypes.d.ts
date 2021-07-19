@@ -4,6 +4,7 @@ interface Field<T> {
     enum?: Array<string>,
     maxLength?: T extends StringConstructor ? number : undefined
     exactLength?: T extends StringConstructor ? number : undefined
+    lazyFill?: boolean
     default?:
     T extends StringConstructor ? string :
     T extends NumberConstructor ? number :
@@ -21,6 +22,9 @@ interface FieldTypeContainer {
     number?: FieldGroup<NumberConstructor>,
     date?: FieldGroup<DateConstructor>,
     boolean?: FieldGroup<BooleanConstructor>,
+    object?: {
+        [key: string]: FieldConstraintsCollection
+    }
 }
 
 interface FieldConstraintsCollection {
