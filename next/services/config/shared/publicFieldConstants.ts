@@ -47,7 +47,6 @@ export const organisations: FieldConstraintsCollection = {
 export const listings: FieldConstraintsCollection = {
     required: {
         string: {
-            time: { maxLength: 1000 },
             duration: { maxLength: 1000 },
             place: { maxLength: 1000 },
             skills: { maxLength: 3000 },
@@ -68,17 +67,22 @@ export const listings: FieldConstraintsCollection = {
                 }
             },
         },
-        number: {
-            currentNumVolunteers: {},
-            minHoursPerWeek: {},
-            maxHoursPerWeek: {},
-        },
         date: {
             createdDate: {},
 
         },
         boolean: {
             isFlexible: {}
+        },
+        number: {
+            requestedNumVolunteers: {},
+            minHoursPerWeek: {},
+            maxHoursPerWeek: { greaterOrEqualTo: "minHoursPerWeek" },
+        },
+    },
+    optional: {
+        string: {
+            time: { maxLength: 1 },
         }
     }
 }

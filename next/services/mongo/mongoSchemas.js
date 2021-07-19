@@ -1,5 +1,5 @@
 import { Schema } from "mongoose";
-import { stringValidate } from "./mongoValidateUtils"
+import { numberValidate, stringValidate } from "./mongoValidateUtils"
 import { users as usersPublic, organisations as orgPublic, listings as listingPublic } from "../config/shared/publicFieldConstants"
 import { users as usersPrivate, organisations as orgPrivate, listings as listingPrivate } from "../config/server/privateFieldConstants"
 
@@ -11,9 +11,9 @@ const fieldTypesByTypeName = {
     object: Object,
 }
 
-export const UserSchema = new Schema(constructSchemaSettings(usersPublic, usersPrivate));
-export const OrgSchema = new Schema(constructSchemaSettings(orgPublic, orgPrivate));
-export const ListingSchema = new Schema(constructSchemaSettings(listingPublic, listingPublic));
+export const UserSchema = constructSchemaSettings(usersPublic, usersPrivate);
+export const OrgSchema = constructSchemaSettings(orgPublic, orgPrivate);
+export const ListingSchema = constructSchemaSettings(listingPublic, listingPublic);
 
 function deepAssign(target, src) {
     if (src === undefined) return target; // return target if there is nothing in src to override target with
@@ -34,7 +34,8 @@ function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
 
     // since Object.assign gives us a shallow copy, we can't use it
     const fields = deepAssign(fieldsPublic, fieldsPrivate);
-    const out = {};
+    const schemaSettings = {};
+    let multiParams = [];
 
     Object.entries(fields).filter(([key, value]) => ["required", "optional"].includes(key)).forEach(([typeContainerKey, typeContainer]) => {
         const isRequired = typeContainerKey === "required";
@@ -43,7 +44,7 @@ function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
             // if an object, recurse
             if (!typeContainer[groupName]) return;
             Object.entries(typeContainer[groupName]).forEach(([entryName, additionalData]) => {
-                if (groupName === "object") return out[entryName] = {
+                if (groupName === "object") return schemaSettings[entryName] = {
                     type: constructSchemaSettings(additionalData),
                     required: isRequired,
                 }
@@ -59,14 +60,33 @@ function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
                     if (additionalData[settingName] !== undefined) currentEntry[targetKey] = additionalData[settingName]; // "if" so that we don't leave "undefined" keys there
                 }
 
+                function rememberMultiParam(settingName, validator) {
+                    const otherParams = additionalData[settingName];
+                    if (otherParams === undefined) return;
+                    const outVals = [validator, entryName];
+                    if (otherParams instanceof Array) outVals.push(...otherParams);
+                    else outVals.push(otherParams);
+                    multiParams.push(outVals);
+                }
+
                 applyCallback("maxLength", stringValidate.maxLength, "validate");
                 applyCallback("exactLength", stringValidate.exactLength, "validate");
+                rememberMultiParam("greaterOrEqualTo", numberValidate.greaterOrEqualTo);
                 applyValue("default");
                 applyValue("enum");
 
-                out[entryName] = currentEntry;
+                schemaSettings[entryName] = currentEntry;
             })
         })
+    })
+
+    const out = new Schema(schemaSettings)
+    multiParams.forEach((settings) => {
+        console.log("settings", settings);
+        const validator = settings.shift();
+
+        // make sure all the parameters are required (otherwise the functions do not make much sense)
+        out.pre("validate", validator(settings));
     })
     return out;
 }

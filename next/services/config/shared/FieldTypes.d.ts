@@ -4,6 +4,7 @@ interface Field<T> {
     enum?: Array<string>,
     maxLength?: T extends StringConstructor ? number : undefined
     exactLength?: T extends StringConstructor ? number : undefined
+    greaterOrEqualTo?: T extends NumberConstructor ? string : undefined
     lazyFill?: boolean
     default?:
     T extends StringConstructor ? string :

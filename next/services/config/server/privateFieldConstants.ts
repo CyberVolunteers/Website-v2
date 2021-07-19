@@ -33,7 +33,7 @@ export const organisations: FieldConstraintsCollection = {
 export const listings: FieldConstraintsCollection = {
     required: {
         number: {
-            requestedNumVolunteers: {},
+            currentNumVolunteers: {},
         },
     },
 }
