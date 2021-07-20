@@ -1,12 +1,12 @@
 import { genSalt, hash as genHash, getRounds, compare } from "bcrypt";
 import { minBcryptRounds } from "../config/server/password"
 
-export const hash = async function (input: string) {
+export async function hash(input: string) {
     const salt = await genSalt(minBcryptRounds);
     return await genHash(input, salt);
 }
 
-export const verifyHash = async function (inputHash: string, password: string, updateHashCallback: (newHash: string) => void) {
+export async function verifyHash(inputHash: string, password: string, updateHashCallback: (newHash: string) => void) {
 
     const isCorrectHash = await compare(password, inputHash);
     if (!isCorrectHash) return false;

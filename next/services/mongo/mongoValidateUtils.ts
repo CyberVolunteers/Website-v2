@@ -7,7 +7,7 @@ export const stringValidate = {
 }
 
 export const numberValidate = {
-    greaterOrEqualTo: createValidateMiddleware("The fields need to be in descending order or equal", null, isAscendingOrder)
+    greaterOrEqualTo: createValidateMiddleware("The fields need to be in descending order or equal", false, isAscendingOrder)
 }
 
 function isAscendingOrder(obj: any, resolvedFields: any[]) {
