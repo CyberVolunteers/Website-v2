@@ -6,6 +6,7 @@
     "spec": "test/**/*.test.ts",
     "require": [
         "ts-node/register",
-        "test/hooks.ts"
+        "test/hooks.ts",
+        "test/config.ts"
     ]
 }

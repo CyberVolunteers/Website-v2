@@ -3,7 +3,6 @@ import bcrypt from "bcrypt"
 import { minBcryptRounds } from "../../services/config/server/password"
 import { expect } from "chai"
 import { spy } from "sinon"
-// import assert from "assert"
 
 describe("password.ts", function () {
     describe("#hash()", function () {

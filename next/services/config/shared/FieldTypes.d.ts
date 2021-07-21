@@ -1,7 +1,7 @@
 import { Number } from "mongoose";
 
 interface Field<T> {
-    enum?: Array<string>,
+    enum?: T extends StringConstructor ? Array<string> : undefined,
     maxLength?: T extends StringConstructor ? number : undefined
     exactLength?: T extends StringConstructor ? number : undefined
     greaterOrEqualTo?: T extends NumberConstructor ? string : undefined

@@ -1,7 +1,5 @@
 import { Schema } from "mongoose";
 import { numberValidate, stringValidate } from "./mongoValidateUtils"
-import { users as usersPublic, organisations as orgPublic, listings as listingPublic } from "../config/shared/publicFieldConstants"
-import { users as usersPrivate, organisations as orgPrivate, listings as listingPrivate } from "../config/server/privateFieldConstants"
 
 const fieldTypesByTypeName = {
     string: String,
@@ -11,11 +9,7 @@ const fieldTypesByTypeName = {
     object: Object,
 }
 
-export const UserSchema = constructSchemaSettings(usersPublic, usersPrivate);
-export const OrgSchema = constructSchemaSettings(orgPublic, orgPrivate);
-export const ListingSchema = constructSchemaSettings(listingPublic, listingPublic);
-
-function deepAssign(target, src) {
+export function deepAssign(target, src) {
     if (src === undefined) return target; // return target if there is nothing in src to override target with
     const isRecursible = (val) => val instanceof Object || val instanceof Array;
     if (!isRecursible(src) || !isRecursible(target)) return src; // if we can not recurse anymore, then choose src
@@ -30,7 +24,7 @@ function deepAssign(target, src) {
     return out;
 }
 
-function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
+export function constructSchema(fieldsPublic, fieldsPrivate = {}) {
 
     // since Object.assign gives us a shallow copy, we can't use it
     const fields = deepAssign(fieldsPublic, fieldsPrivate);
@@ -45,7 +39,7 @@ function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
             if (!typeContainer[groupName]) return;
             Object.entries(typeContainer[groupName]).forEach(([entryName, additionalData]) => {
                 if (groupName === "object") return schemaSettings[entryName] = {
-                    type: constructSchemaSettings(additionalData),
+                    type: constructSchema(additionalData),
                     required: isRequired,
                 }
                 const currentEntry = { type, required: isRequired };
@@ -82,7 +76,6 @@ function constructSchemaSettings(fieldsPublic, fieldsPrivate = {}) {
 
     const out = new Schema(schemaSettings)
     multiParams.forEach((settings) => {
-        console.log("settings", settings);
         const validator = settings.shift();
 
         // make sure all the parameters are required (otherwise the functions do not make much sense)
