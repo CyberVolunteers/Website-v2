@@ -8,5 +8,6 @@
         "ts-node/register",
         "test/hooks.ts",
         "test/config.ts"
-    ]
+    ],
+    "parallel": true
 }

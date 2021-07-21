@@ -3,6 +3,7 @@ import bcrypt from "bcrypt"
 import { minBcryptRounds } from "../../services/config/server/password"
 import { expect } from "chai"
 import { spy } from "sinon"
+import { seal, unseal } from "../../services/auth/iron"
 
 describe("password.ts", function () {
     describe("#hash()", function () {
@@ -59,6 +60,28 @@ describe("password.ts", function () {
             await verifyHash(h, "not test", writeSpy);
 
             expect(writeSpy.notCalled, "The value can not be rehashed if the password is wrong").to.be.true;
+        })
+    })
+})
+
+describe("iton.ts", function () {
+    describe("#seal(), #unseal()", function () {
+        it("should recover data JSON data as it was", async function () {
+            const input = {
+                test: 4,
+                nested: {
+                    eight: 8
+                },
+                str: "string here"
+            }
+            const result = await seal(input)
+            expect(await unseal(result)).to.be.deep.equal(input);
+        })
+
+        it("should recover data string data as it was", async function () {
+            const input = "test test";
+            const result = await seal(input)
+            expect(await unseal(result)).to.be.deep.equal(input);
         })
     })
 })

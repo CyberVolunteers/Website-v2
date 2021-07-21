@@ -7,10 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ./node_modules/mocha/bin/mocha --parallel"
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
+    "@hapi/iron": "^6.0.0",
     "bcrypt": "^5.0.1",
+    "cookie": "^0.4.1",
     "dotenv": "^10.0.0",
     "mongoose": "^5.13.3",
     "next": "11.0.1",
@@ -20,6 +22,7 @@
   "devDependencies": {
     "@types/bcrypt": "^5.0.0",
     "@types/chai": "^4.2.21",
+    "@types/cookie": "^0.4.1",
     "@types/mocha": "^8.2.3",
     "@types/react": "17.0.13",
     "@types/sinon": "^10.0.2",
