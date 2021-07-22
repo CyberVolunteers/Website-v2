@@ -11,7 +11,7 @@ const fieldTypesByTypeName = {
 
 export function deepAssign(target, src) {
     if (src === undefined) return target; // return target if there is nothing in src to override target with
-    const isRecursible = (val) => val instanceof Object || val instanceof Array;
+    const isRecursible = (val) => val instanceof Object;
     if (!isRecursible(src) || !isRecursible(target)) return src; // if we can not recurse anymore, then choose src
 
     const keys = new Set(Object.keys(target))

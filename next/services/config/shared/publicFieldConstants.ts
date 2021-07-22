@@ -49,6 +49,7 @@ export const listings: FieldConstraintsCollection = {
         string: {
             duration: { maxLength: 1000 },
             place: { maxLength: 1000 },
+            time: { maxLength: 1000 },
             skills: { maxLength: 3000 },
             requirements: { maxLength: 3000 },
             title: { maxLength: 150 },
@@ -80,9 +81,4 @@ export const listings: FieldConstraintsCollection = {
             maxHoursPerWeek: { greaterOrEqualTo: "minHoursPerWeek" },
         },
     },
-    optional: {
-        string: {
-            time: { maxLength: 1 },
-        }
-    }
 }
