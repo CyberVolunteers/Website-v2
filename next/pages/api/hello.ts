@@ -34,7 +34,7 @@ const handlers: HandlerCollection = {
     //   birthDate: new Date()
     // })
 
-    await login("email@email.com", "passwd");
+    await login(req.body.email, "passwd");
 
     res.status(200).json({ name: 'John Doe' })
   }

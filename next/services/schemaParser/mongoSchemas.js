@@ -11,13 +11,13 @@ const fieldTypesByTypeName = {
 
 export function deepAssign(target, src) {
     if (src === undefined) return target; // return target if there is nothing in src to override target with
-    const isRecursible = (val) => val instanceof Object;
+    const isRecursible = (val) => typeof val === "object";
     if (!isRecursible(src) || !isRecursible(target)) return src; // if we can not recurse anymore, then choose src
 
     const keys = new Set(Object.keys(target))
     Object.keys(src).forEach((k) => keys.add(k)); // a set allows us not to bother about duplicates
 
-    const out = target instanceof Array ? [] : {}; // the original Object.assign seems to select the type based on the target
+    const out = (Array.isArray(target)) ? [] : {}; // the original Object.assign seems to select the type based on the target
     keys.forEach((k) => {
         out[k] = deepAssign(target[k], src[k])
     })

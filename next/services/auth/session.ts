@@ -1,5 +1,7 @@
 import { verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
+import { UserSchema } from "../mongo/mongoSchemas";
+import { copyMongoKeys } from "../../lib/utils/mongo";
 
 export async function login(email: string, password: string) {
     // find instead of findOne to keep the time roughly constant relative to when there are no results
@@ -8,7 +10,6 @@ export async function login(email: string, password: string) {
         Org.find({ email })
     ])
 
-    console.log(users, organisations)
     const emailWasFound = users.length !== 0 || organisations.length !== 0;
     const doesEmailBelongToUser = users.length !== 0;
     const storedCreds = emailWasFound ?
