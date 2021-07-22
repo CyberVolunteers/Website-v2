@@ -5,7 +5,8 @@ interface Field<T> {
     maxLength?: T extends StringConstructor ? number : undefined
     exactLength?: T extends StringConstructor ? number : undefined
     greaterOrEqualTo?: T extends NumberConstructor ? string : undefined
-    lazyFill?: boolean
+    lazyFill?: boolean,
+    unique?: boolean,
     default?:
     T extends StringConstructor ? string :
     T extends NumberConstructor ? number :

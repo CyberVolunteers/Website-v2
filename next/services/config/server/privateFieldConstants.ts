@@ -5,6 +5,7 @@ import { FieldConstraintsCollection } from "../shared/FieldTypes"
 export const users: FieldConstraintsCollection = {
     required: {
         string: {
+            email: { unique: true },
             passwordHash: { exactLength: 60 },
         },
     },
@@ -21,6 +22,7 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
     required: {
         string: {
+            email: { unique: true },
             passwordHash: { exactLength: 60 }
         },
         boolean: {

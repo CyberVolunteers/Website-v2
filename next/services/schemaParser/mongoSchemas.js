@@ -68,6 +68,7 @@ export function constructSchema(fieldsPublic, fieldsPrivate = {}) {
                 rememberMultiParam("greaterOrEqualTo", numberValidate.greaterOrEqualTo);
                 applyValue("default");
                 applyValue("enum");
+                applyValue("unique");
 
                 schemaSettings[entryName] = currentEntry;
             })

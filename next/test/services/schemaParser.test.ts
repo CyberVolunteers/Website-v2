@@ -271,6 +271,28 @@ describe("mongoSchemas.js", function () {
             expect(constructSchema(o)).to.deep.equal(new mongoose.Schema(expected))
         })
 
+        it("should correctly process unique values", function () {
+            const o: FieldConstraintsCollection = {
+                required: {
+                    string: {
+                        name: {
+                            unique: true
+                        }
+                    }
+                },
+            }
+
+            const expected: SchemaDefinition<any> = {
+                name: {
+                    type: String,
+                    required: true,
+                    unique: true
+                },
+            }
+
+            expect(constructSchema(o)).to.deep.equal(new mongoose.Schema(expected))
+        })
+
         it("should correctly process defaults", function () {
             const o: FieldConstraintsCollection = {
                 optional: {

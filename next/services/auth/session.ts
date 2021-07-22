@@ -27,5 +27,6 @@ export async function login(email: string, password: string) {
 }
 
 export async function signupUser(params: any) {
-
+    // const newUser = new User(copyMongoKeys(UserSchema, params));
+    // await newUser.save();
 }
