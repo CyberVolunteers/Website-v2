@@ -22,7 +22,6 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "services/schemaParser/mongoSchemas.js"
   ],
   "exclude": [
     "node_modules"
