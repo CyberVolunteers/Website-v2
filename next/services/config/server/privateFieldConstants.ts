@@ -2,7 +2,6 @@ import { FieldConstraintsCollection } from "combined-validator";
 
 // NOTE: this file works together with ../shared/publicFieldConstants.ts!
 
-
 export const users: FieldConstraintsCollection = {
     required: {
         string: {

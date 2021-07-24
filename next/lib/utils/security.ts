@@ -1,8 +1,10 @@
-export function deleteProto<T>(val: T) {
-    if (typeof val !== "object") return val
+export function mergeWithCallback<T>(val: T, callback: (k: string, v: T) => [k: string, v: T]) {
+    if ((val as any).constructor?.name !== "object" && !Array.isArray(val)) return val // check if we want to recurse
+
     const out: any = (val instanceof Array) ? [] : {};
-    Object.entries(val).forEach(([k, entry]) => {
-        out[k] = deleteProto(entry);
+    Object.entries(val).forEach(([k, v]) => {
+        const [newK, newV] = callback(k, v);
+        out[newK] = mergeWithCallback(newV, callback);
     })
 
     return out as T

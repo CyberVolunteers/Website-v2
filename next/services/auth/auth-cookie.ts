@@ -1,18 +1,17 @@
 import { seal, unseal } from "./iron"
 import { serialize, parse } from "cookie"
 import { NextApiRequest, NextApiResponse } from "next"
-import { IncomingMessage } from "http"
 import { isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName } from "../config/shared/config"
 
 export async function getSession(req: NextApiRequest) {
     const sessionCookie = req.cookies?.[sessionCookieName];
-    let sealed;
+
+    if (sessionCookie === undefined) return null;
     try {
-        sealed = await unseal(sessionCookie)
+        return await unseal(sessionCookie);
     } catch (err) {
         return null;
     }
-    return sessionCookie === undefined ? null : sealed;
 }
 
 export const refreshSession = async function createSession(res: NextApiResponse, data: any) {
@@ -24,6 +23,8 @@ export const refreshSession = async function createSession(res: NextApiResponse,
         secure: true,
         path: "/"
     })
+
+    // keep a cookie that tells the client that it is logged in
     const isSessionActiveCookie = serialize(isSessionActiveCookieName, "true", {
         maxAge: sessionCookieMaxAge,
         sameSite: "strict",

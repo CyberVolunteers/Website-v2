@@ -1,5 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
-import { deleteProto, sanitiseForMongo } from "./security";
+import { sanitiseForMongo } from "./security";
 
 type SupportedMethods = "GET" | "POST";
 
@@ -16,8 +16,16 @@ type ExtendedNextApiResponse = NextApiResponse & {
 
 }
 
+let hasFrozenPrototype = false;
+export function freezeProto() {
+    if (!hasFrozenPrototype) Object.freeze(Object.prototype) // prevent prototype pollution
+    hasFrozenPrototype = true;
+}
+
 export function createHandler(handlers: HandlerCollection) {
     return async (req: NextApiRequest, res: NextApiResponse) => {
+        freezeProto();
+
         function isSupportedType(method: string): method is SupportedMethods {
             return handlers.hasOwnProperty(method);
         }
@@ -46,8 +54,8 @@ async function sanitise(req: NextApiRequest, res: NextApiResponse) {
     //     urlMessage: "This request did not pass our requirements. Please enter different data",
     //     bodyMessage: "This request did not pass our requirements. Please enter different data"
     // }))
-    req.query = sanitiseForMongo(deleteProto(req.query))
-    req.body = sanitiseForMongo(deleteProto(req.body))
+    req.query = sanitiseForMongo(req.query)
+    req.body = sanitiseForMongo(req.body)
 }
 
 function extendReqRes(req: NextApiRequest, res: NextApiResponse) {
