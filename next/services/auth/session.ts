@@ -1,9 +1,11 @@
 import { verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
+import { copyMongoKeys, getMongo } from "../mongo";
 import { UserSchema } from "../mongo/mongoSchemas";
-import { copyMongoKeys } from "../../lib/utils/mongo";
 
 export async function login(email: string, password: string) {
+    const mongo = await getMongo(); // connect
+
     // find instead of findOne to keep the time roughly constant relative to when there are no results
     const [users, organisations] = await Promise.all([
         User.find({ email }),

@@ -1,11 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
-import { hash } from '../../services/auth/password';
 import { login } from '../../services/auth/session';
-import { getMongo } from "../../services/mongo/mongo"
-import { User, Org, Listing } from "../../services/mongo/mongoModels"
-import { deepAssign } from '../../services/schemaParser/mongoSchemas';
 
 type Data = {
   name: string
@@ -13,8 +9,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-    const mongo = await getMongo();
-
     // new Listing({
 
     // }).validate().catch(console.error)

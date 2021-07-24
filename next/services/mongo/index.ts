@@ -1,5 +1,5 @@
 import { dbServer, dbName } from "../config/server/mongo"
-import { connect, Mongoose } from "mongoose"
+import { connect, Mongoose, Schema } from "mongoose"
 
 interface MongoConnectionDetails {
     instance: Mongoose | null,
@@ -35,4 +35,14 @@ export const getMongo = async function () {
     })
 
     return await mongoConnectionDetails.promise;
+}
+
+export function copyMongoKeys(schema: Schema, data: object) {
+    const out: any = {}
+
+    Object.keys(schema.paths).forEach(k => {
+        if (data.hasOwnProperty(k)) out[k] = (data as any)[k]
+    })
+
+    return out
 }

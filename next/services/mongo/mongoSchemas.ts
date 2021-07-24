@@ -1,4 +1,4 @@
-import { constructSchema } from "../schemaParser/mongoSchemas";
+import { constructSchema } from "combined-validator/dist/mongo";
 import { users as usersPublic, organisations as orgPublic, listings as listingPublic } from "../config/shared/publicFieldConstants"
 import { users as usersPrivate, organisations as orgPrivate, listings as listingPrivate } from "../config/server/privateFieldConstants"
 
