@@ -12,7 +12,7 @@
   "dependencies": {
     "@hapi/iron": "^6.0.0",
     "bcrypt": "^5.0.1",
-    "combined-validator": "^0.0.7",
+    "combined-validator": "^0.0.12",
     "cookie": "^0.4.1",
     "dotenv": "^10.0.0",
     "mongoose": "^5.13.3",

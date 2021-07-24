@@ -1,4 +1,4 @@
-import { FieldConstraintsCollection } from "./FieldTypes"
+import { FieldConstraintsCollection } from "combined-validator";
 
 export const users: FieldConstraintsCollection = {
     required: {
