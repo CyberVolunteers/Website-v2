@@ -1,4 +1,5 @@
 import { NextApiRequest, NextApiResponse } from "next";
+import getRawBody from "raw-body";
 import { sanitiseForMongo } from "./security";
 
 type SupportedMethods = "GET" | "POST";
@@ -16,16 +17,8 @@ type ExtendedNextApiResponse = NextApiResponse & {
 
 }
 
-let hasFrozenPrototype = false;
-export function freezeProto() {
-    if (!hasFrozenPrototype) Object.freeze(Object.prototype) // prevent prototype pollution
-    hasFrozenPrototype = true;
-}
-
 export function createHandler(handlers: HandlerCollection) {
     return async (req: NextApiRequest, res: NextApiResponse) => {
-        freezeProto();
-
         function isSupportedType(method: string): method is SupportedMethods {
             return handlers.hasOwnProperty(method);
         }
@@ -50,10 +43,12 @@ export function createHandler(handlers: HandlerCollection) {
 
 async function sanitise(req: NextApiRequest, res: NextApiResponse) {
     // protect against prototype pollution
-    // await runMiddleware(req, res, filter({
-    //     urlMessage: "This request did not pass our requirements. Please enter different data",
-    //     bodyMessage: "This request did not pass our requirements. Please enter different data"
-    // }))
+    if (req.body !== undefined) throw new Error(`You did not disable the body-parser. For extra security, please do so by including 'export * from "../../lib/defaultEndpointConfig"' in your endpoint`)
+
+    req.body = await (await getRawBody(req)).toString()
+
+    // todo: do the same for the query
+
     req.query = sanitiseForMongo(req.query)
     req.body = sanitiseForMongo(req.body)
 }
@@ -63,19 +58,3 @@ function extendReqRes(req: NextApiRequest, res: NextApiResponse) {
     const newRes: ExtendedNextApiResponse = res;
     newReq.originalUrl = req.url;
 }
-
-
-// modified code, original: https://nextjs.org/docs/api-routes/api-middlewares
-// Helper method to wait for a middleware to execute before continuing
-// And to throw an error when an error happens in a middleware
-// function runMiddleware(req: NextApiRequest, res: NextApiResponse, fn: (req: NextApiRequest, res: NextApiResponse, next: (error?: any) => void) => void) {
-//     return new Promise((resolve, reject) => {
-//         fn(req, res, (result) => {
-//             if (result !== undefined) {
-//                 return resolve(result)
-//             }
-
-//             return reject(result)
-//         })
-//     })
-// }

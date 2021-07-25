@@ -2,17 +2,16 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
 import { login } from '../../services/auth/session';
-// import * as getRawBody from 'raw-body';
+import getRawBody from 'raw-body';
 
 type Data = {
   name: string
 }
 
-// export * from "../../lib/defaultEndpointConfig"
+export * from "../../lib/defaultEndpointConfig"
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-    // console.log(await getRawBody(req))
     // new Listing({
 
     // }).validate().catch(console.error)
