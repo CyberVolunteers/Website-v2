@@ -1,17 +1,19 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
+import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiRequests';
 import { login } from '../../services/auth/session';
-import getRawBody from 'raw-body';
+import loginSpec from "../../services/config/shared/endpointSpec/login"
+import { createAjvJTDSchema } from 'combined-validator';
+
+export * from "../../lib/defaultEndpointConfig"
 
 type Data = {
   name: string
 }
 
-export * from "../../lib/defaultEndpointConfig"
-
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
+    const parser = ajv.compileParser({})
     // new Listing({
 
     // }).validate().catch(console.error)
@@ -43,5 +45,7 @@ export default async function (
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  await createHandler(handlers)(req, res)
+  await createHandler(handlers, {
+    POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
+  })(req, res)
 }
