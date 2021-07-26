@@ -70,9 +70,9 @@ async function sanitise(req: NextApiRequest, res: NextApiResponse, parser: JTDPa
 
     req.body = parsed
     console.log(parsed)
-    //TODO: error out for undefined
     // todo: do the same for the query
 
+    // technically not needed, but here jusst in case someone allows all keys
     req.query = sanitiseForMongo(req.query)
     req.body = sanitiseForMongo(req.body)
 }

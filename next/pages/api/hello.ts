@@ -35,7 +35,8 @@ const handlers: HandlerCollection = {
 
     // console.log(req)
 
-    await login(req.body.email, "passwd");
+    const loginResult = await login(req.body.email, req.body.password);
+    console.log(loginResult)
 
     res.status(200).json({ name: 'John Doe' })
   }
