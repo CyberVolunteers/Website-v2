@@ -14,7 +14,7 @@ export async function getSession(req: NextApiRequest) {
     }
 }
 
-export const refreshSession = async function createSession(res: NextApiResponse, data: any) {
+export async function refreshSession(res: NextApiResponse, data: any) {
     const payload = await seal(data);
     const sessionCookie = serialize(sessionCookieName, payload, {
         maxAge: sessionCookieMaxAge,
@@ -46,4 +46,3 @@ export function removeSession(res: NextApiResponse) {
 
     res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie])
 }
-

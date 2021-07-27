@@ -1,9 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiRequests';
-import { login } from '../../services/auth/session';
-import loginSpec from "../../services/config/shared/endpointSpec/login"
+import { signupUser } from '../../services/auth/session';
 import { createAjvJTDSchema } from 'combined-validator';
+import { getSession, refreshSession } from '../../services/auth/auth-cookie';
+import { users } from '../../services/config/shared/publicFieldConstants';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -14,10 +15,15 @@ type Data = {
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
 
-    const loginResult = await login(req.body.email, req.body.password);
-    console.log(loginResult)
+    const session = await getSession(req)
 
-    res.status(200).json({ name: 'John Doe' })
+    if (session) return res.send("Already signed in");
+
+    const signupResult = await signupUser(req.body);
+
+    if (!signupResult) return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?")
+
+    return res.end()
   }
 }
 
@@ -26,14 +32,6 @@ export default async function (
   res: NextApiResponse<Data>
 ) {
   await createHandler(handlers, {
-    POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
-  }, {
-    POST: {
-      required: {
-        string: {
-          stuff: {}
-        }
-      }
-    }
+    POST: ajv.compileParser(createAjvJTDSchema(users))
   })(req, res)
 }

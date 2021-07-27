@@ -4,6 +4,7 @@ import { sanitiseForMongo } from "./security";
 import { FieldConstraintsCollection, extract, flatten } from "combined-validator"
 
 import Ajv, { JTDParser } from "ajv/dist/jtd"
+import { getMongo } from "../../services/mongo";
 export const ajv = new Ajv({
     strictRequired: true,
     allErrors: true,
@@ -50,6 +51,8 @@ export function createHandler(handlers: HandlerCollection, bodyParsers?: AjvPars
             const bodyParser = (bodyParsers as any)?.[method] as JTDParser<any> | undefined;
             const queryFieldRules = (queryRequiredFields as any)?.[method] as FieldConstraintsCollection | undefined;
             await sanitise(req, res, bodyParser, queryFieldRules);
+
+            await getMongo(); // connect if not connected
 
             // if sanitising rejected the headers
             if (res.headersSent) return;

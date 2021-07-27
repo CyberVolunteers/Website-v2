@@ -1,11 +1,7 @@
-import { verifyHash } from "./password"
+import { hash, verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
-import { copyMongoKeys, getMongo } from "../mongo";
-import { UserSchema } from "../mongo/mongoSchemas";
 
-export async function login(email: string, password: string) {
-    const mongo = await getMongo(); // connect
-
+export async function login({ email, password }: { email: string, password: string }) {
     // find instead of findOne to keep the time roughly constant relative to when there are no results
     const [users, organisations] = await Promise.all([
         User.find({ email }),
@@ -13,22 +9,34 @@ export async function login(email: string, password: string) {
     ])
 
     const emailWasFound = users.length !== 0 || organisations.length !== 0;
-    const doesEmailBelongToUser = users.length !== 0;
-    const storedCreds = emailWasFound ?
+    const doesEmailBelongToUser = emailWasFound && users.length !== 0;
+    const storedInfo = emailWasFound ?
         doesEmailBelongToUser ? users[0] : organisations[0]
         : {
-            passwordHash: "this should never match" // a dummy object for timing attacks
+            passwordHash: "this should never match" // a dummy "hash" against timing attacks
         }
 
-    const isCorrectHash = await verifyHash(password, storedCreds.passwordHash, (newHash) => {
+    console.log("storedCreds", storedInfo)
+    const isCorrectHash = await verifyHash(password, storedInfo.passwordHash, (newHash) => {
         const schema = doesEmailBelongToUser ? User : Org;
         schema.updateOne({ email }, { passwordHash: newHash })
     });
 
-    return isCorrectHash && emailWasFound;
+    return isCorrectHash && emailWasFound ? storedInfo : false;
 }
 
 export async function signupUser(params: any) {
-    // const newUser = new User(copyMongoKeys(UserSchema, params));
-    // await newUser.save();
+    const passwordHash = await hash(params.password);
+    delete params.password;
+    params.passwordHash = passwordHash;
+    console.log(params)
+    const newUser = new User(params);
+
+    try {
+        await newUser.save()
+    } catch (e) {
+        return false;
+    }
+
+    return true;
 }

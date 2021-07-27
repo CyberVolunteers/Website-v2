@@ -7,6 +7,7 @@ export async function hash(input: string) {
 }
 
 export async function verifyHash(inputHash: string, password: string, updateHashCallback: (newHash: string) => void) {
+    console.log("verifyHash", inputHash, password)
 
     const isCorrectHash = await compare(password, inputHash);
     if (!isCorrectHash) return false;

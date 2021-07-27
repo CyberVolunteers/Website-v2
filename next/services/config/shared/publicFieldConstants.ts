@@ -6,6 +6,7 @@ export const users: FieldConstraintsCollection = {
             firstName: { maxLength: 30 },
             lastName: { maxLength: 30 },
             email: { maxLength: 320 },
+            password: {},
             gender: { enum: ["M", "F", "O"] },
             city: { maxLength: 85 },
             country: { maxLength: 56 },

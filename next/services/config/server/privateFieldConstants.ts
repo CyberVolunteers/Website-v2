@@ -6,6 +6,8 @@ export const users: FieldConstraintsCollection = {
     required: {
         string: {
             email: { unique: true },
+            // @ts-ignore
+            password: undefined, // delete the password field from server-side usage
             passwordHash: { exactLength: 60 },
         },
     },
