@@ -13,27 +13,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-    const parser = ajv.compileParser({})
-    // new Listing({
-
-    // }).validate().catch(console.error)
-
-    // console.log(await User.find({}));
-    // console.log(await Org.find({}));
-    // console.log(await Listing.find({}));
-    // await User.create({
-    //   firstName: "J",
-    //   lastName: "D",
-    //   passwordHash: await hash("password"),
-    //   email: "email@email.com",
-    //   gender: "M",
-    //   city: "Moscow Moscow ta da da ta da ta da",
-    //   country: "Germany",
-    //   skillsAndInterests: "none",
-    //   birthDate: new Date()
-    // })
-
-    // console.log(req)
 
     const loginResult = await login(req.body.email, req.body.password);
     console.log(loginResult)
@@ -48,5 +27,13 @@ export default async function (
 ) {
   await createHandler(handlers, {
     POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
+  }, {
+    POST: {
+      required: {
+        string: {
+          stuff: {}
+        }
+      }
+    }
   })(req, res)
 }
