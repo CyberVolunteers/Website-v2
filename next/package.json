@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "@hapi/iron": "^6.0.0",
+    "@material-ui/icons": "^4.11.2",
     "ajv": "^8.6.2",
     "bcrypt": "^5.0.1",
     "combined-validator": "^0.2.1",

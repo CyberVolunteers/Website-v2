@@ -1,0 +1,129 @@
+.Home .top-area {
+  padding-top: 3rem;
+  padding-bottom: 1rem;
+  align-items: flex-start;
+}
+.Home .top-area > div:first-child {
+  width: 70%;
+}
+.Home .top-area > div:first-child small span {
+  color: #f85220;
+}
+.Home .top-area > div:first-child h1 {
+  font-size: 2.5rem;
+  font-weight: 500;
+}
+.Home .top-area > div:first-child p {
+  font-size: 17px;
+  line-height: 2rem;
+}
+.Home .top-area > div:last-child {
+  flex: 1;
+  justify-content: flex-end;
+}
+
+.Home .top-area > div:last-child > * + * {
+  margin-left: 2rem;
+}
+.Home .top-area > div:last-child a {
+  flex-direction: column;
+}
+.Home .top-area > div:last-child a:last-child p {
+  margin-top: 5px;
+}
+.Home .top-area > div:last-child a {
+  color: #000;
+}
+.Home .top-area > div:last-child a .MuiSvgIcon-root {
+  font-size: 30px;
+  color: #000;
+}
+.Home .top-area > div:last-child a img {
+  width: 30px;
+}
+
+@media screen and (max-width: 800px) {
+  .Home .top-area {
+    flex-direction: column;
+  }
+  .Home .top-area > div:first-child {
+    width: 100%;
+  }
+  .Home .top-area > div:last-child {
+    margin-top: 2rem;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .Home .top-area > div:first-child h1 {
+    font-size: 2rem;
+  }
+}
+
+/*cards*/
+.featured-card-wrapper {
+  padding: 2rem 4rem;
+  background-color: #efefef;
+  margin-top: 2rem;
+}
+.featured-card-wrapper > h1 {
+  font-size: 27px;
+}
+.featured-card-wrapper > h1,
+.featured-card-wrapper > p {
+  margin-bottom: 10px;
+  color: #484848;
+}
+
+.cards-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  grid-gap: 2rem;
+  padding: 4rem 0rem;
+}
+
+@media screen and (max-width: 1000px) {
+  .cards-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media screen and (max-width: 700px) {
+  .featured-card-wrapper {
+    padding: 2rem;
+    text-align: center;
+  }
+}
+@media screen and (max-width: 600px) {
+  .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media screen and (max-width: 500px) {
+  .featured-card-wrapper {
+    padding: 2rem 1rem;
+  }
+  .featured-card-wrapper > h1 {
+    font-size: 1.3rem;
+  }
+  .featured-card-wrapper > p {
+    font-size: 0.8rem;
+  }
+}
+
+/* pagination area */
+.pagination-area {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.pagination-area .arrow {
+  color: #f85220;
+}
+.pagination-area .pages span.select a {
+  color: #f85220;
+}
+.pagination-area .pages span a {
+  padding: 0rem 0.5rem;
+  display: inline-block;
+  color: #000;
+}
