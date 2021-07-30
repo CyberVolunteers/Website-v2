@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Card from '../components/Card'
 import FeaturedCard from '../components/FeaturedCard'
 import Pagination from '@material-ui/lab/Pagination';
@@ -12,24 +12,20 @@ import styles from '../styles/searchListings.module.css'
 function Home() {
     const listingsPerPage = 6;
 
-    const listings = [
-        {
-            title: "<title>",
+    const listings = [];
+
+    for (let i = 0; i < 7; i++) {
+        listings.push({
+            title: `<title> ${i}`,
             desc: "<desc>",
             charityName: "<charity name>",
             currentVolunteers: 4,
             requestedVolunteers: 10
-        },
-        {
-            title: "<title 2>",
-            desc: "<desc 2>",
-            charityName: "<charity name 2>",
-            currentVolunteers: 44,
-            requestedVolunteers: 100
-        }
-    ];
+        })
+    }
 
     const pagesNum = Math.ceil(listings.length / listingsPerPage);
+    const [listingsPage, setListingsPage] = useState(0)
 
     return (
         <div className={`${styles["Home"]}`}>
@@ -57,7 +53,7 @@ function Home() {
             <div className={`${styles["cards-grid"]} w-1000`}>
 
                 {
-                    listings.map(value => <Card img="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/4cef12842110eabb16e7f2d27acabe5b.jpg" listing={value} />)
+                    listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/4cef12842110eabb16e7f2d27acabe5b.jpg" listing={value} />)
                 }
             </div>
 
@@ -68,7 +64,8 @@ function Home() {
                 </div> */}
 
                 <div className={`${styles["pages"]}`}>
-                    <Pagination count={10} />
+                    {/* because they start with 1 for some reason */}
+                    <Pagination count={pagesNum} page={listingsPage + 1} onChange={(event, value) => setListingsPage(value - 1)} />
                     {/* <span className={`${styles["select"]}`}>
                         <Link href="/">
                             1
