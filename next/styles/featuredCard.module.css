@@ -26,12 +26,14 @@
 }
 
 .title {
-    color: #f85220;
+    /* color: #f85220; */
 }
 
-.subtitle {
+.charityName {
     color: rgb(156, 156, 156);
     font-weight: 400;
+
+    margin-top: 0.5rem;
 }
 
 .meter-total {
@@ -53,9 +55,9 @@
     top: 0;
 }
 
-.total-go {
+.volunteers-progress-bar {
     color: #f85220;
-    margin-top: 10px;
+    margin-top: 1rem;
     text-align: center;
     display: block;
 }
@@ -67,6 +69,8 @@
     padding: 1rem 2rem;
     font-size: 1rem;
     cursor: pointer;
+
+    margin-top: 2rem;
   }
 
 @media screen and (max-width: 700px) {

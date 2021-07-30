@@ -2,15 +2,17 @@ import React from 'react'
 
 import styles from "../styles/featuredCard.module.css"
 
-function FeaturedCard({ img, title, subtitle, desc, meternow, totalgo }) {
+function FeaturedCard({ img, listing }) {
+
+    const { title, charityName, desc, currentVolunteers, requestedVolunteers } = listing;
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
             {/* <img src="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/462293fd2c362d08699976464e326bf2.jpg" alt="" /> */}
             <img src={img} alt="" />
 
             <div className={`${styles["presentation"]}`}>
-                <h3>{title}</h3>
-                <h4>{subtitle}</h4>
+                <h3 className={`${styles["title"]}`}>{title}</h3>
+                <h4 className={`${styles["charityName"]}`}>{charityName}</h4>
 
                 <p className={`${styles["description"]}`}>
                     {desc}
@@ -19,14 +21,16 @@ function FeaturedCard({ img, title, subtitle, desc, meternow, totalgo }) {
                 </p>
 
                 <div className={`${styles["meter-total"]}`}>
-                    <div className={`${styles["meter"]}`}></div>
+                    <div className={`${styles["meter"]}`} style={{
+                        width: (currentVolunteers / requestedVolunteers) * 100 + "%"
+                    }}></div>
                 </div>
 
-                <span className={`${styles["total-go"]}`}>
-                    {totalgo}$ to go
+                <span className={`${styles["volunteers-progress-bar"]}`}>
+                    {currentVolunteers}/{requestedVolunteers} volunteers
                 </span>
 
-                <button className={`${styles["volunteer-now"]}`}>
+                <button className={`${styles["volunteer-now"]} w-100`}>
                     Volunteer Now
                 </button>
 

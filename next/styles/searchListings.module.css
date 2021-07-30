@@ -1,61 +1,68 @@
-.Home .top-area {
+ .top-area {
   padding-top: 3rem;
   padding-bottom: 1rem;
   align-items: flex-start;
 }
-.Home .top-area > div:first-child {
+ .top-area > div:first-child {
   width: 70%;
 }
-.Home .top-area > div:first-child small span {
+ .top-area > div:first-child small span {
   color: #f85220;
 }
-.Home .top-area > div:first-child h1 {
+ .top-area > div:first-child h1 {
   font-size: 2.5rem;
   font-weight: 500;
 }
-.Home .top-area > div:first-child p {
+ .top-area > div:first-child p {
   font-size: 17px;
   line-height: 2rem;
 }
-.Home .top-area > div:last-child {
+ .top-area > div:last-child {
   flex: 1;
   justify-content: flex-end;
 }
 
-.Home .top-area > div:last-child > * + * {
+ .top-area > div:last-child > * + * {
   margin-left: 2rem;
 }
-.Home .top-area > div:last-child a {
+ .top-area > div:last-child a {
   flex-direction: column;
 }
-.Home .top-area > div:last-child a:last-child p {
+ .top-area > div:last-child a:last-child p {
   margin-top: 5px;
 }
-.Home .top-area > div:last-child a {
+ .top-area > div:last-child a {
   color: #000;
 }
-.Home .top-area > div:last-child a .MuiSvgIcon-root {
+ .top-area > div:last-child a .MuiSvgIcon-root {
   font-size: 30px;
   color: #000;
 }
-.Home .top-area > div:last-child a img {
-  width: 30px;
+
+.icon{
+  width: 80%;
+  display: block;
+  margin: auto;
+}
+
+.right-side {
+  margin-left: auto;
 }
 
 @media screen and (max-width: 800px) {
-  .Home .top-area {
+   .top-area {
     flex-direction: column;
   }
-  .Home .top-area > div:first-child {
+   .top-area > div:first-child {
     width: 100%;
   }
-  .Home .top-area > div:last-child {
-    margin-top: 2rem;
+   .top-area > div:last-child {
+    margin-top: 1.5rem;
   }
 }
 
 @media screen and (max-width: 600px) {
-  .Home .top-area > div:first-child h1 {
+   .top-area > div:first-child h1 {
     font-size: 2rem;
   }
 }

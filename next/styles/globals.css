@@ -27,9 +27,6 @@ ul,
 nav {
   list-style: none;
 }
-.burger-icon {
-  display: none;
-}
 .dflex,
 .dflex-align-center,
 .dflex-justify-center {
@@ -47,4 +44,16 @@ nav {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+}
+
+.pointer{
+  cursor: pointer;
+}
+
+.m-auto{
+  margin:auto;
+}
+
+.w-100 {
+  width: 100%;
 }

@@ -1,95 +1,84 @@
-import React from 'react'
+import React, { useState } from 'react'
 import Link from 'next/link'
-import logo from '../public/img/logo.svg'
 import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
 
+import { useWindowSize } from '../lib/client/hooks';
+
 import styles from "../styles/header.module.css"
 
 function Header() {
+    const sidebarLimitWidth = 600;
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+    const [isSidebarUp, setisSidebarUp] = useState(false);
+
+    const windowSize = useWindowSize();
+
+    const signUpOrMyAccountEl = isLoggedIn ?
+        <li>
+            <Link href="/">My Account</Link>
+        </li>
+        :
+        <>
+            <li>
+                <Link href="/">Sign in</Link>
+            </li>
+            {
+                windowSize.width > sidebarLimitWidth || windowSize.width === undefined ? // only show it on the larger screens (the button on the bottom will be showed otherwise)
+                    <li>
+                        <Link href="/">Sign up</Link>
+                    </li>
+                    : null
+            }
+        </>
+
+
     return (
 
         <>
 
-            <aside className={`${styles["sidebar"]}`}>
-                <li>
-                    <Link href="/">
-                        Find a cause
-                    </Link>
+            {
+                isSidebarUp && windowSize.width <= sidebarLimitWidth ?
 
-                </li>
-                {/* <li>
-                    <Link>
-                        Find a Borrower
-                    </Link>
+                    <aside className={`${styles["sidebar"]}`}>
 
-                </li>
+                        {signUpOrMyAccountEl}
 
-                <li>
-                    <Link>
-                        About Us
-                    </Link>
 
-                </li>
-                <li>
-                    <Link>
-                        How Works
-                    </Link>
-                </li>
-                <li>
-                    <Link>
-                        Where Works
-                    </Link>
-                </li>
-                <li>
-                    <Link>
-                        impact
-                    </Link>
-                </li>
-                <li>
-                    <Link>
-                        Leadership
-                    </Link>
-                </li>
-                <li>
-                    <Link>
-                        Financing
-                    </Link>
-                </li>
-                <li>
-                    <Link>
-                        due diligence
-                    </Link>
-                </li> */}
+                        <li>
+                            <Link href="/">Volunteer</Link>
+                        </li>
 
-            </aside>
+                        <li>
+                            <Link href="/">
+                                About Us
+                            </Link>
+
+                        </li>
+                        <li>
+                            <Link href="/">
+                                Contact us
+                            </Link>
+                        </li>
+
+                    </aside>
+                    : null
+            }
 
             <header className={`${styles["Header"]}`}>
                 <div className={`${styles["header-content"]} w-1000 dflex-align-center`}>
-                    {/* <img src={logo} alt="" /> */}
+                    <Link href="/">
+                        <img className="pointer" src="/img/logo.svg" alt="" />
+                    </Link>
 
 
-                    <div className={`${styles["drop-down"]} ${styles["lend-wrapper"]}`}>
-                        <div className={`${styles["head"]} dflex-align-center`}>
-                            <p>Lend</p>
-                            <ArrowDropDownIcon />
-                        </div>
-                        <ul className={`${styles["body"]}`}>
-                            <li>
-                                <Link href="/">
-                                    Find a cause
-                                </Link>
-
-                            </li>
-                            <li>
-                                <Link href="/">
-                                    Find a Borrower
-                                </Link>
-
-                            </li>
-                        </ul>
-                    </div>
+                    <ul className="dflex-align-center">
+                        <li className={`${styles["head"]} dflex-align-center`}>
+                            <p>Volunteer</p>
+                        </li>
+                    </ul>
 
                     <form action="">
                         <div className={`${styles["input-wrapper"]} dflex-align-center`}>
@@ -99,12 +88,12 @@ function Header() {
                     </form>
 
                     <ul className="dflex-align-center">
-                        <li>
+                        {/* <li>
                             <Link href="/">
-                                Borrow
+                                Volunteer now
                             </Link>
-                        </li>
-                        <li className={`${styles["drop-down"]} ${styles["lend-wrapper"]} ${styles["about-wrapper"]}`}>
+                        </li> */}
+                        <li className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}>
                             <div className={`${styles["head"]} dflex-align-center`}>
                                 <p>About</p>
                                 <ArrowDropDownIcon />
@@ -118,45 +107,23 @@ function Header() {
                                 </li>
                                 <li>
                                     <Link href="/">
-                                        How Works
+                                        Contact us
                                     </Link>
                                 </li>
-                                <li>
-                                    <Link href="/">
-                                        Where Works
-                                    </Link>
-                                </li>
-                                {/* <li>
-                                    <Link>
-                                        impact
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link>
-                                        Leadership
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link>
-                                        Financing
-                                    </Link>
-                                </li>
-                                <li>
-                                    <Link>
-                                        due diligence
-                                    </Link>
-                                </li> */}
                             </ul>
                         </li>
 
-                        <li>
-                            <Link href="/">Sign in</Link>
-                        </li>
+                        {signUpOrMyAccountEl}
+                        {
+                            windowSize.width <= sidebarLimitWidth ?
+                                <li className={`${styles["bottomButton"]}`}>
+                                    <Link href="/">Sign in</Link>
+                                </li>
+                                : null
+                        }
                     </ul>
 
-                    <div className={`${styles["burger-icon"]}`} onClick={e => {
-                        document.querySelector(".sidebar").classList.toggle("active")
-                    }}>
+                    <div className={`${styles["burger-icon"]}`} onClick={e => setisSidebarUp(!isSidebarUp)}>
                         <MenuIcon />
                     </div>
                 </div>
