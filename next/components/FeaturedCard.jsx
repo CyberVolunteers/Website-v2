@@ -7,7 +7,6 @@ function FeaturedCard({ img, listing }) {
     const { title, charityName, desc, currentVolunteers, requestedVolunteers } = listing;
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
-            {/* <img src="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/462293fd2c362d08699976464e326bf2.jpg" alt="" /> */}
             <img src={img} alt="" />
 
             <div className={`${styles["presentation"]}`}>

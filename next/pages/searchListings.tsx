@@ -2,8 +2,6 @@ import React, { useState } from 'react'
 import Card from '../components/Card'
 import FeaturedCard from '../components/FeaturedCard'
 import Pagination from '@material-ui/lab/Pagination';
-import ArrowLeftIcon from '@material-ui/icons/ArrowLeft';
-import ArrowRightIcon from '@material-ui/icons/ArrowRight';
 import Footer from '../components/Footer'
 import Link from 'next/link'
 
@@ -59,42 +57,10 @@ function Home() {
 
 
             <div className={`${styles["pagination-area"]} w-1000`}>
-                {/* <div className={`${styles["left-arrow"]} ${styles["arrow"]}`}>
-                    <ArrowLeftIcon />
-                </div> */}
-
                 <div className={`${styles["pages"]}`}>
                     {/* because they start with 1 for some reason */}
                     <Pagination count={pagesNum} page={listingsPage + 1} onChange={(event, value) => setListingsPage(value - 1)} />
-                    {/* <span className={`${styles["select"]}`}>
-                        <Link href="/">
-                            1
-                        </Link>
-                    </span>
-                    <span>
-                        <Link href="/">
-                            2
-                        </Link>
-                    </span>
-                    <span>
-                        <Link href="/">
-                            3
-                        </Link>
-                    </span>
-
-                    <span>.</span>
-                    <span>.</span>
-                    <span>.</span>
-                    <span>
-                        <Link href="/">
-                            44
-                        </Link>
-                    </span> */}
                 </div>
-                {/* <div className={`${styles["right-arrow"]} ${styles["arrow"]}`}>
-                    <ArrowRightIcon />
-                </div> */}
-
             </div>
 
             <Footer />
