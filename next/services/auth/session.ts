@@ -16,7 +16,6 @@ export async function login({ email, password }: { email: string, password: stri
             passwordHash: "this should never match" // a dummy "hash" against timing attacks
         }
 
-    console.log("storedCreds", storedInfo)
     const isCorrectHash = await verifyHash(password, storedInfo.passwordHash, (newHash) => {
         const schema = doesEmailBelongToUser ? User : Org;
         schema.updateOne({ email }, { passwordHash: newHash })
@@ -29,7 +28,6 @@ export async function signupUser(params: any) {
     const passwordHash = await hash(params.password);
     delete params.password;
     params.passwordHash = passwordHash;
-    console.log(params)
     const newUser = new User(params);
 
     try {

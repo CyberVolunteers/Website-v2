@@ -9,7 +9,7 @@ export default function Home() {
 
 
     async function onSubmit() {
-        const response = await fetch("/api/hello?stuff=3&useless=4", {
+        const response = await fetch("/api/login", {
             method: "POST",
             credentials: "same-origin", // only send cookies for same-origin requests
             "headers": {
