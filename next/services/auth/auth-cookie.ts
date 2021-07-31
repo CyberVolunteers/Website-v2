@@ -2,8 +2,17 @@ import { seal, unseal } from "./iron"
 import { serialize, parse } from "cookie"
 import { NextApiRequest, NextApiResponse } from "next"
 import { isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName } from "../config/shared/config"
+import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../../lib/utils/apiRequests";
+import { deepAssign } from "combined-validator";
 
-export async function getSession(req: NextApiRequest) {
+export async function getSession(req: ExtendedNextApiRequest) {
+    if (req.session !== undefined) return req.session;
+
+    const out = req.session = await getSessionRaw(req);
+    return out;
+}
+
+async function getSessionRaw(req: ExtendedNextApiRequest) {
     const sessionCookie = req.cookies?.[sessionCookieName];
 
     if (sessionCookie === undefined) return null;
@@ -14,7 +23,15 @@ export async function getSession(req: NextApiRequest) {
     }
 }
 
-export async function refreshSession(res: NextApiResponse, data: any) {
+export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNextApiResponse, updateInstructions: any) {
+    const session = await getSession(req) ?? {};
+
+    const newData = deepAssign(session, updateInstructions);
+    await setSession(res, newData);
+    req.session = newData;
+}
+
+export async function setSession(res: NextApiResponse, data: any) {
     const payload = await seal(data);
     const sessionCookie = serialize(sessionCookieName, payload, {
         maxAge: sessionCookieMaxAge,
@@ -31,7 +48,6 @@ export async function refreshSession(res: NextApiResponse, data: any) {
         secure: true,
         path: "/"
     })
-
 
     res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie])
 }

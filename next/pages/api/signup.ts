@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiRequests';
 import { signupUser } from '../../services/auth/session';
 import { createAjvJTDSchema } from 'combined-validator';
-import { getSession, refreshSession } from '../../services/auth/auth-cookie';
+import { getSession, setSession } from '../../services/auth/auth-cookie';
 import { users } from '../../services/config/shared/publicFieldConstants';
 
 export * from "../../lib/defaultEndpointConfig"
@@ -31,7 +31,11 @@ export default async function (
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  await createHandler(handlers, {
-    POST: ajv.compileParser(createAjvJTDSchema(users))
-  })(req, res)
+  await createHandler(handlers,
+    {
+      useCsrf: true,
+    },
+    {
+      POST: ajv.compileParser(createAjvJTDSchema(users))
+    })(req, res)
 }

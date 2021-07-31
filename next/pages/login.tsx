@@ -1,18 +1,17 @@
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useState } from "react";
+import { csrfFetch } from "../lib/client/util";
+import { updateCsrf } from "../lib/utils/security";
 
-export default function Home() {
+export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-
-
-
-
     async function onSubmit() {
-        const response = await fetch("/api/login", {
+        const response = await csrfFetch(props, "/api/login", {
             method: "POST",
             credentials: "same-origin", // only send cookies for same-origin requests
-            "headers": {
+            headers: {
 
                 "content-type": "application/json",
                 "accept": "application/json",
@@ -22,6 +21,8 @@ export default function Home() {
                 password
             })
         });
+        const resText = await response?.text();
+
     }
 
     return <div>
@@ -40,4 +41,12 @@ export default function Home() {
 
         <button className="submit" type="submit" onClick={onSubmit}>Wow, i sure do trust this website!</button>
     </div>
+}
+
+export const getServerSideProps: GetServerSideProps = async (context) => {
+    return {
+        props: {
+            csrfToken: await updateCsrf(context)
+        }, // will be passed to the page component as props
+    }
 }

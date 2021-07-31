@@ -4,7 +4,7 @@ import { minBcryptRounds } from "../../services/config/server/password"
 import { expect } from "chai"
 import { mock, SinonSpy, spy, stub } from "sinon"
 import { seal, unseal } from "../../services/auth/iron"
-import { getSession, refreshSession, removeSession } from "../../services/auth/auth-cookie"
+import { getSession, setSession, removeSession } from "../../services/auth/auth-cookie"
 import { NextApiRequest, NextApiResponse } from "next"
 import { parse } from "cookie"
 import * as dotenv from "dotenv";
@@ -164,7 +164,7 @@ describe("auth-cookies.ts", function () {
 
         it("should set two cookies", async function () {
 
-            await refreshSession(resStub, "data");
+            await setSession(resStub, "data");
 
 
             expect(resSpy.called, "the callback must have been called").to.be.true;
@@ -174,7 +174,7 @@ describe("auth-cookies.ts", function () {
 
         it("should have correct cookie data", async function () {
             const dataToSeal = "some data"
-            await refreshSession(resStub, dataToSeal);
+            await setSession(resStub, dataToSeal);
 
             const cookieData = resSpy.args[0][1];
             const cookie1 = parse(cookieData[0]);
@@ -187,7 +187,7 @@ describe("auth-cookies.ts", function () {
         it("should set correct cookie options", async function () {
             const serialiseSpy = spy(cookie, "serialize");
 
-            await refreshSession(resStub, "some data");
+            await setSession(resStub, "some data");
 
             expect(serialiseSpy.calledTwice, "the cookie needs to be set twice").to.be.true;
 

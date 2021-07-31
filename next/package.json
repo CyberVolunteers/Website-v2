@@ -10,6 +10,7 @@
     "test": "nyc env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' ./node_modules/mocha/bin/mocha"
   },
   "dependencies": {
+    "@hapi/cryptiles": "^5.1.0",
     "@hapi/iron": "^6.0.0",
     "@material-ui/core": "^4.12.2",
     "@material-ui/icons": "^4.11.2",

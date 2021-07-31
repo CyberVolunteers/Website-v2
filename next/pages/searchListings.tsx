@@ -7,7 +7,7 @@ import Link from 'next/link'
 
 import styles from '../styles/searchListings.module.css'
 
-function Home() {
+export default function SearchListings() {
     const listingsPerPage = 6;
 
     const listings = [];
@@ -72,5 +72,3 @@ function Home() {
 
 
 }
-
-export default Home

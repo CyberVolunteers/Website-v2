@@ -4,7 +4,7 @@ import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiReques
 import { login } from '../../services/auth/session';
 import loginSpec from "../../services/config/shared/endpointSpec/login"
 import { createAjvJTDSchema } from 'combined-validator';
-import { getSession, refreshSession } from '../../services/auth/auth-cookie';
+import { getSession, setSession } from '../../services/auth/auth-cookie';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -17,13 +17,13 @@ const handlers: HandlerCollection = {
 
     const session = await getSession(req)
 
-    if (session) return res.send("Already signed in");
+    if (session?.email) return res.send("Already signed in");
 
     const loginResult = await login(req.body);
 
     if (!loginResult) return res.status(400).send("This email and password combination does not appear to be correct")
 
-    await refreshSession(res, loginResult) //TODO: add some data here
+    await setSession(res, loginResult) //TODO: add some data here
 
     return res.end()
   }
@@ -33,7 +33,11 @@ export default async function (
   req: NextApiRequest,
   res: NextApiResponse<Data>
 ) {
-  await createHandler(handlers, {
-    POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
-  })(req, res)
+  await createHandler(handlers,
+    {
+      useCsrf: true,
+    },
+    {
+      POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
+    })(req, res)
 }

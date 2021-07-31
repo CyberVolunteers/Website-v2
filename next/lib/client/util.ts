@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { isSessionActiveCookieName } from "../../services/config/shared/config"
+import { csrfHeaderName, csrfTokenVariableName, isSessionActiveCookieName } from "../../services/config/shared/config"
 
 export function checkIsLoggedIn() {
     if (isServer()) return false;
@@ -26,3 +26,10 @@ export function getCookie(name: string) {
 }
 
 function isServer() { return typeof window === "undefined" }
+
+export async function csrfFetch(props: any, url: string, settings: any) {
+    if (isServer()) return;
+    const csrfToken = props[csrfTokenVariableName];
+    settings.headers[csrfHeaderName] = csrfToken;
+    return await fetch(url, settings);
+}
