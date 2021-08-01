@@ -1,9 +1,24 @@
 import { seal, unseal } from "./iron"
-import { serialize, parse } from "cookie"
+import { serialize, parse, CookieSerializeOptions } from "cookie"
 import { NextApiRequest, NextApiResponse } from "next"
 import { isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName } from "../../config/shared/config"
 import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../../lib/utils/apiRequests";
 import { deepAssign } from "combined-validator";
+
+const sessionCookieOptions: CookieSerializeOptions = {
+    maxAge: sessionCookieMaxAge,
+    httpOnly: true, // stop the client from accessing the cookie
+    sameSite: "strict",
+    secure: true,
+    path: "/"
+}
+
+const isSessionActiveCookieOptions: CookieSerializeOptions = {
+    maxAge: sessionCookieMaxAge,
+    sameSite: "strict",
+    secure: true,
+    path: "/"
+}
 
 export async function getSession(req: ExtendedNextApiRequest) {
     if (req.session !== undefined) return req.session;
@@ -33,21 +48,10 @@ export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNe
 
 export async function setSession(res: NextApiResponse, data: any) {
     const payload = await seal(data);
-    const sessionCookie = serialize(sessionCookieName, payload, {
-        maxAge: sessionCookieMaxAge,
-        httpOnly: true, // stop the client from accessing the cookie
-        sameSite: "strict",
-        secure: true,
-        path: "/"
-    })
+    const sessionCookie = serialize(sessionCookieName, payload, sessionCookieOptions)
 
     // keep a cookie that tells the client that it is logged in
-    const isSessionActiveCookie = serialize(isSessionActiveCookieName, "true", {
-        maxAge: sessionCookieMaxAge,
-        sameSite: "strict",
-        secure: true,
-        path: "/"
-    })
+    const isSessionActiveCookie = serialize(isSessionActiveCookieName, "true", isSessionActiveCookieOptions)
 
     res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie])
 }
@@ -57,8 +61,8 @@ export function removeSession(res: NextApiResponse) {
         maxAge: -1,
         path: '/',
     }
-    const sessionCookie = serialize(sessionCookieName, '', emptyCookieSettings)
-    const isSessionActiveCookie = serialize(isSessionActiveCookieName, '', emptyCookieSettings)
+    const sessionCookie = serialize(sessionCookieName, '', Object.assign(sessionCookieOptions, emptyCookieSettings))
+    const isSessionActiveCookie = serialize(isSessionActiveCookieName, '', Object.assign(isSessionActiveCookieOptions, emptyCookieSettings))
 
     res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie])
 }

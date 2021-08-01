@@ -13,7 +13,7 @@ import { useEffect } from 'react';
 function Header() {
     const sidebarLimitWidth = 600;
     const [isLoggedIn, setIsLoggedIn] = useState(false); // start off false (default on the server) and then change if needed
-    useEffect(() => setIsLoggedIn(checkIsLoggedIn())); // change on any rerender
+    useEffect(() => setIsLoggedIn(checkIsLoggedIn()), []); // change on any rerender
 
     const [isSidebarUp, setisSidebarUp] = useState(false);
 

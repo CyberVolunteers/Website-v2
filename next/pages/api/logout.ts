@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
+import { removeSession } from '../../services/auth/auth-cookie';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -10,7 +11,7 @@ type Data = {
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-    console.log("logout");
+    await removeSession(res);
     return res.end()
   }
 }
