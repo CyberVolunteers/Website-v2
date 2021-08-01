@@ -50,6 +50,9 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
             return res.status(405).end(`Method ${req.method} Not Allowed`);
         }
 
+        // expect to use csrf at least with post
+        if (method === "POST" && !options.useCsrf) throw new Error("Make sure to use csrf tokens with post")
+
         try {
             extendReqRes(req, res);
 

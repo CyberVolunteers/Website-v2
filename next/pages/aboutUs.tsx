@@ -3,9 +3,9 @@ import { useState } from "react";
 import { csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
-export default function Home() {
+export default function AboutUs() {
     return <div>
-        <p>We are the Cybervolunteers and this is our home page</p>
+        <p>We are doing stuff</p>
 
         {/* Etc */}
     </div>

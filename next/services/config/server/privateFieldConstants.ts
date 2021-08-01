@@ -29,7 +29,7 @@ export const organisations: FieldConstraintsCollection = {
         },
         boolean: {
             isEmailVerified: { default: false },
-            isCharityVerified: { default: false }
+            isOrganisationVerified: { default: false }
         }
     }
 }

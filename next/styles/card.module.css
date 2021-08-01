@@ -25,7 +25,7 @@
  .bottom .title {
   color: #f85220;
 }
- .bottom .charityName {
+ .bottom .organisationName {
   color: rgb(156, 156, 156);
   font-weight: 400;
 
@@ -56,6 +56,7 @@
 }
 
 .volunteer-now {
+  width: 100%;
   background-color: #f85220;
   border: none;
   color: #fff;
@@ -69,10 +70,7 @@
   width: 100%;
   justify-content: space-between;
 }
- .submittion-area button,
- .submittion-area button {
-  width: 100%;
-}
+
   .submittion-area select {
   padding: 1rem 0.6rem;
   height: 100%;

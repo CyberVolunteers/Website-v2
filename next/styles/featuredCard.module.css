@@ -29,7 +29,7 @@
     /* color: #f85220; */
 }
 
-.charityName {
+.organisationName {
     color: rgb(156, 156, 156);
     font-weight: 400;
 
@@ -63,6 +63,9 @@
 }
  
 .volunteer-now {
+    width: 100%;
+    display: block;
+    text-align: center;
     background-color: #f85220;
     border: none;
     color: #fff;

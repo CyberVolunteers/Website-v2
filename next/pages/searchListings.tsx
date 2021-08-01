@@ -14,11 +14,12 @@ export default function SearchListings() {
 
     for (let i = 0; i < 7; i++) {
         listings.push({
+            uuid: "abcd-uuid-asafs",
             title: `<title> ${i}`,
             desc: "<desc>",
-            charityName: "<charity name>",
+            organisationName: "<org name>",
             currentVolunteers: 4,
-            requestedVolunteers: 10
+            requestedVolunteers: 10,
         })
     }
 
@@ -31,12 +32,10 @@ export default function SearchListings() {
             <div className={`${styles["top-area"]} dflex w-1000`}>
                 <span className="w-100 dflex-align-center">
                     <h1>Volunteer now</h1>
-                    <Link href="/">
-                        <span className={`${styles["right-side"]}`}>
-                            <img className={`${styles["icon"]}`} src="/img/filter.svg" />
-                            <p>Filter</p>
-                        </span>
-                    </Link>
+                    <span className={`${styles["right-side"]}`}>
+                        <img className={`${styles["icon"]}`} src="/img/filter.svg" />
+                        <p>Filter</p>
+                    </span>
                 </span>
             </div >
 
@@ -62,13 +61,6 @@ export default function SearchListings() {
                     <Pagination count={pagesNum} page={listingsPage + 1} onChange={(event, value) => setListingsPage(value - 1)} />
                 </div>
             </div>
-
-            <Footer />
         </div >
     )
-
-
-
-
-
 }

@@ -21,17 +21,35 @@ function Header() {
 
     const signUpOrMyAccountEl = isLoggedIn ?
         <li>
-            <Link href="/">My Account</Link>
+            <Link href="/myAccount" passHref>
+                <a>
+                    <p>
+                        My Account
+                    </p>
+                </a>
+            </Link>
         </li>
         :
         <>
             <li>
-                <Link href="/">Sign in</Link>
+                <Link href="/login" passHref>
+                    <a>
+                        <p>
+                            Sign in
+                        </p>
+                    </a>
+                </Link>
             </li>
             {
                 windowSize.width > sidebarLimitWidth || windowSize.width === undefined ? // only show it on the larger screens (the button on the bottom will be showed otherwise)
                     <li>
-                        <Link href="/">Sign up</Link>
+                        <Link href="/signupSelect" passHref>
+                            <a>
+                                <p>
+                                    Sign up
+                                </p>
+                            </a>
+                        </Link>
                     </li>
                     : null
             }
@@ -51,18 +69,32 @@ function Header() {
 
 
                         <li>
-                            <Link href="/">Volunteer</Link>
+                            <Link href="/searchListings" passHref>
+                                <a>
+                                    <p>
+                                        Volunteer
+                                    </p>
+                                </a>
+                            </Link>
                         </li>
 
                         <li>
-                            <Link href="/">
-                                About Us
+                            <Link href="/aboutUs" passHref>
+                                <a>
+                                    <p>
+                                        About Us
+                                    </p>
+                                </a>
                             </Link>
 
                         </li>
                         <li>
-                            <Link href="/">
-                                Contact us
+                            <Link href="/contactUs" passHref>
+                                <a>
+                                    <p>
+                                        Contact us
+                                    </p>
+                                </a>
                             </Link>
                         </li>
 
@@ -72,14 +104,22 @@ function Header() {
 
             <header className={`${styles["Header"]}`}>
                 <div className={`${styles["header-content"]} w-1000 dflex-align-center`}>
-                    <Link href="/">
-                        <img className="pointer" src="/img/logo.svg" alt="" />
+                    <Link href="/" passHref>
+                        <a>
+                            <img className="pointer" src="/img/logo.svg" alt="" />
+                        </a>
                     </Link>
 
 
                     <ul className="dflex-align-center">
                         <li className={`${styles["head"]} dflex-align-center`}>
-                            <p>Volunteer</p>
+                            <Link href="/searchListings" passHref>
+                                <a>
+                                    <p>
+                                        Volunteer
+                                    </p>
+                                </a>
+                            </Link>
                         </li>
                     </ul>
 
@@ -91,11 +131,6 @@ function Header() {
                     </form>
 
                     <ul className="dflex-align-center">
-                        {/* <li>
-                            <Link href="/">
-                                Volunteer now
-                            </Link>
-                        </li> */}
                         <li className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}>
                             <div className={`${styles["head"]} dflex-align-center`}>
                                 <p>About</p>
@@ -103,14 +138,22 @@ function Header() {
                             </div>
                             <ul className={`${styles["body"]}`}>
                                 <li>
-                                    <Link href="/">
-                                        About Us
+                                    <Link href="/aboutUs" passHref>
+                                        <a>
+                                            <p>
+                                                About Us
+                                            </p>
+                                        </a>
                                     </Link>
 
                                 </li>
                                 <li>
-                                    <Link href="/">
-                                        Contact us
+                                    <Link href="/contactUs" passHref>
+                                        <a>
+                                            <p>
+                                                Contact us
+                                            </p>
+                                        </a>
                                     </Link>
                                 </li>
                             </ul>
@@ -120,7 +163,13 @@ function Header() {
                         {
                             windowSize.width <= sidebarLimitWidth ?
                                 <li className={`${styles["bottomButton"]}`}>
-                                    <Link href="/">Sign in</Link>
+                                    <Link href="/login" passHref>
+                                        <a>
+                                            <p>
+                                                Sign in
+                                            </p>
+                                        </a>
+                                    </Link>
                                 </li>
                                 : null
                         }

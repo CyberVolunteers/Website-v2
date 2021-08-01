@@ -3,7 +3,7 @@ import { useState } from "react";
 import { csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
-export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function OrganisationSignup(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
@@ -22,22 +22,22 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
             })
         });
         const resText = await response?.text();
-
     }
 
     return <div>
-        Hello and welcome to my secure website
-        <br />
+        <p>Hello and welcome to my secure website</p>
 
-        <label htmlFor="email">Email</label>
-        <input type="email" className="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+        <p>
+            <label htmlFor="email">Email</label>
+            <input type="email" className="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
+        </p>
 
-        <br />
+        <p>
+            <label htmlFor="pwd">Password</label>
+            <input className="pwd" name="pwd" value={password} onChange={(e) => setPassword(e.target.value)}></input>
+        </p>
 
-        <label htmlFor="pwd">Password</label>
-        <input className="pwd" name="pwd" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-
-        <br />
+        {/* Etc */}
 
         <button className="submit" type="submit" onClick={onSubmit}>Wow, i sure do trust this website!</button>
     </div>

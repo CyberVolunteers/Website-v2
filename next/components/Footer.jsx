@@ -12,8 +12,12 @@ function Footer() {
                         Volunteer
                     </li>
                     <li>
-                        <Link href="/">
-                            Volunteer now
+                        <Link href="/searchListings" passHref>
+                            <a>
+                                <p>
+                                    Volunteer now
+                                </p>
+                            </a>
                         </Link>
                     </li>
                 </ul>
@@ -23,16 +27,22 @@ function Footer() {
                         More about us
                     </li>
                     <li>
-                        <Link href="/">
-
-                            About us
+                        <Link href="/aboutUs" passHref>
+                            <a>
+                                <p>
+                                    About us
+                                </p>
+                            </a>
 
                         </Link>
                     </li>
                     <li>
-                        <Link href="/">
-
-                            Contact us
+                        <Link href="/contactUs" passHref>
+                            <a>
+                                <p>
+                                    Contact us
+                                </p>
+                            </a>
 
                         </Link>
                     </li>
@@ -43,23 +53,39 @@ function Footer() {
                         Account management
                     </li>
                     <li>
-                        <Link href="/">
-                            Sign in
+                        <Link href="/login" passHref>
+                            <a>
+                                <p>
+                                    Sign in
+                                </p>
+                            </a>
                         </Link>
                     </li>
                     <li>
-                        <Link href="/">
-                            Sign up
+                        <Link href="/signupSelect" passHref>
+                            <a>
+                                <p>
+                                    Sign up
+                                </p>
+                            </a>
                         </Link>
                     </li>
                     <li>
-                        <Link href="/">
-                            My account
+                        <Link href="/myAccount" passHref>
+                            <a>
+                                <p>
+                                    My account
+                                </p>
+                            </a>
                         </Link>
                     </li>
                     <li>
-                        <Link href="/">
-                            Log out
+                        <Link href="/logout" passHref>
+                            <a>
+                                <p>
+                                    Log out
+                                </p>
+                            </a>
                         </Link>
                     </li>
                 </ul>
@@ -69,8 +95,12 @@ function Footer() {
                         Explore
                     </li>
                     <li>
-                        <Link href="/">
-                            Search listings
+                        <Link href="/searchListings" passHref>
+                            <a>
+                                <p>
+                                    Search listings
+                                </p>
+                            </a>
                         </Link>
                     </li>
                 </ul>

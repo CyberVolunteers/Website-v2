@@ -2,7 +2,7 @@
   background-color: #f8f9fa;
 }
 
- .header-content > img {
+ .header-content > a, .header-content > img {
   width: 200px;
 }
 
