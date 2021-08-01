@@ -3,12 +3,16 @@ import { useState } from "react";
 import { csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
-export default function OrganisationSignup(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+import { organisations as organisationsFieldSpec } from "../config/shared/publicFieldConstants"
+import { flatten } from "combined-validator";
+
+
+export default function OrganisationSignup({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     async function onSubmit() {
-        const response = await csrfFetch(props, "/api/login", {
+        const response = await csrfFetch(csrfToken, "/api/login", {
             method: "POST",
             credentials: "same-origin", // only send cookies for same-origin requests
             headers: {
@@ -46,7 +50,8 @@ export default function OrganisationSignup(props: InferGetServerSidePropsType<ty
 export const getServerSideProps: GetServerSideProps = async (context) => {
     return {
         props: {
-            csrfToken: await updateCsrf(context)
+            csrfToken: await updateCsrf(context),
+            signupFields: flatten(organisationsFieldSpec),
         }, // will be passed to the page component as props
     }
 }

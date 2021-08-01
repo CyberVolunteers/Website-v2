@@ -7,8 +7,8 @@ import { fixedTimeComparison } from "@hapi/cryptiles"
 import Ajv, { JTDParser } from "ajv/dist/jtd"
 import { getMongo } from "../../services/mongo";
 import { getSession, updateSession } from "../../services/auth/auth-cookie";
-import { csrfTokenLength, csrfTokenName } from "../../services/config/server/sentMetadata";
-import { csrfHeaderName } from "../../services/config/shared/config"
+import { csrfTokenLength, csrfTokenName } from "../../config/server/sentMetadata";
+import { csrfHeaderName } from "../../config/shared/config"
 export const ajv = new Ajv({
     strictRequired: true,
     allErrors: true,
@@ -87,7 +87,6 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
 async function sanitise(req: NextApiRequest, res: NextApiResponse, bodyParser: JTDParser<any> | undefined, queryFieldRules: FieldConstraintsCollection | undefined) {
     // protect against prototype pollution - force a more strict parser
     if (req.body !== undefined) throw new Error(`You did not disable the body-parser. For extra security, please do so by including 'export * from "../../lib/defaultEndpointConfig"' in your endpoint`)
-
 
     req.body = await (await getRawBody(req)).toString()
     req.body = bodyParser ? bodyParser(req.body) : null;

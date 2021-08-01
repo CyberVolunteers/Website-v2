@@ -4,7 +4,7 @@ import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiReques
 import { signupUser } from '../../services/auth/session';
 import { createAjvJTDSchema } from 'combined-validator';
 import { getSession, setSession } from '../../services/auth/auth-cookie';
-import { users } from '../../services/config/shared/publicFieldConstants';
+import { users } from '../../config/shared/publicFieldConstants';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -14,10 +14,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-
-    const session = await getSession(req)
-
-    if (session) return res.send("Already signed in");
 
     const signupResult = await signupUser(req.body);
 

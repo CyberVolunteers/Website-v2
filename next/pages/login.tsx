@@ -3,12 +3,12 @@ import { useState } from "react";
 import { csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
-export default function Login(props: InferGetServerSidePropsType<typeof getServerSideProps>) {
+export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
     async function onSubmit() {
-        const response = await csrfFetch(props, "/api/login", {
+        const response = await csrfFetch(csrfToken, "/api/login", {
             method: "POST",
             credentials: "same-origin", // only send cookies for same-origin requests
             headers: {
@@ -22,7 +22,7 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
             })
         });
         const resText = await response?.text();
-
+        console.log(resText);
     }
 
     return <div>
@@ -43,7 +43,9 @@ export default function Login(props: InferGetServerSidePropsType<typeof getServe
     </div>
 }
 
-export const getServerSideProps: GetServerSideProps = async (context) => {
+export const getServerSideProps: GetServerSideProps<{
+    csrfToken: string,
+}> = async (context) => {
     return {
         props: {
             csrfToken: await updateCsrf(context)

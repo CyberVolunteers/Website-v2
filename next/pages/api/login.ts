@@ -2,7 +2,7 @@
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiRequests';
 import { login } from '../../services/auth/session';
-import loginSpec from "../../services/config/shared/endpointSpec/login"
+import loginSpec from "../../config/shared/endpointSpec/login"
 import { createAjvJTDSchema } from 'combined-validator';
 import { getSession, setSession } from '../../services/auth/auth-cookie';
 

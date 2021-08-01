@@ -1,7 +1,7 @@
 import { randomBytes } from "crypto";
 import { GetServerSidePropsContext } from "next";
 import { updateSession } from "../../services/auth/auth-cookie";
-import { csrfTokenLength, csrfTokenName } from "../../services/config/server/sentMetadata";
+import { csrfTokenLength, csrfTokenName } from "../../config/server/sentMetadata";
 
 export function mergeWithCallback<T>(val: T, callback: (k: string, v: T) => [k: string, v: T]) {
     if ((val as any).constructor?.name !== "object" && !Array.isArray(val)) return val // check if we want to recurse

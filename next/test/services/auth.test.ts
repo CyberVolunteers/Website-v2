@@ -1,6 +1,6 @@
 import { hash, verifyHash } from "../../services/auth/password"
 import bcrypt from "bcrypt"
-import { minBcryptRounds } from "../../services/config/server/password"
+import { minBcryptRounds } from "../../config/server/password"
 import { expect } from "chai"
 import { mock, SinonSpy, spy, stub } from "sinon"
 import { seal, unseal } from "../../services/auth/iron"
@@ -8,7 +8,7 @@ import { getSession, setSession, removeSession } from "../../services/auth/auth-
 import { NextApiRequest, NextApiResponse } from "next"
 import { parse } from "cookie"
 import * as dotenv from "dotenv";
-import { sessionCookieMaxAge } from "../../services/config/shared/config"
+import { sessionCookieMaxAge } from "../../config/shared/config"
 
 const cookie = require("cookie")
 

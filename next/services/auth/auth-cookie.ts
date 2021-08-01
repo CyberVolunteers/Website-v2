@@ -1,7 +1,7 @@
 import { seal, unseal } from "./iron"
 import { serialize, parse } from "cookie"
 import { NextApiRequest, NextApiResponse } from "next"
-import { isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName } from "../config/shared/config"
+import { isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName } from "../../config/shared/config"
 import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../../lib/utils/apiRequests";
 import { deepAssign } from "combined-validator";
 

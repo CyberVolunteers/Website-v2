@@ -33,6 +33,7 @@ export async function signupUser(params: any) {
     try {
         await newUser.save()
     } catch (e) {
+        console.error(e);
         return false;
     }
 

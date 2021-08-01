@@ -1,5 +1,4 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useState } from "react";
 import { csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
