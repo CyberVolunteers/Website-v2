@@ -4,7 +4,7 @@ import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiReques
 // import { signupUser } from '../../services/auth/session';
 import { createAjvJTDSchema } from 'combined-validator';
 // import { getSession, setSession } from '../../services/auth/auth-cookie';
-import { users } from '../../config/shared/publicFieldConstants';
+import { organisations } from '../../config/shared/publicFieldConstants';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -32,6 +32,6 @@ export default async function (
       useCsrf: true,
     },
     {
-      POST: ajv.compileParser(createAjvJTDSchema(users))
+      POST: ajv.compileParser(createAjvJTDSchema(organisations))
     })(req, res)
 }

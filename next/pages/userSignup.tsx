@@ -1,9 +1,9 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { createRef, FormEvent, useState } from "react";
-import { csrfFetch, getCorrectInput as genInputElement, undoCamelCase, validateClient } from "../lib/client/util";
+import { csrfFetch, genInputElement, undoCamelCase, extractAndValidateFormData } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 import { users as userFieldSpec } from "../config/shared/publicFieldConstants"
-import { flatten, Flattened, FlattenedValue } from "combined-validator";
+import { flatten, Flattened } from "combined-validator";
 import { capitalize } from "@material-ui/core";
 import { RefObject } from "react";
 
@@ -25,9 +25,9 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
         evt.preventDefault();
         formRef.current?.checkValidity();
 
-        const [errors, cleanedData] = validateClient(formStates, signupFields);
+        const [errors, cleanedData] = extractAndValidateFormData(formStates, signupFields);
         if (errors.length !== 0) return setFormErrors(errors)
-        setFormErrors([]);
+        setFormErrors([]); // delete them again
 
         const response = await csrfFetch(csrfToken, "/api/signupUser", {
             method: "POST",

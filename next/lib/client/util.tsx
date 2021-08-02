@@ -39,7 +39,7 @@ export function undoCamelCase(s: string) {
     return s.replace(/([A-Z])/g, ' $1').toLowerCase();
 }
 
-export function getCorrectInput(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any) {
+export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any) {
     const inputType = flattenedValue.type;
     if (typeof inputType !== "string") return <p>To be implemented</p>
 
@@ -64,15 +64,16 @@ export function getCorrectInput(name: string, flattenedValue: FlattenedValue, fo
             break;
 
         case "number":
-            return <input type="number" className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)}></input>
+            newProps.type = "number"
+            break;
 
         case "date":
-
-            return <input type="date" className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)}></input>
+            newProps.type = "date"
+            break;
 
         case "boolean":
-            return <input placeholder="WORK IN PROGRESS" type="text" className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)}></input>
-
+            newProps.placeholder = "WORK IN PROGRESS";
+            newProps.type = "text"
         default:
             break;
     }
@@ -84,7 +85,7 @@ export type ValidateClientResult = [Error[], {
     [key: string]: any
 }]
 
-export function validateClient(formStates: any, fieldStructure: Flattened): ValidateClientResult {
+export function extractAndValidateFormData(formStates: any, fieldStructure: Flattened): ValidateClientResult {
     const errors: Error[] = [];
     const cleanedData = Object.fromEntries(Object.entries(formStates).filter(([k, v]) => v !== "")) // exclude optional stuff
 
