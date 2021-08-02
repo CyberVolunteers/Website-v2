@@ -31,6 +31,7 @@ export const organisations: FieldConstraintsCollection = {
     required: {
         string: {
             email: { maxLength: 320 },
+            password: {},
             orgType: { maxLength: 60 },
             orgName: { maxLength: 150 },
             orgDesc: { maxLength: 5000 },

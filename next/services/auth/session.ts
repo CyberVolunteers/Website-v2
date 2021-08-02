@@ -31,6 +31,7 @@ export async function signupUser(params: any) {
     const newUser = new User(params);
 
     try {
+        if (await isEmailFree(params.email) === false) throw new Error("This email is already used")
         await newUser.save()
     } catch (e) {
         console.error(e);
@@ -38,4 +39,41 @@ export async function signupUser(params: any) {
     }
 
     return true;
+}
+
+export async function signupOrg(params: any) {
+    const passwordHash = await hash(params.password);
+    delete params.password;
+    params.passwordHash = passwordHash;
+    const newUser = new Org(params);
+
+    try {
+        if (await isEmailFree(params.email) === false) throw new Error("This email is already used")
+        await newUser.save()
+    } catch (e) {
+        console.error(e);
+        return false;
+    }
+
+    return true;
+}
+
+export async function isEmailFree(email: string) {
+    // parallelise to make it as quick as possible
+
+    async function failOnNoElements(p: Promise<any>) {
+        const res = (await p);
+        if (res === null) throw new Error("Email not found");
+        return true;
+    }
+
+    try {
+        await Promise.any([
+            failOnNoElements(User.findOne({ email })),
+            failOnNoElements(Org.findOne({ email }))
+        ])
+        return false;
+    } catch {
+        return true;
+    }
 }

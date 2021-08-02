@@ -1,10 +1,10 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
 import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiRequests';
+import { login } from '../../services/auth/session';
+import loginSpec from "../../config/shared/endpointSpec/login"
 import { createAjvJTDSchema } from 'combined-validator';
-// import { getSession, setSession } from '../../services/auth/auth-cookie';
-import { organisations } from '../../config/shared/publicFieldConstants';
-import { signupOrg } from '../../services/auth/session';
+import { getSession, setSession } from '../../services/auth/auth-cookie';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -15,9 +15,15 @@ type Data = {
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
 
-    const signupResult = await signupOrg(req.body);
+    const session = await getSession(req)
 
-    if (!signupResult) return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?")
+    if (session?.email) return res.send("Already signed in");
+
+    const loginResult = await login(req.body);
+
+    if (!loginResult) return res.status(400).send("This email and password combination does not appear to be correct")
+
+    await setSession(res, loginResult) //TODO: add some data here
 
     return res.end()
   }
@@ -32,6 +38,6 @@ export default async function (
       useCsrf: true,
     },
     {
-      POST: ajv.compileParser(createAjvJTDSchema(organisations))
+      POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
     })(req, res)
 }
