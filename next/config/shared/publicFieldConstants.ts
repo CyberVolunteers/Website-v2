@@ -19,10 +19,11 @@ export const users: FieldConstraintsCollection = {
     },
     optional: {
         string: {
-            nationality: { maxLength: 60, lazyFill: true },
-            phoneNumber: { maxLength: 16, lazyFill: true },
+            nationality: { maxLength: 60, },
         },
-
+        number: {
+            phoneNumber: {},
+        }
     },
 };
 
@@ -35,8 +36,10 @@ export const organisations: FieldConstraintsCollection = {
             orgType: { maxLength: 60 },
             orgName: { maxLength: 150 },
             orgDesc: { maxLength: 5000 },
-            phoneNumber: { maxLength: 16 },
             orgLocation: { maxLength: 150 }
+        },
+        number: {
+            phoneNumber: {},
         }
     },
     optional: {

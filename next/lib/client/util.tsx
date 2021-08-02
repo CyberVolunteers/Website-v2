@@ -64,7 +64,9 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
             break;
 
         case "number":
-            newProps.type = "number"
+            newProps.type = "text"
+            newProps.pattern = "[0-9]*"
+            newProps.title = "Please enter a number"
             break;
 
         case "date":
@@ -91,6 +93,8 @@ export function extractAndValidateFormData(formStates: any, fieldStructure: Flat
 
     // convert all dates to iso
     Object.entries(fieldStructure).filter(([k, v]) => v.type === "date").forEach(([k, v]) => cleanedData[k] = new Date(cleanedData[k] as string).toISOString())
+    // convert all number strings to numbers
+    Object.entries(fieldStructure).filter(([k, v]) => v.type === "number").forEach(([k, v]) => cleanedData[k] = new Number(cleanedData[k] as string))
 
     // enums
     // in the future, can be placed in a loop going over all value_name: predicate pairs

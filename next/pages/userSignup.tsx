@@ -1,5 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { createRef, FormEvent, useState } from "react";
+import { createRef, FormEvent, useEffect, useState } from "react";
 import { csrfFetch, genInputElement, undoCamelCase, extractAndValidateFormData } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 import { users as userFieldSpec } from "../config/shared/publicFieldConstants"
@@ -21,11 +21,31 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
         formStateSetters[k] = stateSetter
     })
 
+    const [showEmailUnavailableWarning, setShowEmailUnavailableWarning] = useState(false);
+    useEffect(() => {
+        console.log("update");
+        (async () => {
+            const res = await fetch("/api/isEmailFree?" +
+                new URLSearchParams({ email: formStates.email }), {
+                method: "GET",
+                credentials: "same-origin", // only send cookies for same-origin requests
+                headers: {
+                    "content-type": "application/json",
+                    "accept": "application/json",
+                },
+            })
+            setShowEmailUnavailableWarning(await res.json() !== true); // fail-safe - if something goes wrong, it shows the warning
+        })()
+    }, [formStates.email])
+
     async function onSubmit(evt: FormEvent<HTMLFormElement>) {
         evt.preventDefault();
         formRef.current?.checkValidity();
 
         const [errors, cleanedData] = extractAndValidateFormData(formStates, signupFields);
+
+        if (showEmailUnavailableWarning) errors.push(new Error("This email is already used"));
+
         if (errors.length !== 0) return setFormErrors(errors)
         setFormErrors([]); // delete them again
 
@@ -69,6 +89,11 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
                     return <p key={index}>
                         <label htmlFor={k}>{capitalize(undoCamelCase(k))} {v.required ? "(required)" : null}</label>
                         {genInputElement(k, v, formStates, formStateSetters)}
+                        {
+                            k === "email" && showEmailUnavailableWarning ?
+                                <span>This email isn't available</span>
+                                : null
+                        }
                     </p>
                 })
             }
