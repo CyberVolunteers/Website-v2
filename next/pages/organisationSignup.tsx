@@ -36,6 +36,9 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
                     "accept": "application/json",
                 },
             })
+
+            if (res.status !== 200) return setFormErrors([new Error(await res?.text())]);
+
             setShowEmailUnavailableWarning(await res.json() !== true); // fail-safe - if something goes wrong, it shows the warning
         })()
     }, [formStates.email])
@@ -51,7 +54,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
         if (errors.length !== 0) return setFormErrors(errors)
         setFormErrors([]); // delete them again
 
-        const response = await csrfFetch(csrfToken, "/api/signupOrg", {
+        const res = await csrfFetch(csrfToken, "/api/signupOrg", {
             method: "POST",
             credentials: "same-origin", // only send cookies for same-origin requests
             headers: {
@@ -61,7 +64,9 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
             },
             body: JSON.stringify(cleanedData)
         });
-        const resText = await response?.text();
+        if (res?.status !== 200) return setFormErrors([new Error(await res?.text())]);
+
+        const resText = await res?.text();
         console.log(cleanedData, resText)
     }
 

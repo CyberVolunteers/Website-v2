@@ -1,5 +1,6 @@
 import { capitalize } from "@material-ui/core";
 import { Flattened, FlattenedValue } from "combined-validator";
+import { ChangeEvent } from "react";
 import { useEffect } from "react";
 import { csrfHeaderName, isSessionActiveCookieName } from "../../config/shared/config"
 
@@ -65,8 +66,9 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
 
         case "number":
             newProps.type = "text"
-            newProps.pattern = "[0-9]*"
+            newProps.pattern = "\\d*"
             newProps.title = "Please enter a number"
+            newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => formStateSetters[name]?.(e.target.value.replace(/[^\d]/g, "")) // remove non-digits
             break;
 
         case "date":
@@ -80,7 +82,7 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
             break;
     }
 
-    return <input className={name} name={name} required={flattenedValue.required} {...newProps} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)} />;
+    return <input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)} {...newProps} />;
 }
 
 export type ValidateClientResult = [Error[], {
