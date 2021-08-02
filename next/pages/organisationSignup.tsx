@@ -8,12 +8,14 @@ import { flatten, Flattened } from "combined-validator";
 import { capitalize } from "@material-ui/core";
 import { useEffect } from "react";
 
+import isEmail from 'validator/lib/isEmail'
+
 
 export default function OrganisationSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const formStates: any = {}
     const formStateSetters: any = {}
 
-    const [formErrors, setFormErrors] = useState([] as Error[]);
+    const [formErrors, setFormErrors] = useState([] as string[]);
 
     const formRef: RefObject<HTMLFormElement> = createRef();
 
@@ -22,6 +24,30 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
         formStates[k] = state
         formStateSetters[k] = stateSetter
     })
+
+    const [perElementErrors, setPerElementErrors] = useState({} as {
+        [key: string]: string
+    })
+
+    function connectValidator(callback: (v: any) => boolean) {
+        return (k: string, v: any) => {
+            const hasPassed = callback(v);
+
+            if (!hasPassed) {
+                perElementErrors[k] = `Please enter a valid value for ${k}`
+            } else {
+                delete perElementErrors[k]
+            }
+
+            setPerElementErrors(perElementErrors);
+
+            return hasPassed
+        }
+    }
+
+    const validationCallbacks: { [k: string]: (k: string, v: any) => boolean } = {
+        email: connectValidator(isEmail)
+    }
 
     const [showEmailUnavailableWarning, setShowEmailUnavailableWarning] = useState(false);
     useEffect(() => {
@@ -37,7 +63,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
                 },
             })
 
-            if (res.status !== 200) return setFormErrors([new Error(await res?.text())]);
+            if (res.status !== 200) return setFormErrors([await res.text()]);
 
             setShowEmailUnavailableWarning(await res.json() !== true); // fail-safe - if something goes wrong, it shows the warning
         })()
@@ -47,9 +73,11 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
         evt.preventDefault();
         formRef.current?.checkValidity();
 
-        const [errors, cleanedData] = extractAndValidateFormData(formStates, signupFields);
+        const [errors, cleanedData] = extractAndValidateFormData(formStates, signupFields, {
+            // email: isEmail // technically not needed because of the html5 verification going on
+        });
 
-        if (showEmailUnavailableWarning) errors.push(new Error("This email is already used"));
+        if (showEmailUnavailableWarning) errors.push("This email is already used");
 
         if (errors.length !== 0) return setFormErrors(errors)
         setFormErrors([]); // delete them again
@@ -64,7 +92,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
             },
             body: JSON.stringify(cleanedData)
         });
-        if (res?.status !== 200) return setFormErrors([new Error(await res?.text())]);
+        if (res?.status !== 200) return setFormErrors([await res?.text() ?? "Something went wrong"]);
 
         const resText = await res?.text();
         console.log(cleanedData, resText)
@@ -81,7 +109,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
                         {
                             formErrors.map((e, index) => {
                                 return <p key={index}>
-                                    {e.message}
+                                    {e}
                                 </p>
                             })
                         }
@@ -95,11 +123,12 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
                 Object.entries(signupFields).map(([k, v], index) => {
                     return <p key={index}>
                         <label htmlFor={k}>{capitalize(undoCamelCase(k))} {v.required ? "(required)" : null}</label>
-                        {genInputElement(k, v, formStates, formStateSetters)}
+                        {genInputElement(k, v, formStates, formStateSetters, validationCallbacks[k])}
                         {
                             k === "email" && showEmailUnavailableWarning ?
                                 <span>This email isn't available</span>
-                                : null
+                                : perElementErrors[k] === undefined ? null :
+                                    <span>{perElementErrors[k]}</span>
                         }
                     </p>
                 })

@@ -40,12 +40,17 @@ export function undoCamelCase(s: string) {
     return s.replace(/([A-Z])/g, ' $1').toLowerCase();
 }
 
-export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any) {
+export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any, validationCallback?: (k: string, v: any) => void) {
     const inputType = flattenedValue.type;
     if (typeof inputType !== "string") return <p>To be implemented</p>
 
+    function setValue(v: any) {
+        if (validationCallback !== undefined) validationCallback(name, v);
+        formStateSetters[name]?.(v)
+    }
+
     if (flattenedValue.enum !== undefined)
-        return <select className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)} >
+        return <select className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} >
             {
                 formStates[name] ? null : <option value="notSelected">Select:</option> // only show this if nothing else is selected
             }
@@ -68,7 +73,7 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
             newProps.type = "text"
             newProps.pattern = "\\d*"
             newProps.title = "Please enter a number"
-            newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => formStateSetters[name]?.(e.target.value.replace(/[^\d]/g, "")) // remove non-digits
+            newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d]/g, "")) // remove non-digits
             break;
 
         case "date":
@@ -82,15 +87,15 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
             break;
     }
 
-    return <input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => formStateSetters[name]?.(e.target.value)} {...newProps} />;
+    return <input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} {...newProps} />;
 }
 
-export type ValidateClientResult = [Error[], {
+export type ValidateClientResult = [string[], {
     [key: string]: any
 }]
 
-export function extractAndValidateFormData(formStates: any, fieldStructure: Flattened): ValidateClientResult {
-    const errors: Error[] = [];
+export function extractAndValidateFormData(formStates: any, fieldStructure: Flattened, additionalValidate?: { [key: string]: (v: any) => boolean }): ValidateClientResult {
+    const errors: string[] = [];
     const cleanedData = Object.fromEntries(Object.entries(formStates).filter(([k, v]) => v !== "")) // exclude optional stuff
 
     // convert all dates to iso
@@ -98,11 +103,16 @@ export function extractAndValidateFormData(formStates: any, fieldStructure: Flat
     // convert all number strings to numbers
     Object.entries(fieldStructure).filter(([k, v]) => v.type === "number").forEach(([k, v]) => cleanedData[k] = new Number(cleanedData[k] as string))
 
-    // enums
-    // in the future, can be placed in a loop going over all value_name: predicate pairs
-    Object.entries(fieldStructure).filter(([k, v]) => v.enum !== undefined).forEach(([k, v]) => {
-        if (!v.enum.includes(cleanedData[k])) errors.push(new Error(`Please select a valid value for ${k}`))
+    Object.entries(fieldStructure).forEach(([k, v]) => {
+
+        // additional stuff
+        if (additionalValidate?.[k] !== undefined && !additionalValidate[k](v)) errors.push(`Please enter a valid value for ${k}`)
+
+        // enums
+        if (v.enum !== undefined && !v.enum.includes(cleanedData[k])) errors.push(`Please select a valid value for ${k}`)
     })
+
+    // custom ones
 
     return [errors, cleanedData];
 }
