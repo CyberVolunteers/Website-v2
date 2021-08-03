@@ -1,8 +1,10 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import getRawBody from "raw-body";
 import { genRandomToken, sanitiseForMongo } from "./security";
-import { FieldConstraintsCollection, extract, flatten } from "combined-validator"
+import { FieldConstraintsCollection, extract, flatten, createAjvJTDSchema } from "combined-validator"
 import { fixedTimeComparison } from "@hapi/cryptiles"
+
+import { users } from '../../config/shared/publicFieldConstants';
 
 import Ajv, { JTDParser } from "ajv/dist/jtd"
 import { getMongo } from "../../services/mongo";

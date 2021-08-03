@@ -1,6 +1,6 @@
 import { capitalize } from "@material-ui/core";
 import { Flattened, FlattenedValue } from "combined-validator";
-import { ChangeEvent } from "react";
+import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
 import { csrfHeaderName, isSessionActiveCookieName } from "../../config/shared/config"
 
@@ -31,7 +31,6 @@ export function getCookie(name: string) {
 function isServer() { return typeof window === "undefined" }
 
 export async function csrfFetch(csrfToken: string, url: string, settings: any) {
-    if (isServer()) return;
     settings.headers[csrfHeaderName] = csrfToken;
     return await fetch(url, settings);
 }
@@ -40,13 +39,13 @@ export function undoCamelCase(s: string) {
     return s.replace(/([A-Z])/g, ' $1').toLowerCase();
 }
 
-export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any, validationCallback?: (k: string, v: any) => void) {
+export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any, validationCallback?: (k: string, v: any) => Promise<boolean>) {
     const inputType = flattenedValue.type;
     if (typeof inputType !== "string") return <p>To be implemented</p>
 
     function setValue(v: any) {
-        if (validationCallback !== undefined) validationCallback(name, v);
-        formStateSetters[name]?.(v)
+        formStateSetters[name]?.(v) // do it straight away for responsiveness
+        if (validationCallback !== undefined) { validationCallback(name, v); }
     }
 
     if (flattenedValue.enum !== undefined)
@@ -90,29 +89,57 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
     return <input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} {...newProps} />;
 }
 
-export type ValidateClientResult = [string[], {
+export type ValidateClientResult = [{
+    [key: string]: string
+}, {
     [key: string]: any
 }]
 
-export function extractAndValidateFormData(formStates: any, fieldStructure: Flattened, additionalValidate?: { [key: string]: (v: any) => boolean }): ValidateClientResult {
-    const errors: string[] = [];
+export function extractAndValidateFormData(formStates: any, fieldStructure: Flattened): ValidateClientResult {
+    const errors: {
+        [key: string]: string
+    } = {};
     const cleanedData = Object.fromEntries(Object.entries(formStates).filter(([k, v]) => v !== "")) // exclude optional stuff
 
+    const currentStructure = Object.fromEntries(Object.entries(fieldStructure).filter(([k, v]) => v.required || cleanedData[k] !== undefined)) // remove things that are not present and are not required
+
     // convert all dates to iso
-    Object.entries(fieldStructure).filter(([k, v]) => v.type === "date").forEach(([k, v]) => cleanedData[k] = new Date(cleanedData[k] as string).toISOString())
+    Object.entries(currentStructure).filter(([k, v]) => v.type === "date").forEach(([k, v]) => cleanedData[k] = new Date(cleanedData[k] as string).toISOString())
     // convert all number strings to numbers
-    Object.entries(fieldStructure).filter(([k, v]) => v.type === "number").forEach(([k, v]) => cleanedData[k] = new Number(cleanedData[k] as string))
+    Object.entries(currentStructure).filter(([k, v]) => v.type === "number").forEach(([k, v]) => cleanedData[k] = parseInt(cleanedData[k] as string))
 
-    Object.entries(fieldStructure).forEach(([k, v]) => {
-
-        // additional stuff
-        if (additionalValidate?.[k] !== undefined && !additionalValidate[k](v)) errors.push(`Please enter a valid value for ${k}`)
-
+    Object.entries(currentStructure).forEach(([k, v]) => {
         // enums
-        if (v.enum !== undefined && !v.enum.includes(cleanedData[k])) errors.push(`Please select a valid value for ${k}`)
+        if (v.enum !== undefined && !v.enum.includes(cleanedData[k])) errors[`enum_${k}`] = `Please select a valid value for ${k}`
     })
 
     // custom ones
 
     return [errors, cleanedData];
+}
+
+export async function createErrorMessage(res: Response) {
+    return `${res.status >= 500 ? "Server" : "Client"} error: ${await res.text()}`
+}
+
+export async function updateOverallErrors(res: Response, thisId: string, overallErrors: {
+    [key: string]: string;
+},
+    setOverallErrors: Dispatch<SetStateAction<{
+        [key: string]: string;
+    }>>) {
+    const overallErrorsCopy = Object.assign({}, overallErrors); // so that when react compares the previous and the current value, it does not find them to be the same
+    console.log("overallErrors", overallErrors)
+    console.log("res", res)
+    if (res.status >= 400) {
+        overallErrorsCopy[thisId] = await createErrorMessage(res);
+        setOverallErrors(overallErrorsCopy);
+        console.log("created one")
+        return false
+    }
+
+    delete overallErrorsCopy[thisId];
+    setOverallErrors(overallErrorsCopy);
+    console.log("deleted error")
+    return true
 }
