@@ -1,5 +1,6 @@
 import { capitalize } from "@material-ui/core";
 import { Flattened, FlattenedValue } from "combined-validator";
+import { useRouter } from "next/dist/client/router";
 import { useState } from "react";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
@@ -16,7 +17,28 @@ function isLoggedIn() {
     }
 }
 
-export function isOrg() {
+export type ViewerType = "loggedOut" | "user" | "org" | "server"
+export function activateViewProtection(allow: ViewerType[]) {
+    const router = useRouter();
+
+    const currentViewType = useViewerType();
+    console.log(currentViewType)
+    if (!allow.includes(currentViewType)) {
+        router.push("/notAllowed")
+        return false;
+    }
+
+    return true;
+}
+
+export function useViewerType(): ViewerType {
+    if (isServer()) return "server";
+    const isLoggedIn = useIsLoggedIn()
+    if (!isLoggedIn) return "loggedOut";
+    return isOrg() ? "org" : "user"
+}
+
+function isOrg() {
     if (isServer()) return false;
     else return getCookie(isOrgCookieName) === "true";
 }
