@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useState } from "react";
-import { csrfFetch } from "../lib/client/util";
+import { csrfFetch, updateLoginState } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
 export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -21,6 +21,7 @@ export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof 
                 password
             })
         });
+        updateLoginState() // not in an if statement so that we don't miss it if the error code was not checked for
         const resText = await response?.text();
     }
 

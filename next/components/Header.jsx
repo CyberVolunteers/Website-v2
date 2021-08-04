@@ -7,14 +7,14 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { useWindowSize } from '../lib/client/hooks';
 
 import styles from "../styles/header.module.css"
-import { isLoggedIn as checkIfIsLoggedIn, useIsAfterRehydration } from '../lib/client/util';
+import { useIsLoggedIn, useIsAfterRehydration } from '../lib/client/util';
 import { useEffect } from 'react';
 
 function Header() {
     const sidebarLimitWidth = 600;
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // start off false (default on the server) and then change if needed
-    useEffect(() => setIsLoggedIn(checkIfIsLoggedIn()), []); // change on any rerender
     const isAfterRehydration = useIsAfterRehydration();
+
+    const isLoggedIn = useIsLoggedIn();
 
     const [isSidebarUp, setisSidebarUp] = useState(false);
 

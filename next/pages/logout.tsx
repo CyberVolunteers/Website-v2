@@ -1,5 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { csrfFetch } from "../lib/client/util";
+import { csrfFetch, updateLoginState } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
 export default function Logout({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
@@ -14,6 +14,8 @@ export default function Logout({ csrfToken }: InferGetServerSidePropsType<typeof
                 "accept": "application/json",
             },
         })
+
+        updateLoginState() // not in an if statement so that we don't miss it if the error code was not checked for
     }
 
     return <div>

@@ -5,9 +5,15 @@ import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
 import { csrfHeaderName, currentPageHeaderName, isOrgCookieName, isSessionActiveCookieName } from "../../config/shared/config"
 
-export function isLoggedIn() {
+function isLoggedIn() {
     if (isServer()) return false;
-    else return getCookie(isSessionActiveCookieName) === "true";
+    else {
+        const isLoggedIn = getCookie(isSessionActiveCookieName) === "true";
+
+        const bc = new BroadcastChannel("loginEvents");
+        bc.postMessage(isLoggedIn);
+        return isLoggedIn;
+    }
 }
 
 export function isOrg() {
@@ -19,6 +25,24 @@ export function useIsAfterRehydration() {
     const [isFirstRender, setIsFirstRender] = useState(false);
     useEffect(() => setIsFirstRender(true), [])
     return isFirstRender;
+}
+
+export function useIsLoggedIn() {
+    if (isServer()) return false;
+    const [isLoggedInState, setIsLoggedInState] = useState(false); // start off false (default on the server) and then change if needed
+    useEffect(() => setIsLoggedInState(isLoggedIn()), []); // change after rehydration
+
+    const bc = new BroadcastChannel("loginEvents");
+    bc.onmessage = function (evt) {
+        setIsLoggedInState(evt.data);
+    }
+
+    return isLoggedInState
+}
+
+export function updateLoginState() {
+    const bc = new BroadcastChannel("loginEvents");
+    bc.postMessage(isLoggedIn());
 }
 
 export function getCookie(name: string) {
