@@ -1,16 +1,24 @@
 import { capitalize } from "@material-ui/core";
 import { Flattened, FlattenedValue } from "combined-validator";
+import { useState } from "react";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
-import { csrfHeaderName, currentPageHeaderName, isSessionActiveCookieName } from "../../config/shared/config"
+import { csrfHeaderName, currentPageHeaderName, isOrgCookieName, isSessionActiveCookieName } from "../../config/shared/config"
 
-export function checkIsLoggedIn() {
+export function isLoggedIn() {
     if (isServer()) return false;
     else return getCookie(isSessionActiveCookieName) === "true";
 }
 
-export function runOnClientRender(callback: () => {}) {
-    useEffect(callback as any, []);
+export function isOrg() {
+    if (isServer()) return false;
+    else return getCookie(isOrgCookieName) === "true";
+}
+
+export function useIsAfterRehydration() {
+    const [isFirstRender, setIsFirstRender] = useState(false);
+    useEffect(() => setIsFirstRender(true), [])
+    return isFirstRender;
 }
 
 export function getCookie(name: string) {

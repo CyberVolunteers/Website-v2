@@ -12,7 +12,7 @@ export async function login({ email, password }: { email: string, password: stri
     const emailWasFound = users.length !== 0 || organisations.length !== 0;
     const doesEmailBelongToUser = emailWasFound && users.length !== 0;
     const storedInfo = emailWasFound ?
-        doesEmailBelongToUser ? users[0] : organisations[0]
+        doesEmailBelongToUser ? users[0]._doc : organisations[0]._doc
         : {
             passwordHash: "this should never match" // a dummy "hash" against timing attacks
         }
@@ -24,7 +24,7 @@ export async function login({ email, password }: { email: string, password: stri
 
     storedInfo.isOrg = !doesEmailBelongToUser;
 
-    return isCorrectHash && emailWasFound ? storedInfo._doc : false;
+    return isCorrectHash && emailWasFound ? storedInfo : false;
 }
 
 export async function signupUser(params: any) {
