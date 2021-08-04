@@ -2,7 +2,7 @@ import { capitalize } from "@material-ui/core";
 import { Flattened, FlattenedValue } from "combined-validator";
 import { ChangeEvent, Dispatch, SetStateAction } from "react";
 import { useEffect } from "react";
-import { csrfHeaderName, isSessionActiveCookieName } from "../../config/shared/config"
+import { csrfHeaderName, currentPageHeaderName, isSessionActiveCookieName } from "../../config/shared/config"
 
 export function checkIsLoggedIn() {
     if (isServer()) return false;
@@ -32,6 +32,7 @@ function isServer() { return typeof window === "undefined" }
 
 export async function csrfFetch(csrfToken: string, url: string, settings: any) {
     settings.headers[csrfHeaderName] = csrfToken;
+    settings.headers[currentPageHeaderName] = window.location.pathname;
     return await fetch(url, settings);
 }
 
@@ -129,17 +130,13 @@ export async function updateOverallErrors(res: Response, thisId: string, overall
         [key: string]: string;
     }>>) {
     const overallErrorsCopy = Object.assign({}, overallErrors); // so that when react compares the previous and the current value, it does not find them to be the same
-    console.log("overallErrors", overallErrors)
-    console.log("res", res)
     if (res.status >= 400) {
         overallErrorsCopy[thisId] = await createErrorMessage(res);
         setOverallErrors(overallErrorsCopy);
-        console.log("created one")
         return false
     }
 
     delete overallErrorsCopy[thisId];
     setOverallErrors(overallErrorsCopy);
-    console.log("deleted error")
     return true
 }

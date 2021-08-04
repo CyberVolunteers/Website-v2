@@ -97,7 +97,6 @@ const AutoConstructedForm: FC<{
         // actual request
 
         const [errors, cleanedData] = extractAndValidateFormData(formStates, fields);
-        console.log("errors", errors)
         if (Object.keys(errors).length !== 0) return setOverallErrors(errors)
 
         onSubmitCalback(evt, cleanedData);

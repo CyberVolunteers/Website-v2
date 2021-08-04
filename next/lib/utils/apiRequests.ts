@@ -4,13 +4,10 @@ import { genRandomToken, sanitiseForMongo } from "./security";
 import { FieldConstraintsCollection, extract, flatten, createAjvJTDSchema } from "combined-validator"
 import { fixedTimeComparison } from "@hapi/cryptiles"
 
-import { users } from '../../config/shared/publicFieldConstants';
-
 import Ajv, { JTDParser } from "ajv/dist/jtd"
 import { getMongo } from "../../services/mongo";
 import { getSession, updateSession } from "../../services/auth/auth-cookie";
-import { csrfTokenLength, csrfTokenName } from "../../config/server/sentMetadata";
-import { csrfHeaderName } from "../../config/shared/config"
+import { csrfHeaderName, currentPageHeaderName } from "../../config/shared/config"
 export const ajv = new Ajv({
     strictRequired: true,
     allErrors: true,
@@ -61,19 +58,11 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
             const bodyParser = (bodyParsers as any)?.[method] as JTDParser<any> | undefined;
             const queryFieldRules = (queryRequiredFields as any)?.[method] as FieldConstraintsCollection | undefined;
             await sanitise(req, res, bodyParser, queryFieldRules);
-            // if sanitising rejected the headers
+            // if sanitising already sent a response
             if (res.headersSent) return;
 
-            if (options.useCsrf) {
-                const expectedCsrfToken = (await getSession(req))[csrfTokenName];
-
-                const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()];
-
-                if (typeof receivedCsrfToken !== "string") return res.status(400).send("Incorrect or undefined scsrf header");
-
-                const isCorrect = fixedTimeComparison(receivedCsrfToken, expectedCsrfToken);
-                if (!isCorrect) return res.status(403).send("Invalid csrf token");
-            }
+            if (options.useCsrf) checkCsrf(req, res);
+            if (res.headersSent) return;
 
             await getMongo(); // connect if not connected
 
@@ -85,6 +74,18 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
     }
 }
 
+async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
+    const receivedPageName = req.headers[currentPageHeaderName.toLowerCase()];
+    if (typeof receivedPageName !== "string") return res.status(400).send("Incorrect or undefined current page header");
+
+    const expectedCsrfToken = (await getSession(req))?.csrfToken?.[receivedPageName]; // from the sealed csrf cookie
+    const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()]; // from the headers
+
+
+    if (typeof receivedCsrfToken !== "string") return res.status(400).send("Incorrect or undefined csrf header");
+
+    if (!fixedTimeComparison(expectedCsrfToken, receivedCsrfToken)) return res.status(403).send("Invalid csrf token");
+}
 
 async function sanitise(req: NextApiRequest, res: NextApiResponse, bodyParser: JTDParser<any> | undefined, queryFieldRules: FieldConstraintsCollection | undefined) {
     // protect against prototype pollution - force a more strict parser

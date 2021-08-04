@@ -8,6 +8,7 @@ export async function login({ email, password }: { email: string, password: stri
         Org.find({ email })
     ])
 
+
     const emailWasFound = users.length !== 0 || organisations.length !== 0;
     const doesEmailBelongToUser = emailWasFound && users.length !== 0;
     const storedInfo = emailWasFound ?
@@ -21,7 +22,9 @@ export async function login({ email, password }: { email: string, password: stri
         schema.updateOne({ email }, { passwordHash: newHash })
     });
 
-    return isCorrectHash && emailWasFound ? storedInfo : false;
+    storedInfo.isOrg = !doesEmailBelongToUser;
+
+    return isCorrectHash && emailWasFound ? storedInfo._doc : false;
 }
 
 export async function signupUser(params: any) {

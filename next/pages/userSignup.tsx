@@ -29,8 +29,6 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
             },
         })
 
-        console.log(res)
-
         if (!await updateOverallErrors(res, "isUserEmailAvailable", overallErrors, setOverallErrors)) return false;
 
         if (await res.json() !== true) throw new Error("This email is not available") // fail-safe - if something goes wrong, it shows the warning

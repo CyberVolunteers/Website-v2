@@ -4,7 +4,7 @@ import { createHandler, HandlerCollection, ajv } from '../../lib/utils/apiReques
 import { login } from '../../services/auth/session';
 import loginSpec from "../../config/shared/endpointSpec/login"
 import { createAjvJTDSchema } from 'combined-validator';
-import { getSession, setSession } from '../../services/auth/auth-cookie';
+import { getSession, updateSession } from '../../services/auth/auth-cookie';
 
 export * from "../../lib/defaultEndpointConfig"
 
@@ -23,7 +23,7 @@ const handlers: HandlerCollection = {
 
     if (!loginResult) return res.status(400).send("This email and password combination does not appear to be correct")
 
-    await setSession(res, loginResult) //TODO: add some data here
+    await updateSession(req, res, loginResult) //TODO: add some data here
 
     return res.end()
   }

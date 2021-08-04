@@ -10,7 +10,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
     GET: async function (req, res) {
-        console.log("search listings");
         return res.json({})
     }
 }

@@ -22,7 +22,6 @@ export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof 
             })
         });
         const resText = await response?.text();
-        console.log(resText);
     }
 
     return <div>

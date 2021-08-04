@@ -14,7 +14,6 @@ export default function Logout({ csrfToken }: InferGetServerSidePropsType<typeof
                 "accept": "application/json",
             },
         })
-        console.log(res?.statusText)
     }
 
     return <div>
