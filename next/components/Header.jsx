@@ -7,19 +7,20 @@ import MenuIcon from '@material-ui/icons/Menu';
 import { useWindowSize } from '../lib/client/hooks';
 
 import styles from "../styles/header.module.css"
-import { isLoggedIn as checkIfIsLoggedIn } from '../lib/client/util';
+import { isLoggedIn as checkIfIsLoggedIn, useIsAfterRehydration } from '../lib/client/util';
 import { useEffect } from 'react';
 
 function Header() {
     const sidebarLimitWidth = 600;
     const [isLoggedIn, setIsLoggedIn] = useState(false); // start off false (default on the server) and then change if needed
     useEffect(() => setIsLoggedIn(checkIfIsLoggedIn()), []); // change on any rerender
+    const isAfterRehydration = useIsAfterRehydration();
 
     const [isSidebarUp, setisSidebarUp] = useState(false);
 
     const windowSize = useWindowSize();
 
-    const signUpOrMyAccountEl = isLoggedIn ?
+    const signUpOrMyAccountEl = !isAfterRehydration ? null : isLoggedIn ?
         <li>
             <Link href="/myAccount" passHref>
                 <a>
@@ -123,19 +124,27 @@ function Header() {
                         </li>
                     </ul>
 
-                    <form action="">
-                        <div className={`${styles["input-wrapper"]} dflex-align-center`}>
-                            <SearchIcon />
-                            <input type="text" placeholder="Search Here..." />
-                        </div>
-                    </form>
+                    {
+                        isAfterRehydration ? // because it resizes automatically, we need to disable it to prevent flicker
+                            <form action="">
+                                <div className={`${styles["input-wrapper"]} dflex-align-center`}>
+                                    <SearchIcon />
+                                    <input type="text" placeholder="Search Here..." />
+                                </div>
+                            </form>
+                            : null
+                    }
 
                     <ul className="dflex-align-center">
                         <li className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}>
-                            <div className={`${styles["head"]} dflex-align-center`}>
-                                <p>About</p>
-                                <ArrowDropDownIcon />
-                            </div>
+                            {
+                                isAfterRehydration ? // because it resizes automatically, we need to disable it to prevent flicker
+                                    <div className={`${styles["head"]} dflex-align-center`}>
+                                        <p>About</p>
+                                        <ArrowDropDownIcon />
+                                    </div>
+                                    : null
+                            }
                             <ul className={`${styles["body"]}`}>
                                 <li>
                                     <Link href="/aboutUs" passHref>
@@ -161,7 +170,7 @@ function Header() {
 
                         {signUpOrMyAccountEl}
                         {
-                            windowSize.width <= sidebarLimitWidth ?
+                            isAfterRehydration && windowSize.width <= sidebarLimitWidth ?
                                 <li className={`${styles["bottomButton"]}`}>
                                     <Link href="/login" passHref>
                                         <a>
