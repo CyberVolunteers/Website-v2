@@ -20,21 +20,24 @@ function isLoggedIn() {
 export type ViewerType = "loggedOut" | "user" | "org" | "server"
 export function activateViewProtection(allow: ViewerType[]) {
     const router = useRouter();
+    const currentViewType = getViewerType();
+    const [out, setOut] = useState(true);
 
-    const currentViewType = useViewerType();
-    console.log(currentViewType)
-    if (!allow.includes(currentViewType)) {
-        router.push("/notAllowed")
-        return false;
-    }
+    useEffect(() => {
+        if (!allow.includes(currentViewType)) {
+            if (currentViewType !== "server") router.replace(`/notAllowed?redirect=${router.pathname}`)
+            return setOut(false);
+        }
 
-    return true;
+        return setOut(true);
+    }, [])
+
+    return out
 }
 
-export function useViewerType(): ViewerType {
+export function getViewerType() {
     if (isServer()) return "server";
-    const isLoggedIn = useIsLoggedIn()
-    if (!isLoggedIn) return "loggedOut";
+    if (!isLoggedIn()) return "loggedOut";
     return isOrg() ? "org" : "user"
 }
 
@@ -64,7 +67,9 @@ export function useIsLoggedIn() {
 
 export function updateLoginState() {
     const bc = new BroadcastChannel("loginEvents");
-    bc.postMessage(isLoggedIn());
+    const out = isLoggedIn()
+    bc.postMessage(out);
+    return out;
 }
 
 export function getCookie(name: string) {

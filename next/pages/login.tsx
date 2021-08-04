@@ -1,4 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useRouter } from "next/dist/client/router";
 import { useState } from "react";
 import { csrfFetch, updateLoginState } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
@@ -6,6 +7,7 @@ import { updateCsrf } from "../lib/utils/security";
 export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const router = useRouter()
 
     async function onSubmit() {
         const response = await csrfFetch(csrfToken, "/api/login", {
@@ -21,8 +23,9 @@ export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof 
                 password
             })
         });
-        updateLoginState() // not in an if statement so that we don't miss it if the error code was not checked for
-        const resText = await response?.text();
+        const isLoggedIn = updateLoginState() // not in an if statement so that we don't miss it if the error code was not checked for
+
+        if (isLoggedIn) router.push(typeof router.query.redirect === "string" ? router.query.redirect : "/searchListings")
     }
 
     return <div>

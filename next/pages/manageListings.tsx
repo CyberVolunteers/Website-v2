@@ -1,11 +1,11 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { activateViewProtection, csrfFetch } from "../lib/client/util";
+import { activateViewProtection as useViewProtection, csrfFetch } from "../lib/client/util";
 import { updateCsrf } from "../lib/utils/security";
 
 export default function ManageListings({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-    if (!activateViewProtection(["org"])) return null; // prevent the rest from being executed so that the unloaded component doesn't get updated
+    useViewProtection(["org"]);
 
-    async function createListing() {
+    function createListing() {
 
     }
 

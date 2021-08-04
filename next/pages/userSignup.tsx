@@ -8,8 +8,10 @@ import { capitalize } from "@material-ui/core";
 import { RefObject } from "react";
 import isEmail from "validator/lib/isEmail";
 import AutoConstructedForm, { PerElementValidatorCallbacks } from "../components/AutoCostructedForm";
+import { useRouter } from "next/dist/client/router";
 
 export default function UserSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const router = useRouter()
     const [overallErrors, setOverallErrors] = useState({} as {
         [key: string]: string
     });
@@ -50,6 +52,7 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
         });
 
         if (!await updateOverallErrors(res, "userSignupPost", overallErrors, setOverallErrors)) return;
+        router.push("/login")
     }
 
     return <div>

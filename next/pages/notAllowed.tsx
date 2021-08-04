@@ -1,8 +1,10 @@
+import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
-import { useIsAfterRehydration, useViewerType } from "../lib/client/util"
+import { useIsAfterRehydration, getViewerType } from "../lib/client/util"
 
 export default function NotAllowed() {
-    const currentUser = useViewerType()
+    const router = useRouter()
+    const currentUser = getViewerType()
     const isAfterHydration = useIsAfterRehydration()
 
     return <div>
@@ -19,7 +21,7 @@ export default function NotAllowed() {
                 }
             })()
         }
-        <Link href="/login" passHref>
+        <Link href={`/login?redirect=${router.query.redirect ?? ""}`} passHref>
             <a>
                 <p>
                     Log in!

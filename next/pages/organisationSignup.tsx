@@ -8,8 +8,10 @@ import { flatten, Flattened } from "combined-validator";
 
 import isEmail from 'validator/lib/isEmail'
 import AutoConstructedForm, { PerElementValidatorCallbacks } from "../components/AutoCostructedForm";
+import { useRouter } from "next/dist/client/router";
 
 export default function OrganisationSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+    const router = useRouter()
     const [overallErrors, setOverallErrors] = useState({} as {
         [key: string]: string
     });
@@ -50,6 +52,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
         });
 
         if (!await updateOverallErrors(res, "orgSignupPost", overallErrors, setOverallErrors)) return;
+        router.push("/login")
     }
 
     return <div>
