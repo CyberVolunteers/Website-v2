@@ -1,8 +1,8 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
 import { useState } from "react";
-import { csrfFetch, updateLoginState } from "../lib/client/util";
-import { updateCsrf } from "../lib/utils/security";
+import { updateLoginState } from "../client/utils/userState";
+import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 
 export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const [email, setEmail] = useState("");

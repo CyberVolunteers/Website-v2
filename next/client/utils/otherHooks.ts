@@ -1,6 +1,8 @@
+import { useRouter } from "next/dist/client/router";
 import { useEffect, useState } from "react";
+import { ViewerType } from "../types";
+import { useViewerType } from "./userState";
 
-// Hook
 export function useWindowSize() {
     const [windowSize, setWindowSize] = useState({
         width: undefined,
@@ -29,4 +31,27 @@ export function useWindowSize() {
         }
     }, []); // Empty array ensures that effect is only run on mount
     return windowSize;
+}
+
+export function useIsAfterRehydration() {
+    const [isFirstRender, setIsFirstRender] = useState(false);
+    useEffect(() => setIsFirstRender(true), [])
+    return isFirstRender;
+}
+
+export function useViewProtection(allow: ViewerType[]) {
+    const router = useRouter();
+    const currentViewType = useViewerType()
+    const [out, setOut] = useState(true);
+
+    useEffect(() => {
+        if (!allow.includes(currentViewType)) {
+            if (currentViewType !== "server") router.replace(`/notAllowed?redirect=${router.pathname}`)
+            return setOut(false);
+        }
+
+        return setOut(true);
+    }, [])
+
+    return out
 }

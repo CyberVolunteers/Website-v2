@@ -1,14 +1,15 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React, { createRef, FormEvent, useEffect, useState } from "react";
-import { csrfFetch, genInputElement, undoCamelCase, extractAndValidateFormData, updateOverallErrors } from "../lib/client/util";
-import { updateCsrf } from "../lib/utils/security";
-import { users as userFieldSpec } from "../config/shared/publicFieldConstants"
+import { users as userFieldSpec } from "../serverAndClient/publicFieldConstants"
 import { flatten, Flattened } from "combined-validator";
 import { capitalize } from "@material-ui/core";
 import { RefObject } from "react";
 import isEmail from "validator/lib/isEmail";
-import AutoConstructedForm, { PerElementValidatorCallbacks } from "../components/AutoCostructedForm";
+import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
 import { useRouter } from "next/dist/client/router";
+import { updateOverallErrorsForRequests } from "../client/utils/misc";
+import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
+import { createIsEmailIsAvailableValidator } from "../client/utils/formUtils";
 
 export default function UserSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     const router = useRouter()
@@ -17,24 +18,7 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
     });
 
     const perElementValidationCallbacks: PerElementValidatorCallbacks = {
-        email: [isEmail, checkIfEmailIsAvailable],
-    }
-
-    async function checkIfEmailIsAvailable(email: string) {
-        const res = await fetch("/api/isEmailFree?" +
-            new URLSearchParams({ email }), {
-            method: "GET",
-            credentials: "same-origin", // only send cookies for same-origin requests
-            headers: {
-                "content-type": "application/json",
-                "accept": "application/json",
-            },
-        })
-
-        if (!await updateOverallErrors(res, "isUserEmailAvailable", overallErrors, setOverallErrors)) return false;
-
-        if (await res.json() !== true) throw new Error("This email is not available") // fail-safe - if something goes wrong, it shows the warning
-        return true
+        email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
     }
 
     async function onSubmit(evt: FormEvent<HTMLFormElement>, data: {
@@ -51,7 +35,7 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
             body: JSON.stringify(data)
         });
 
-        if (!await updateOverallErrors(res, "userSignupPost", overallErrors, setOverallErrors)) return;
+        if (!await updateOverallErrorsForRequests(res, "userSignupPost", overallErrors, setOverallErrors)) return;
         router.push("/login")
     }
 

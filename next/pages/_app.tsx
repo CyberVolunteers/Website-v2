@@ -1,8 +1,8 @@
-import '../styles/globals.css'
+import '../client/styles/global.css'
 import type { AppProps } from 'next/app'
-import Header from '../components/Header'
+import Header from '../client/components/Header'
 import React from 'react'
-import Footer from '../components/Footer'
+import Footer from '../client/components/Footer'
 
 function MyApp({ Component, pageProps }: AppProps) {
   return <>

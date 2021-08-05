@@ -1,42 +1,17 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import getRawBody from "raw-body";
-import { genRandomToken, sanitiseForMongo } from "./security";
-import { FieldConstraintsCollection, extract, flatten, createAjvJTDSchema } from "combined-validator"
-import { fixedTimeComparison } from "@hapi/cryptiles"
+import { sanitiseForMongo } from "./security";
+import { FieldConstraintsCollection, extract, flatten } from "combined-validator"
 
 import Ajv, { JTDParser } from "ajv/dist/jtd"
-import { getMongo } from "../../services/mongo";
-import { getSession, updateSession } from "../../services/auth/auth-cookie";
-import { csrfHeaderName, currentPageHeaderName } from "../../config/shared/config"
+import { getMongo } from "../../server/mongo";
+import { checkCsrf } from "../../serverAndClient/csrf";
+import { HandlerCollection, AjvParserCollection, QueryFieldsCollection, ExtendedNextApiRequest, ExtendedNextApiResponse, SupportedMethods } from "../../server/types";
 export const ajv = new Ajv({
     strictRequired: true,
     allErrors: true,
     removeAdditional: "all"
 });
-
-type SupportedMethods = "GET" | "POST";
-
-type Handler = (req: NextApiRequest, res: NextApiResponse) => Promise<void>
-export type HandlerCollection = {
-    [key in SupportedMethods]?: Handler;
-};
-
-export type AjvParserCollection = {
-    [key in SupportedMethods]?: JTDParser<any>;
-};
-
-export type QueryFieldsCollection = {
-    [key in SupportedMethods]?: FieldConstraintsCollection
-}
-
-export type ExtendedNextApiRequest = NextApiRequest & {
-    originalUrl?: string,
-    session?: any
-}
-
-export type ExtendedNextApiResponse = NextApiResponse & {
-
-}
 
 export function createHandler(handlers: HandlerCollection, options: { useCsrf: boolean }, bodyParsers?: AjvParserCollection, queryRequiredFields?: QueryFieldsCollection) {
     return async (req: NextApiRequest, res: NextApiResponse) => {
@@ -64,6 +39,7 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
             if (options.useCsrf) checkCsrf(req, res);
             if (res.headersSent) return;
 
+            // TODO: maybe change this to a more elegant way?
             await getMongo(); // connect if not connected
 
             await handlers[method]?.(req, res);
@@ -72,19 +48,6 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
             return res.status(500).send("Could not process that request. Please contact us at hello@cybervolunteers.org.uk")
         }
     }
-}
-
-async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
-    const receivedPageName = req.headers[currentPageHeaderName.toLowerCase()];
-    if (typeof receivedPageName !== "string") return res.status(400).send("Incorrect or undefined current page header");
-
-    const expectedCsrfToken = (await getSession(req))?.csrfToken?.[receivedPageName]; // from the sealed csrf cookie
-    const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()]; // from the headers
-
-
-    if (typeof receivedCsrfToken !== "string") return res.status(400).send("Incorrect or undefined csrf header");
-
-    if (!fixedTimeComparison(expectedCsrfToken, receivedCsrfToken)) return res.status(403).send("Invalid csrf token");
 }
 
 async function sanitise(req: NextApiRequest, res: NextApiResponse, bodyParser: JTDParser<any> | undefined, queryFieldRules: FieldConstraintsCollection | undefined) {

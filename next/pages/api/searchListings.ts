@@ -1,6 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
+import { createHandler } from '../../lib/utils/apiRequests';
+import { HandlerCollection } from '../../server/types';
 
 export * from "../../lib/defaultEndpointConfig"
 

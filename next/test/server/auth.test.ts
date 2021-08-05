@@ -1,14 +1,14 @@
-import { hash, verifyHash } from "../../services/auth/password"
+import { hash, verifyHash } from "../../server/auth/password"
 import bcrypt from "bcrypt"
-import { minBcryptRounds } from "../../config/server/password"
+import { minBcryptRounds } from "../../server/auth/config"
 import { expect } from "chai"
 import { mock, SinonSpy, spy, stub } from "sinon"
-import { seal, unseal } from "../../services/auth/iron"
-import { getSession, setSession, removeSession } from "../../services/auth/auth-cookie"
+import { seal, unseal } from "../../server/auth/iron"
+import { getSession, updateSession, removeSession } from "../../server/auth/auth-cookie"
 import { NextApiRequest, NextApiResponse } from "next"
 import { parse } from "cookie"
 import * as dotenv from "dotenv";
-import { sessionCookieMaxAge } from "../../config/shared/config"
+import { sessionCookieMaxAge } from "../../serverAndClient/cookiesConfig"
 
 const cookie = require("cookie")
 

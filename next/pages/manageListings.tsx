@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { activateViewProtection as useViewProtection, csrfFetch } from "../lib/client/util";
-import { updateCsrf } from "../lib/utils/security";
+import { useViewProtection } from "../client/utils/otherHooks";
+import { updateCsrf } from "../serverAndClient/csrf";
 
 export default function ManageListings({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
     useViewProtection(["org"]);

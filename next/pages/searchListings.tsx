@@ -1,11 +1,11 @@
 import React, { useState } from 'react'
-import Card from '../components/Card'
-import FeaturedCard from '../components/FeaturedCard'
+import Card from '../client/components/Card'
+import FeaturedCard from '../client/components/FeaturedCard'
 import Pagination from '@material-ui/lab/Pagination';
-import Footer from '../components/Footer'
+import Footer from '../client/components/Footer'
 import Link from 'next/link'
 
-import styles from '../styles/searchListings.module.css'
+import styles from '../client/styles/searchListings.module.css'
 
 export default function SearchListings() {
     const listingsPerPage = 6;

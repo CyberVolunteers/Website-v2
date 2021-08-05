@@ -1,8 +1,9 @@
 import Link from "next/link";
-import { getViewerType, useIsAfterRehydration } from "../lib/client/util";
+import { useIsAfterRehydration } from "../client/utils/otherHooks";
+import { useViewerType } from "../client/utils/userState";
 
 export default function MyAccount() {
-    const userType = getViewerType();
+    const userType = useViewerType();
     const isAfterRehydration = useIsAfterRehydration();
 
     return <div>

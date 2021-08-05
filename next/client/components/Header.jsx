@@ -4,17 +4,18 @@ import ArrowDropDownIcon from '@material-ui/icons/ArrowDropDown';
 import SearchIcon from '@material-ui/icons/Search';
 import MenuIcon from '@material-ui/icons/Menu';
 
-import { useWindowSize } from '../lib/client/hooks';
+import { useWindowSize } from '../utils/otherHooks';
+import { useViewerType } from "../utils/userState";
 
 import styles from "../styles/header.module.css"
-import { useIsLoggedIn, useIsAfterRehydration } from '../lib/client/util';
-import { useEffect } from 'react';
+import { useIsAfterRehydration } from '../utils/otherHooks';
 
 function Header() {
     const sidebarLimitWidth = 600;
     const isAfterRehydration = useIsAfterRehydration();
 
-    const isLoggedIn = useIsLoggedIn();
+    const userType = useViewerType();
+    const isLoggedIn = ["user", "org"].includes(userType);
 
     const [isSidebarUp, setisSidebarUp] = useState(false);
 

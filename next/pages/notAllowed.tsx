@@ -1,10 +1,11 @@
 import { useRouter } from "next/dist/client/router";
 import Link from "next/link";
-import { useIsAfterRehydration, getViewerType } from "../lib/client/util"
+import { useIsAfterRehydration } from "../client/utils/otherHooks";
+import { useViewerType } from "../client/utils/userState";
 
 export default function NotAllowed() {
     const router = useRouter()
-    const currentUser = getViewerType()
+    const currentUser = useViewerType()
     const isAfterHydration = useIsAfterRehydration()
 
     return <div>

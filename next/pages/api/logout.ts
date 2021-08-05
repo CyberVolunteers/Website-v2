@@ -1,7 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from 'next'
-import { createHandler, HandlerCollection } from '../../lib/utils/apiRequests';
-import { removeSession } from '../../services/auth/auth-cookie';
+import { createHandler } from '../../lib/utils/apiRequests';
+import { removeSession } from '../../server/auth/auth-cookie';
+import { HandlerCollection } from '../../server/types';
 
 export * from "../../lib/defaultEndpointConfig"
 

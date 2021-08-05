@@ -1,9 +1,9 @@
 import { seal, unseal } from "./iron"
 import { serialize, CookieSerializeOptions } from "cookie"
 import { NextApiResponse } from "next"
-import { isOrgCookieName, isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName, csrfCookieName } from "../../config/shared/config"
-import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../../lib/utils/apiRequests";
+import { isOrgCookieName, isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName, csrfCookieName } from "../../serverAndClient/cookiesConfig"
 import { deepAssign } from "combined-validator";
+import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../types";
 
 const sessionCookieOptions: CookieSerializeOptions = {
     maxAge: sessionCookieMaxAge,
@@ -65,7 +65,6 @@ export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNe
 
 async function setSession(res: NextApiResponse, data: any) {
     // delete all proto stuff
-
     const dataCopyNoCsrf = Object.assign({}, data);
     delete dataCopyNoCsrf["csrfToken"];
 
@@ -87,9 +86,9 @@ export function removeSession(res: NextApiResponse) {
         maxAge: -1,
         path: '/',
     }
-    const sessionCookie = serialize(sessionCookieName, '', Object.assign(sessionCookieOptions, emptyCookieSettings))
-    const isSessionActiveCookie = serialize(isSessionActiveCookieName, '', Object.assign(isSessionActiveCookieOptions, emptyCookieSettings))
-    const isOrgCookieNameCookie = serialize(isOrgCookieName, '', Object.assign(isOrgCookieOptions, emptyCookieSettings))
+    const sessionCookie = serialize(sessionCookieName, '', Object.assign({}, sessionCookieOptions, emptyCookieSettings)) // empty objects because the target object is modified
+    const isSessionActiveCookie = serialize(isSessionActiveCookieName, '', Object.assign({}, isSessionActiveCookieOptions, emptyCookieSettings))
+    const isOrgCookieNameCookie = serialize(isOrgCookieName, '', Object.assign({}, isOrgCookieOptions, emptyCookieSettings))
 
     // NOTE: leaving the csrf cookie
 

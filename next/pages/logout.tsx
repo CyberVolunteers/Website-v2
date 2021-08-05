@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { csrfFetch, updateLoginState } from "../lib/client/util";
-import { updateCsrf } from "../lib/utils/security";
+import { updateLoginState } from "../client/utils/userState";
+import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 
 export default function Logout({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 

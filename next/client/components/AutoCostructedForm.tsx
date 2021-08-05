@@ -4,7 +4,8 @@ import { useEffect } from "react";
 import { Dispatch, FormEvent, SetStateAction } from "react";
 import { createRef, RefObject, useState } from "react";
 import { FC } from "react";
-import { undoCamelCase, genInputElement, extractAndValidateFormData } from "../lib/client/util";
+import { extractAndValidateFormData, genInputElement } from "../utils/formUtils";
+import { undoCamelCase } from "../utils/misc";
 
 type PerElementValidatorCallback = (v: any) => boolean | Promise<boolean>;
 export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCallback | PerElementValidatorCallback[] };
@@ -92,6 +93,8 @@ const AutoConstructedForm: FC<{
         evt.preventDefault();
         if (!formRef.current?.checkValidity()) return;
 
+        //  do not submit if there is an error
+        // TODO: highlight those errors 
         if (Object.keys(perElementErrors).length !== 0) return;
         if (Object.keys(overallErrors).length !== 0) return;
         // actual request
