@@ -24,6 +24,11 @@ module.exports = {
 	],
 	"rules": {
 		"react/react-in-jsx-scope": "off",
+		"no-console": "error",
+		"no-unsafe-optional-chaining": "warn",
+		"require-atomic-updates": "warn",
+		"eqeqeq": "warn",
+		"strict": ["warn", "global"],
 		"indent": [
 			"error",
 			"tab"

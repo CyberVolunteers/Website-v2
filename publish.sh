@@ -5,6 +5,9 @@ set -e
 if [[ "$2" = "-p" ]]; then
 	cd ./next && npm run lint
 	cd ../
+
+else
+	echo "Note: you will not be pushing the changes"
 fi
 
 echo $(pwd)

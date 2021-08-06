@@ -1,3 +1,5 @@
+
+
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler } from "../../server/apiRequests";
@@ -7,7 +9,7 @@ import { HandlerCollection } from "../../server/types";
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-  name: string
+	name: string
 }
 
 const handlers: HandlerCollection = {
