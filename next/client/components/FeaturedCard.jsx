@@ -8,7 +8,7 @@ function FeaturedCard({ img, listing }) {
     const { title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid } = listing;
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
-            <img src={img} alt="" />
+            <img src={img} />
 
             <div className={`${styles["presentation"]}`}>
                 <h3 className={`${styles["title"]}`}>{title}</h3>

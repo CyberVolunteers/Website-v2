@@ -1,7 +1,9 @@
-export default function Home() {
-    return <div>
-        <p>We are the Cybervolunteers and this is our home page</p>
+import { ReactElement } from "react";
 
-        {/* Etc */}
-    </div>
+export default function Home(): ReactElement {
+	return <div>
+		<p>We are the Cybervolunteers and this is our home page</p>
+
+		{/* Etc */}
+	</div>;
 }

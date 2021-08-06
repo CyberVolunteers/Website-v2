@@ -1,29 +1,29 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { createHandler } from '../../lib/utils/apiRequests';
-import { removeSession } from '../../server/auth/auth-cookie';
-import { HandlerCollection } from '../../server/types';
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createHandler } from "../../server/apiRequests";
+import { removeSession } from "../../server/auth/auth-cookie";
+import { HandlerCollection } from "../../server/types";
 
-export * from "../../lib/defaultEndpointConfig"
+export * from "../../server/defaultEndpointConfig";
 
 type Data = {
   name: string
 }
 
 const handlers: HandlerCollection = {
-  POST: async function (req, res) {
-    await removeSession(res);
-    return res.end()
-  }
-}
+	POST: async function (req, res) {
+		await removeSession(res);
+		return res.end();
+	}
+};
 
-export default async function (
-  req: NextApiRequest,
-  res: NextApiResponse<Data>
-) {
-  await createHandler(
-    handlers,
-    {
-      useCsrf: true,
-    })(req, res)
+export default async function logout (
+	req: NextApiRequest,
+	res: NextApiResponse<Data>
+): Promise<void> {
+	await createHandler(
+		handlers,
+		{
+			useCsrf: true,
+		})(req, res);
 }

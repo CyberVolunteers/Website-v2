@@ -1,7 +1,9 @@
-export default function ContactUs() {
-    return <div>
-        <p>Please email dummy@dummy.com</p>
+import { ReactElement } from "react";
 
-        {/* Etc */}
-    </div>
+export default function ContactUs(): ReactElement {
+	return <div>
+		<p>Please email dummy@dummy.com</p>
+
+		{/* Etc */}
+	</div>;
 }

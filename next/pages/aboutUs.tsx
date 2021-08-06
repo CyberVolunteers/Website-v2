@@ -1,7 +1,9 @@
-export default function AboutUs() {
-    return <div>
-        <p>We are doing stuff</p>
+import { ReactElement } from "react";
 
-        {/* Etc */}
-    </div>
+export default function AboutUs(): ReactElement {
+	return <div>
+		<p>We are doing stuff</p>
+
+		{/* Etc */}
+	</div>;
 }

@@ -108,7 +108,7 @@ function Header() {
                 <div className={`${styles["header-content"]} w-1000 dflex-align-center`}>
                     <Link href="/" passHref>
                         <a>
-                            <img className="pointer" src="/img/logo.svg" alt="" />
+                            <img className="pointer" src="/img/logo.svg" />
                         </a>
                     </Link>
 
