@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
@@ -8,7 +9,17 @@ function FeaturedCard({ img, listing }) {
     const { title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid } = listing;
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
-            <img src={img} />
+            <div className={`img-container`}>
+                <Image
+                    src={img}
+                    // width={100}
+                    // height={100}
+                    size={"40vw"}
+                    layout="fill"
+                    objectFit="contain"
+                    alt="Featured listing image"
+                />
+            </div>
 
             <div className={`${styles["presentation"]}`}>
                 <h3 className={`${styles["title"]}`}>{title}</h3>

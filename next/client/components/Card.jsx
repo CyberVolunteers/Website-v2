@@ -1,3 +1,4 @@
+import Image from 'next/image';
 import Link from 'next/link';
 import React from 'react'
 
@@ -9,7 +10,18 @@ function Card({ img, listing }) {
 
     return (
         <div className={`${styles["Card"]}`}>
-            <img src={img} />
+            <div className={`${styles["card-image-container"]} img-container`}>
+                <Image
+                    src={img}
+                    // width={100}
+                    // height={100}
+                    size={"30vw"}
+                    layout="fill"
+                    objectPosition="center top"
+                    objectFit="contain"
+                    alt="Listing image"
+                />
+            </div>
             <div className={`${styles["bottom"]}`}>
                 <h3 className={`${styles["title"]}`}>{title}</h3>
                 <h4 className={`${styles["organisationName"]}`}>{organisationName}</h4>

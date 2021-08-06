@@ -3,6 +3,8 @@ import Card from "../client/components/Card";
 import FeaturedCard from "../client/components/FeaturedCard";
 import Pagination from "@material-ui/lab/Pagination";
 
+import Image from "next/image";
+
 import styles from "../client/styles/searchListings.module.css";
 import { ReactElement } from "react";
 
@@ -32,7 +34,14 @@ export default function SearchListings(): ReactElement {
 				<span className="w-100 dflex-align-center">
 					<h1>Volunteer now</h1>
 					<span className={`${styles["right-side"]}`}>
-						<img className={`${styles["icon"]}`} src="/img/filter.svg" alt="Filter icon" />
+						<div className={`${styles["icon-container"]}`}>
+							<Image
+								src="/img/filter.svg"
+								width={30}
+								height={30}
+								alt="Filter icon"
+							/>
+						</div>
 						<p>Filter</p>
 					</span>
 				</span>
@@ -42,14 +51,14 @@ export default function SearchListings(): ReactElement {
 			<div className={`${styles["featured-card-wrapper"]}`}>
 				<h1 className="w-1000">Featured: Loans with research backed impact</h1>
 				<p className="w-1000">{listings[0].title}</p>
-				<FeaturedCard listing={listings[0]} img="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/462293fd2c362d08699976464e326bf2.jpg" />
+				<FeaturedCard listing={listings[0]} img="/img/listing1.jpg" />
 			</div>
 
 
 			<div className={`${styles["cards-grid"]} w-1000`}>
 
 				{
-					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="https://www-kiva-org-0.freetls.fastly.net/img/w480h360/4cef12842110eabb16e7f2d27acabe5b.jpg" listing={value} />)
+					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="/img/listing2.jpg" listing={value} />)
 				}
 			</div>
 

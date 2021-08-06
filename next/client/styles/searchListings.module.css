@@ -39,9 +39,11 @@
   color: #000;
 }
 
-.icon{
-  width: 80%;
-  display: block;
+.icon-container{
+  position: relative;
+  height: 30px;
+  width: 30px;
+  /* display: block; */
   margin: auto;
 }
 

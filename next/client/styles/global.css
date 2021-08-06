@@ -61,3 +61,7 @@ nav {
 .d-block{
   display: block;
 }
+
+.img-container {
+  position: relative;
+}
