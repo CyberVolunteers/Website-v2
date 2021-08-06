@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { login } from "../../server/auth/session";
+import { isLoggedIn, login } from "../../server/auth/session";
 import loginSpec from "../../server/ajvConfig";
 import { createAjvJTDSchema } from "combined-validator";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
@@ -10,7 +10,7 @@ import { HandlerCollection } from "../../server/types";
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-  name: string
+	name: string
 }
 
 const handlers: HandlerCollection = {
@@ -18,7 +18,7 @@ const handlers: HandlerCollection = {
 
 		const session = await getSession(req);
 
-		if (session?.email) return res.send("Already signed in");
+		if (isLoggedIn(session)) return res.send("Already signed in");
 
 		const loginResult = await login(req.body);
 
@@ -30,7 +30,7 @@ const handlers: HandlerCollection = {
 	}
 };
 
-export default async function loginRequest (
+export default async function loginRequest(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {

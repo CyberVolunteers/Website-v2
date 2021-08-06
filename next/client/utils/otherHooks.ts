@@ -44,14 +44,20 @@ export function useViewProtection(allow: ViewerType[]) {
     const currentViewType = useViewerType()
     const [out, setOut] = useState(true);
 
+
     useEffect(() => {
+        if (currentViewType === "hydrating") return; // race conditions are fun
         if (!allow.includes(currentViewType)) {
-            if (currentViewType !== "server") router.replace(`/notAllowed?redirect=${router.pathname}`)
+            console.log(currentViewType)
+            if (currentViewType !== "server") router.replace(`/notAllowed?${new URLSearchParams({
+                redirect: router.pathname,
+                required: JSON.stringify(allow)
+            })}`)
             return setOut(false);
         }
 
         return setOut(true);
-    }, [])
+    }, [currentViewType])
 
     return out
 }

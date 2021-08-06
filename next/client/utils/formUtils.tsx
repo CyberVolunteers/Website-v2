@@ -6,7 +6,7 @@ import { undoCamelCase, updateOverallErrorsForRequests } from "./misc";
 
 export function genInputElement(name: string, flattenedValue: FlattenedValue, formStates: any, formStateSetters: any, validationCallback?: (k: string, v: any) => Promise<boolean>) {
     const inputType = flattenedValue.type;
-    if (typeof inputType !== "string") return <p>To be implemented</p>
+    if (typeof inputType !== "string") return <span>To be implemented</span>
 
     function setValue(v: any) {
         formStateSetters[name]?.(v) // do it straight away for responsiveness
@@ -85,8 +85,7 @@ export function createIsEmailIsAvailableValidator(overallErrors: {
         [key: string]: string;
     }>>) {
     return async function (email: string) {
-        const res = await fetch("/api/isEmailFree?" +
-            new URLSearchParams({ email }), {
+        const res = await fetch(`/api/isEmailFree?${new URLSearchParams({ email })}`, {
             method: "GET",
             credentials: "same-origin", // only send cookies for same-origin requests
             headers: {

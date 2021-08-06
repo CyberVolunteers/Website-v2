@@ -80,3 +80,11 @@ export async function isEmailFree(email: string) {
         return true;
     }
 }
+
+export function isLoggedIn(session: any) {
+    return typeof session?.email === "string"
+}
+
+export function isOrg(session: any) {
+    return isLoggedIn(session) && session?.isOrg === true;
+}
