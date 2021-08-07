@@ -2,12 +2,16 @@ import Link from "next/link";
 import { ReactElement } from "react";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import { useViewerType } from "../client/utils/userState";
+import Head from "../client/components/Head";
+
 
 export default function MyAccount(): ReactElement {
 	const userType = useViewerType();
 	const isAfterRehydration = useIsAfterRehydration();
 
 	return <div>
+		<Head title="My account - cybervolunteers" />
+
 		<p>Hello and welcome to my secure website</p>
 
 		{/* render the common stuff normally */}

@@ -87,3 +87,12 @@ export const listings: FieldConstraintsCollection = {
         },
     },
 }
+
+export const loginSpec: FieldConstraintsCollection = {
+    required: {
+        string: {
+            email: {},
+            password: {}
+        },
+    },
+};

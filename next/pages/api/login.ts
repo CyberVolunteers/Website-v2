@@ -2,10 +2,10 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { isLoggedIn, login } from "../../server/auth/session";
-import loginSpec from "../../server/ajvConfig";
 import { createAjvJTDSchema } from "combined-validator";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
+import { loginSpec } from "../../serverAndClient/publicFieldConstants";
 
 export * from "../../server/defaultEndpointConfig";
 

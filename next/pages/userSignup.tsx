@@ -8,6 +8,9 @@ import { useRouter } from "next/dist/client/router";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { createIsEmailIsAvailableValidator } from "../client/utils/formUtils";
+import { AutoConstructedFormData } from "../client/types";
+import Head from "../client/components/Head";
+
 
 export default function UserSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
@@ -19,11 +22,7 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
 		email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
 	};
 
-	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: {
-		// we don't want to check the types here
-		// eslint-disable-next-line
-		[key: string]: any
-	}) {
+	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: AutoConstructedFormData) {
 		const res = await csrfFetch(csrfToken, "/api/signupUser", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -40,6 +39,8 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
 	}
 
 	return <div>
+		<Head title="Sign up as a volunteer - cybervolunteers" />
+
 		<p>Hello and welcome to my secure website</p>
 
 		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />

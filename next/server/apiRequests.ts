@@ -7,6 +7,7 @@ import Ajv, { JTDParser } from "ajv/dist/jtd";
 import { getMongo } from "./mongo";
 import { checkCsrf } from "../serverAndClient/csrf";
 import { HandlerCollection, AjvParserCollection, QueryFieldsCollection, ExtendedNextApiRequest, ExtendedNextApiResponse, SupportedMethods } from "./types";
+import { contactEmail } from "../serverAndClient/staticDetails";
 export const ajv = new Ajv({
 	strictRequired: true,
 	allErrors: true,
@@ -45,7 +46,7 @@ export function createHandler(handlers: HandlerCollection, options: { useCsrf: b
 			await handlers[method]?.(req, res);
 		} catch (err) {
 			console.error(err);
-			return res.status(500).send("Could not process that request. Please contact us at hello@cybervolunteers.org.uk");
+			return res.status(500).send(`Could not process that request. Please contact us at ${contactEmail}`);
 		}
 	};
 }

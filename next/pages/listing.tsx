@@ -7,7 +7,7 @@ export default function Listing(): ReactElement {
 		<h1>This is a listing title</h1>
 
 		<p>
-			<p>Desc: {"bla bla bla"}</p>
+			<span>Desc: {"bla bla bla"}</span>
 		</p>
 
 		{/* Etc */}

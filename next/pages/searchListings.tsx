@@ -7,6 +7,8 @@ import Image from "next/image";
 
 import styles from "../client/styles/searchListings.module.css";
 import { ReactElement } from "react";
+import Head from "../client/components/Head";
+
 
 export default function SearchListings(): ReactElement {
 	const listingsPerPage = 6;
@@ -27,7 +29,9 @@ export default function SearchListings(): ReactElement {
 	const pagesNum = Math.ceil(listings.length / listingsPerPage);
 	const [listingsPage, setListingsPage] = useState(0);
 
-	return (
+	return (<>
+		<Head title="Search for listings - cybervolunteers" />
+
 		<div className={`${styles["Home"]}`}>
 
 			<div className={`${styles["top-area"]} dflex w-1000`}>
@@ -70,5 +74,6 @@ export default function SearchListings(): ReactElement {
 				</div>
 			</div>
 		</div >
+	</>
 	);
 }

@@ -1,17 +1,17 @@
 import { flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { useRouter } from "next/dist/client/router";
 import React, { ReactElement, useState } from "react";
 import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { useViewProtection } from "../client/utils/otherHooks";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { listings as listingsFields } from "../serverAndClient/publicFieldConstants";
+import Head from "../client/components/Head";
 
-export default function createListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+
+export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
 
-	const router = useRouter();
 	const [overallErrors, setOverallErrors] = useState({} as {
 		[key: string]: string
 	});
@@ -20,6 +20,7 @@ export default function createListing({ csrfToken, listingFields }: InferGetServ
 	};
 
 	async function onSubmit() {
+		// console.log("to be implemented");
 		// const res = await csrfFetch(csrfToken, "/api/signupUser", {
 		// 	method: "POST",
 		// 	credentials: "same-origin", // only send cookies for same-origin requests
@@ -35,6 +36,7 @@ export default function createListing({ csrfToken, listingFields }: InferGetServ
 	}
 
 	return <div>
+		<Head title="Create a listing - cybervolunteers" />
 
 		<AutoConstructedForm fields={listingFields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
 

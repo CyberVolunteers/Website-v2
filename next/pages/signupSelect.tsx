@@ -1,9 +1,13 @@
 import Link from "next/link";
 import { ReactElement } from "react";
+import Head from "../client/components/Head";
+
 
 export default function SignupSelect(): ReactElement {
 
 	return <div>
+		<Head title="Sign up - cybervolunteers" />
+
 		<p>
 			Hello and welcome to my secure website
 		</p>

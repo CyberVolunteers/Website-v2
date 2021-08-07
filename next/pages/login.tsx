@@ -1,17 +1,29 @@
+import { flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
-import { ReactElement } from "react";
+import React, { FormEvent, ReactElement } from "react";
 import { useState } from "react";
+import isEmail from "validator/lib/isEmail";
+import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
+import { AutoConstructedFormData } from "../client/types";
+import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { updateLoginState } from "../client/utils/userState";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
+import { loginSpec } from "../serverAndClient/publicFieldConstants";
+import Head from "../client/components/Head";
 
-export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	const [email, setEmail] = useState("");
-	const [password, setPassword] = useState("");
+export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
+	const [overallErrors, setOverallErrors] = useState({} as {
+		[key: string]: string
+	});
 
-	async function onSubmit() {
-		await csrfFetch(csrfToken, "/api/login", {
+	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
+		email: [isEmail],
+	};
+
+	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: AutoConstructedFormData) {
+		const res = await csrfFetch(csrfToken, "/api/login", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
@@ -19,40 +31,33 @@ export default function Login({ csrfToken }: InferGetServerSidePropsType<typeof 
 				"content-type": "application/json",
 				"accept": "application/json",
 			},
-			body: JSON.stringify({
-				email,
-				password
-			})
+			body: JSON.stringify(data)
 		});
-		const isLoggedIn = updateLoginState();
 
-		if (isLoggedIn) router.push(typeof router.query.redirect === "string" ? router.query.redirect : "/searchListings");
+		if (!await updateOverallErrorsForRequests(res, "loginPost", overallErrors, setOverallErrors)) return;
+
+		updateLoginState();
+		router.push(typeof router.query.redirect === "string" ? router.query.redirect : "/searchListings"); // redirect
 	}
 
 	return <div>
+		<Head title="Sign in - cybervolunteers" />
+
 		Hello and welcome to my secure website
 		<br />
 
-		<label htmlFor="email">Email</label>
-		<input type="email" className="email" name="email" value={email} onChange={(e) => setEmail(e.target.value)}></input>
-
-		<br />
-
-		<label htmlFor="pwd">Password</label>
-		<input className="pwd" name="pwd" value={password} onChange={(e) => setPassword(e.target.value)}></input>
-
-		<br />
-
-		<button className="submit" type="submit" onClick={onSubmit}>Wow, i sure do trust this website!</button>
+		<AutoConstructedForm fields={fields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
 	</div>;
 }
 
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string,
+	fields: Flattened
 }> = async (context) => {
 	return {
 		props: {
-			csrfToken: await updateCsrf(context)
+			csrfToken: await updateCsrf(context),
+			fields: flatten(loginSpec)
 		}, // will be passed to the page component as props
 	};
 };

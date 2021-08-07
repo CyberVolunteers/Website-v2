@@ -21,6 +21,23 @@ function Header() {
 
     const windowSize = useWindowSize();
 
+    const actionSlot = !isAfterRehydration ? null : userType === "org" ?
+        <Link href="/manageListings" passHref>
+            <a>
+                <p>
+                    Manage listings
+                </p>
+            </a>
+        </Link>
+        :
+        <Link href="/searchListings" passHref>
+            <a>
+                <p>
+                    Volunteer
+                </p>
+            </a>
+        </Link>
+
     const signUpOrMyAccountEl = !isAfterRehydration ? null : isLoggedIn ?
         <li>
             <Link href="/myAccount" passHref>
@@ -71,13 +88,7 @@ function Header() {
 
 
                         <li>
-                            <Link href="/searchListings" passHref>
-                                <a>
-                                    <p>
-                                        Volunteer
-                                    </p>
-                                </a>
-                            </Link>
+                            {actionSlot}
                         </li>
 
                         <li>
@@ -115,13 +126,7 @@ function Header() {
 
                     <ul className="dflex-align-center">
                         <li className={`${styles["head"]} dflex-align-center`}>
-                            <Link href="/searchListings" passHref>
-                                <a>
-                                    <p>
-                                        Volunteer
-                                    </p>
-                                </a>
-                            </Link>
+                            {actionSlot}
                         </li>
                     </ul>
 

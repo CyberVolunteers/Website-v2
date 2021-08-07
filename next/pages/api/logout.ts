@@ -7,7 +7,7 @@ import { HandlerCollection } from "../../server/types";
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-  name: string
+	name: string
 }
 
 const handlers: HandlerCollection = {
@@ -17,7 +17,7 @@ const handlers: HandlerCollection = {
 	}
 };
 
-export default async function logout (
+export default async function logout(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {

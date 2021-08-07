@@ -48,7 +48,6 @@ export function useViewProtection(allow: ViewerType[]) {
     useEffect(() => {
         if (currentViewType === "hydrating") return; // race conditions are fun
         if (!allow.includes(currentViewType)) {
-            console.log(currentViewType)
             if (currentViewType !== "server") router.replace(`/notAllowed?${new URLSearchParams({
                 redirect: router.pathname,
                 required: JSON.stringify(allow)

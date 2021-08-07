@@ -5,3 +5,15 @@ export type ValidateClientResult = [{
 }, {
     [key: string]: any
 }]
+
+export type AutoConstructedFormData = {
+    // we don't want to check the types here
+    // eslint-disable-next-line
+    [key: string]: any;
+};
+
+declare global {
+    interface Window {
+        wasHeadIncluded?: boolean
+    }
+}

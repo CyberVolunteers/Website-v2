@@ -2,10 +2,6 @@ import { useEffect, useState } from "react";
 import { isOrgCookieName, isSessionActiveCookieName } from "../../serverAndClient/cookiesConfig";
 import { ViewerType } from "../types";
 
-declare global {
-    interface Window { loginEventsBroadcastChannel: BroadcastChannel; }
-}
-
 function getCookie(name: string) {
     if (document.cookie.length > 0) {
         let startIndex = document.cookie.indexOf(name + "=");
