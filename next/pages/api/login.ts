@@ -18,13 +18,13 @@ const handlers: HandlerCollection = {
 
 		const session = await getSession(req);
 
-		if (isLoggedIn(session)) return res.send("Already signed in");
+		if (isLoggedIn(session)) console.log("Signing in a someone else")
 
 		const loginResult = await login(req.body);
 
 		if (!loginResult) return res.status(400).send("This email and password combination does not appear to be correct");
 
-		await updateSession(req, res, loginResult); //TODO: add some data here
+		await updateSession(req, res, loginResult);
 
 		return res.end();
 	}
