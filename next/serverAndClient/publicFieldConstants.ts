@@ -1,4 +1,5 @@
 import { FieldConstraintsCollection } from "combined-validator";
+import { userFieldNamesToShow } from "./displayNames";
 
 export const users: FieldConstraintsCollection = {
     required: {
@@ -91,7 +92,7 @@ export const listings: FieldConstraintsCollection = {
 export const loginSpec: FieldConstraintsCollection = {
     required: {
         string: {
-            email: {},
+            email: { maxLength: 320 },
             password: {}
         },
     },

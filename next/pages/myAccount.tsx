@@ -4,12 +4,10 @@ import { useIsAfterRehydration, useViewProtection } from "../client/utils/otherH
 import { useViewerType } from "../client/utils/userState";
 import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { updateCsrf } from "../serverAndClient/csrf";
-import { flatten } from "combined-validator";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 import { isLoggedIn, isOrg } from "../server/auth/session";
-import { undoCamelCase } from "../client/utils/misc";
+import { orgFieldNamesToShow, userFieldNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function MyAccount({ accountData }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -75,29 +73,6 @@ export default function MyAccount({ accountData }: InferGetServerSidePropsType<t
 			</a>
 		</Link>
 	</div>;
-}
-
-const orgFieldNamesToShow = {
-	email: "Your email",
-	orgType: "The type of your organisation",
-	orgName: "The name of your organisation",
-	orgDesc: "The description of your organisation",
-	orgLocation: "The location of your organisation",
-	phoneNumber: "Your phone number",
-	websiteUrl: "The address of your website",
-}
-
-const userFieldNamesToShow = {
-	firstName: "First name",
-	lastName: "Last name",
-	email: "Your email",
-	gender: "Your specified gender",
-	city: "Your city",
-	country: "Your country",
-	skillsAndInterests: "Your skills and interests",
-	birthDate: "Your date of birth",
-	nationality: "Your nationality",
-	phoneNumber: "Your phone number",
 }
 
 type AccountDataType = null | {
