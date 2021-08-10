@@ -23,6 +23,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	async function onSubmit(evt: React.FormEvent<HTMLFormElement>, data: {
 		[key: string]: any;
 	}) {
+		console.log(data)
 		// console.log("to be implemented");
 		// const res = await csrfFetch(csrfToken, "/api/signupUser", {
 		// 	method: "POST",

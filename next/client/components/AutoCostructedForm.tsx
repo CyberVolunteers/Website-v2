@@ -35,7 +35,10 @@ const AutoConstructedForm: FC<{
     function createState(f: Flattened) {
         Object.entries(f).forEach(([k, v]) => {
             if (typeof v.type !== "string") return createState(v.type); // nested
-            const [state, stateSetter] = useState(v.type === "boolean" ? false : "")
+            const [state, stateSetter] = useState(
+                v.array === true ? [] :
+                    v.type === "boolean" ? false : ""
+            )
             formStates[k] = state
             formStateSetters[k] = stateSetter
         })
@@ -169,7 +172,8 @@ export function genInputElement(
     presentableNames?: { [key: string]: string }
 ): ReactElement {
     const validationCallback = connectPerElementValidator(perElementValidationCallbacks[name]);
-    const outLabel = <label htmlFor={name}>{presentableNames?.[name] ?? capitalize(undoCamelCase(name))} {flattenedValue.required ? "(required)" : null}</label>
+    const getPresentableName = (v: string) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
+    const outLabel = <label htmlFor={name}>{getPresentableName(name)} {flattenedValue.required ? "(required)" : null}</label>
 
     const inputType = flattenedValue.type;
 
@@ -187,7 +191,35 @@ export function genInputElement(
         if (validationCallback !== undefined) { validationCallback(name, v); }
     }
 
-    if (flattenedValue.enum !== undefined)
+    if (flattenedValue.enum !== undefined) {
+        if (flattenedValue.array === true) {
+            return <>
+                {outLabel}
+                <br />
+                {Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) => {
+                    return <span key={k}>
+
+                        <span style={{
+                            textDecoration: formStates[name].includes(v) ? "underline" : "none",
+                            cursor: "pointer"
+                        }}
+                            onClick={() => {
+                                const newState = [...formStates[name]] // clone
+                                const index = newState.indexOf(v);
+                                // delete r add
+                                if (index !== -1) newState.splice(index, 1)
+                                else newState.push(v)
+                                formStateSetters[name]?.(newState)
+                            }}
+                        >
+                            {getPresentableName(v)}
+                        </span>
+                        < br />
+                    </span>
+                }
+                )}
+            </>
+        }
         return <>
             {outLabel}
             <select className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} >
@@ -196,11 +228,12 @@ export function genInputElement(
                 }
                 {Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) =>
                     <option key={k} value={v}>
-                        {capitalize(undoCamelCase(v))}
+                        {getPresentableName(v)}
                     </option>
                 )}
             </select>
         </>
+    }
 
     const newProps: any = {}
 
@@ -274,7 +307,7 @@ function extractAndValidateFormData(formStates: any, fieldStructure: Flattened):
             }
 
             // enums
-            if (v.enum !== undefined && !v.enum.includes(cleanedinputData[k])) return perElementErrors[k] = `Please select a valid value`
+            if (v.enum !== undefined && v.array !== true && !v.enum.includes(cleanedinputData[k])) return perElementErrors[k] = `Please select a valid value`
 
             // finally, if nothing took care of it, show this generic error
             if (cleanedinputData[k] === undefined) return errors.valuesAreRequired = "Please make sure you have specified all the required values";
