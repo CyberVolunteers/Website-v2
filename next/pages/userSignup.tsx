@@ -10,6 +10,7 @@ import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { createIsEmailIsAvailableValidator } from "../client/utils/formUtils";
 import { AutoConstructedFormData } from "../client/types";
 import Head from "../client/components/Head";
+import { userFieldNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function UserSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -43,7 +44,7 @@ export default function UserSignup({ csrfToken, signupFields }: InferGetServerSi
 
 		<p>Hello and welcome to my secure website</p>
 
-		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} presentableNames={userFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
 	</div>;
 }
 

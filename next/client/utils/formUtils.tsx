@@ -45,8 +45,7 @@ export function genInputElement(name: string, flattenedValue: FlattenedValue, fo
             break;
 
         case "boolean":
-            newProps.placeholder = "WORK IN PROGRESS";
-            newProps.type = "text"
+            newProps.type = "checkbox";
         default:
             break;
     }

@@ -7,6 +7,7 @@ import { useViewProtection } from "../client/utils/otherHooks";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { listings as listingsFields } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
+import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -38,7 +39,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	return <div>
 		<Head title="Create a listing - cybervolunteers" />
 
-		<AutoConstructedForm fields={listingFields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<AutoConstructedForm fields={listingFields} presentableNames={listingFieldNamesToShow} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
 
 	</div>;
 }

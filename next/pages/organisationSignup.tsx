@@ -12,6 +12,7 @@ import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { createIsEmailIsAvailableValidator } from "../client/utils/formUtils";
 import { AutoConstructedFormData } from "../client/types";
 import Head from "../client/components/Head";
+import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function OrganisationSignup({ csrfToken, signupFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -45,7 +46,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
 
 		<p>Hello and welcome to my secure website</p>
 
-		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} presentableNames={orgFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
 	</div>;
 }
 

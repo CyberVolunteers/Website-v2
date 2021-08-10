@@ -13,6 +13,7 @@ export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCal
 const AutoConstructedForm: FC<{
     fields: Flattened,
     perElementValidationCallbacks: PerElementValidatorCallbacks,
+    presentableNames?: {[key: string]: string}, 
     onSubmit: (evt: FormEvent<HTMLFormElement>, data: {
         [key: string]: any
     }) => Promise<void>,
@@ -22,7 +23,7 @@ const AutoConstructedForm: FC<{
     setOverallErrors: Dispatch<SetStateAction<{
         [key: string]: string;
     }>>
-}> = ({ fields, perElementValidationCallbacks, onSubmit: onSubmitCalback, overallErrors, setOverallErrors }) => {
+}> = ({ fields, perElementValidationCallbacks, onSubmit: onSubmitCalback, overallErrors, setOverallErrors, presentableNames }) => {
     const formStates: any = {}
     const formStateSetters: any = {}
 
@@ -127,8 +128,10 @@ const AutoConstructedForm: FC<{
         <form onSubmit={onSubmit} ref={formRef}>
             {
                 Object.entries(fields).map(([k, v], index) => {
+                    const getName = (n: string) => presentableNames?.[n] ?? capitalize(undoCamelCase(n)); 
+
                     return <p key={index}>
-                        <label htmlFor={k}>{capitalize(undoCamelCase(k))} {v.required ? "(required)" : null}</label>
+                        <label htmlFor={k}>{getName(k)} {v.required ? "(required)" : null}</label>
                         {genInputElement(k, v, formStates, formStateSetters, connectPerElementValidator(perElementValidationCallbacks[k]))}
                         {
                             perElementErrors[k] === undefined ? null :

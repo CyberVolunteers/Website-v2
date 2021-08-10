@@ -4,4 +4,4 @@ import { users as usersPrivate, organisations as orgPrivate, listings as listing
 
 export const UserSchema = constructSchema(deepAssign(usersPublic, usersPrivate));
 export const OrgSchema = constructSchema(deepAssign(orgPublic, orgPrivate));
-export const ListingSchema = constructSchema(deepAssign(listingPublic, listingPublic));
+export const ListingSchema = constructSchema(deepAssign(listingPublic, listingPrivate));

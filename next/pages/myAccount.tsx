@@ -28,7 +28,6 @@ export default function MyAccount({ accountData }: InferGetServerSidePropsType<t
 					v = new Date(v).toDateString()
 
 				return <p key={k}>
-					{console.log(k, v)}
 					<span>{k}: {v}</span>
 				</p>
 			})
@@ -88,7 +87,6 @@ export const getServerSideProps: GetServerSideProps<{
 		const fieldNames = isOrg(session) ? orgFieldNamesToShow : userFieldNamesToShow;
 		const fieldKeys = Object.keys(fieldNames).filter(k => k in session);
 		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]]))
-		console.log(fields)
 	}
 
 	return {
