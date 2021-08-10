@@ -1,7 +1,10 @@
 import { Dispatch, SetStateAction } from "react";
 
 export function undoCamelCase(s: string) {
-    return s.replace(/([A-Z])/g, ' $1').toLowerCase();
+    let out =  s.replace(/([A-Z])/g, ' $1'); // add a space before all the capital letters
+    out = out.replace(/([0-9]+)/g, ' $1'); // add a space before digits
+    out = out.toLowerCase();
+    return out;
 }
 
 async function createErrorMessage(res: Response) { // it is a separate function to account for a possible improvement

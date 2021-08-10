@@ -20,7 +20,9 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 	};
 
-	async function onSubmit() {
+	async function onSubmit(evt: React.FormEvent<HTMLFormElement>, data: {
+		[key: string]: any;
+	}) {
 		// console.log("to be implemented");
 		// const res = await csrfFetch(csrfToken, "/api/signupUser", {
 		// 	method: "POST",
