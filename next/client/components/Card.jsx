@@ -31,13 +31,13 @@ function Card({ img, listing }) {
                     <a href="#" >Read more</a>
                 </p>
 
-                <div className={`${styles["meter-total"]}`}>
+                {/* <div className={`${styles["meter-total"]}`}>
                     <div className={`${styles["meter"]}`} style={{ width: currentVolunteers / requestedVolunteers * 100 + "%" }}></div>
                 </div>
 
                 <span className={`${styles["volunteers-progress-bar"]}`}>
                     {currentVolunteers}/{requestedVolunteers} volunteers
-                </span>
+                </span> */}
 
                 <div className={`${styles["submittion-area"]} dflex-align-center`}>
 
