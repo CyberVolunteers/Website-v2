@@ -60,6 +60,7 @@ const AutoConstructedForm: FC<{
         evt.preventDefault();
         if (!formRef.current?.checkValidity()) return;
 
+        //TODO: don't resubmit without change
         //  do not submit if there is an error
         const allCorrect = Object.entries(fieldRefs).every(([k, v]) => (v.current as any)?.doesHaveNoErrors() === true);
         console.log("allCorrect", allCorrect)

@@ -68,7 +68,7 @@ const FormComponent = forwardRef((props: {
 		getData: () => {
 			const newData = (childRef.current as any)?._getData()
 			const errorObj = new Error(`Please supply an appropriate value for "${getPresentableName(props.name, props.presentableNames)}"`);
-			if(newData === null) throw errorObj
+			if (newData === null) throw errorObj
 			if (newData === "") {
 				if (props.flattenedValue.required) throw errorObj
 				else return undefined;
@@ -118,18 +118,24 @@ const InputElement = forwardRef((props: {
 
 	// nested things
 	if (typeof inputType !== "string") {
+		const nestedRefs = Object.fromEntries(Object.entries(inputType).map(([k, v]) => [k, useRef()]));
+
 		useImperativeHandle(ref, () => ({
 			_getData: () => {
-				return null
+				// NOTE: we are not handling errors so that they rise up the call stack
+				const newData = Object.fromEntries(Object.entries(nestedRefs).map(([k, v]) => {
+					const newNestedEntry = (v.current as any)?.getData();
+					return [k, newNestedEntry]
+				}));
+				return newData
 			}
 		}));
 		return <>
 			{Object.entries(inputType).map(([newName, newVal]) => {
-				const nestedRef = useRef();
 				//TODO: use on error set
-				//TODO: test it
+				//TODO: test if problems in nested components are indeed processed
 				return <span key={newName}>
-					<FormComponent name={newName} flattenedValue={newVal} {...{ formStates, formStateSetters, connectPerElementValidator, perElementValidationCallbacks, presentableNames }} />
+					<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ formStates, formStateSetters, connectPerElementValidator, perElementValidationCallbacks, presentableNames }} />
 				</span>
 			}
 			)}
