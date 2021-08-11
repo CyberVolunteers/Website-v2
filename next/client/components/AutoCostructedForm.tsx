@@ -20,10 +20,6 @@ const AutoConstructedForm: FC<{
         [key: string]: string;
     }>>
 }> = ({ fields, perElementValidationCallbacks, onSubmit: onSubmitCalback, overallErrors, setOverallErrors, presentableNames }) => {
-    const formStates: any = {}
-    const formStateSetters: any = {}
-
-
     // add states
     function createState(f: Flattened) {
         Object.entries(f).forEach(([k, v]) => {
@@ -32,8 +28,6 @@ const AutoConstructedForm: FC<{
                 v.array === true ? [] :
                     v.type === "boolean" ? false : ""
             )
-            formStates[k] = state
-            formStateSetters[k] = stateSetter
         })
     }
 
@@ -47,11 +41,6 @@ const AutoConstructedForm: FC<{
     Object.entries(fields).forEach(([k, v]) => {
         fieldRefs[k] = (useRef<typeof FormComponent>())
     });
-
-    // delete the error messages on field change
-    useEffect(() => {
-        setOverallErrors({})
-    }, Object.values(formStates))
 
     function onSubmit(evt: FormEvent<HTMLFormElement>) {
         evt.preventDefault();
@@ -109,7 +98,12 @@ const AutoConstructedForm: FC<{
                 Object.entries(fields).map(([k, v], index) => {
 
                     return <p key={index}>
-                        <FormComponent ref={fieldRefs[k]} name={k} flattenedValue={v} formStates={formStates} formStateSetters={formStateSetters} perElementValidationCallbacks={perElementValidationCallbacks} presentableNames={presentableNames} />
+                        <FormComponent ref={fieldRefs[k]}
+                            name={k}
+                            flattenedValue={v}
+                            perElementValidationCallbacks={perElementValidationCallbacks}
+                            presentableNames={presentableNames}
+                            onChange={() => setOverallErrors({})} /> {/* delete the error messages on field change*/}
                     </p>
                 })
             }

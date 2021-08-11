@@ -15,8 +15,7 @@ type Data = {
 }
 
 const handlers: HandlerCollection = {
-	POST: async function (req, res) {
-		
+	POST: async function (req, res) {		
 		const session = await getSession(req);
 
 		if (!isOrg(session)) return res.status(403).send("You need to be an organisation to do that");

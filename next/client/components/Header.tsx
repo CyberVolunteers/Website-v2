@@ -22,6 +22,8 @@ function Header() {
 
     const windowSize = useWindowSize();
 
+    const windowWidth = windowSize.width ?? 1000; // to make sure that the larger version is displayed otherwise
+
     const actionSlot = !isAfterRehydration ? null : userType === "org" ?
         <Link href="/manageListings" passHref>
             <a>
@@ -61,7 +63,7 @@ function Header() {
                 </Link>
             </li>
             {
-                windowSize.width > sidebarLimitWidth || windowSize.width === undefined ? // only show it on the larger screens (the button on the bottom will be showed otherwise)
+                !isAfterRehydration || windowWidth > sidebarLimitWidth ? // only show it on the larger screens (the button on the bottom will be showed otherwise)
                     <li>
                         <Link href="/signupSelect" passHref>
                             <a>
@@ -81,7 +83,7 @@ function Header() {
         <>
 
             {
-                isSidebarUp && windowSize.width <= sidebarLimitWidth ?
+                isAfterRehydration && isSidebarUp && windowWidth <= sidebarLimitWidth ?
 
                     <aside className={`${styles["sidebar"]}`}>
 
@@ -177,7 +179,7 @@ function Header() {
 
                         {signUpOrMyAccountEl}
                         {
-                            isAfterRehydration && windowSize.width <= sidebarLimitWidth ?
+                            isAfterRehydration && windowWidth <= sidebarLimitWidth ?
                                 <li className={`${styles["bottomButton"]}`}>
                                     <Link href="/login" passHref>
                                         <a>

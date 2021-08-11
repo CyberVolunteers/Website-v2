@@ -12,11 +12,10 @@ const getPresentableName = (v: string, presentableNames?: { [key: string]: strin
 const FormComponent = forwardRef((props: {
 	name: string,
 	flattenedValue: FlattenedValue,
-	formStates: any,
-	formStateSetters: any,
 	perElementValidationCallbacks: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
-	onErrorSet?: (msg: string) => void
+	onErrorSet?: (msg: string) => void,
+	onChange?: (newVal: any) => void
 }, ref) => {
 	const childRef = useRef();
 	const [elementError, setElementError] = useState("");
@@ -83,7 +82,7 @@ const FormComponent = forwardRef((props: {
 
 	return <span>
 		{outLabel}
-		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} />
+		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={props.onChange} />
 		{
 			elementError === "" ? null :
 				<span>{elementError}</span>
@@ -96,20 +95,18 @@ export default FormComponent;
 const InputElement = forwardRef((props: {
 	name: string,
 	flattenedValue: FlattenedValue,
-	formStates: any,
-	formStateSetters: any,
 	connectPerElementValidator: (callbacks?: PerElementValidatorCallback | PerElementValidatorCallback[] | undefined) => ((k: string, v: any) => Promise<boolean>) | undefined,
 	perElementValidationCallbacks: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
-	onErrorSet?: (msg: string) => void
+	onErrorSet?: (msg: string) => void,
+	onChange?: (newVal: any) => void
 }, ref) => {
 	const { name,
 		flattenedValue,
-		formStates,
-		formStateSetters,
 		connectPerElementValidator,
 		perElementValidationCallbacks,
 		presentableNames,
+		onChange
 	} = props;
 
 	const validationCallback = connectPerElementValidator(perElementValidationCallbacks[name]);
@@ -135,30 +132,35 @@ const InputElement = forwardRef((props: {
 				//TODO: use on error set
 				//TODO: test if problems in nested components are indeed processed
 				return <span key={newName}>
-					<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ formStates, formStateSetters, connectPerElementValidator, perElementValidationCallbacks, presentableNames }} />
+					<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ connectPerElementValidator, perElementValidationCallbacks, presentableNames }} onChange={onChange} />
 				</span>
 			}
 			)}
 		</>
 	}
+	const [formState, formStateSetter] = useState(
+		flattenedValue.array === true ? [] as any[] :
+			flattenedValue.type === "boolean" ? false : ""
+	);
 
 	function setValue(v: any) {
-		formStateSetters[name]?.(v) // do it straight away for responsiveness
+		formStateSetter(v) // do it straight away for responsiveness
+		onChange?.(v)
 		if (validationCallback !== undefined) { validationCallback(name, v); }
 	}
 
 	if (flattenedValue.enum !== undefined) {
-		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} />
-		else return <DropdownComponent ref={ref} {...props} setValue={setValue} />
+		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} formState={formState as any[]} formStateSetter={formStateSetter}/>
+		else return <DropdownComponent ref={ref} {...props} setValue={setValue} formState={formState} />
 	}
 
-	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} />
+	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} formState={formState as any[]}/>
 })
 
-const MultiSelect = forwardRef(({ name, flattenedValue, formStates, formStateSetters, presentableNames }: { name: string, flattenedValue: FlattenedValue, formStates: { [key: string]: any }, formStateSetters: any, presentableNames?: { [key: string]: string } }, ref) => {
+const MultiSelect = forwardRef(({ name, flattenedValue, formState, formStateSetter, presentableNames }: { name: string, flattenedValue: FlattenedValue, formState: any[], formStateSetter: any, presentableNames?: { [key: string]: string } }, ref) => {
 	useImperativeHandle(ref, () => ({
 		_getData: () => {
-			return formStates[name];
+			return formState;
 		}
 	}));
 	return <span>
@@ -167,16 +169,16 @@ const MultiSelect = forwardRef(({ name, flattenedValue, formStates, formStateSet
 			return <span key={k}>
 
 				<span style={{
-					textDecoration: formStates[name].includes(v) ? "underline" : "none",
+					textDecoration: formState.includes(v) ? "underline" : "none",
 					cursor: "pointer"
 				}}
 					onClick={() => {
-						const newState = [...formStates[name]] // clone
+						const newState = [...formState] // clone
 						const index = newState.indexOf(v);
 						// delete r add
 						if (index !== -1) newState.splice(index, 1)
 						else newState.push(v)
-						formStateSetters[name]?.(newState)
+						formStateSetter?.(newState)
 					}}
 				>
 					{getPresentableName(v, presentableNames)}
@@ -188,17 +190,17 @@ const MultiSelect = forwardRef(({ name, flattenedValue, formStates, formStateSet
 	</span>
 })
 
-const DropdownComponent = forwardRef(({ name, flattenedValue, formStates, presentableNames, setValue }: { name: string, flattenedValue: FlattenedValue, formStates: { [key: string]: any }, presentableNames?: { [key: string]: string }, setValue: (v: any) => void }, ref) => {
+const DropdownComponent = forwardRef(({ name, flattenedValue, formState, presentableNames, setValue }: { name: string, flattenedValue: FlattenedValue, formState: any, presentableNames?: { [key: string]: string }, setValue: (v: any) => void }, ref) => {
 	useImperativeHandle(ref, () => ({
 		_getData: () => {
 			// a check to make sure 
-			if (!flattenedValue.enum.includes(formStates[name])) return null;
-			return formStates[name]
+			if (!flattenedValue.enum.includes(formState)) return null;
+			return formState
 		}
 	}));
-	return <select className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} >
+	return <select className={name} name={name} required={flattenedValue.required} value={formState} onChange={e => setValue(e.target.value)} >
 		{
-			formStates[name] ? null : <option value="notSelected">Select:</option> // only show this if nothing else is selected
+			formState ? null : <option value="notSelected">Select:</option> // only show this if nothing else is selected
 		}
 		{Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) =>
 			<option key={k} value={v}>
@@ -208,23 +210,23 @@ const DropdownComponent = forwardRef(({ name, flattenedValue, formStates, presen
 	</select>
 })
 
-const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, formStates, setValue }: { name: string, flattenedValue: FlattenedValue, inputType: string, formStates: { [key: string]: any }, setValue: (v: any) => void }, ref) => {
+const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, formState, setValue }: { name: string, flattenedValue: FlattenedValue, inputType: string, formState: any, setValue: (v: any) => void }, ref) => {
 	useImperativeHandle(ref, () => ({
 		_getData: () => {
 			switch (inputType) {
 				case "date":
 					// convert all dates to iso
 					// TODO: completely isolate formStates
-					formStates[name] = new Date(formStates[name] as string).toISOString()
+					formState = new Date(formState as string).toISOString()
 					break;
 				case "number":
 					// convert all number strings to numbers
-					const out = parseInt(formStates[name] as string)
-					if (isNaN(out)) formStates[name] = "";
-					else formStates[name] = out;
+					const out = parseInt(formState as string)
+					if (isNaN(out)) formState = "";
+					else formState = out;
 					break;
 			}
-			return formStates[name];
+			return formState;
 		}
 	}));
 	const newProps: any = {}
@@ -249,13 +251,13 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 		case "boolean":
 			newProps.type = "checkbox";
 			newProps.required = false;
-			newProps.checked = formStates[name];
+			newProps.checked = formState;
 			newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.checked);
 		default:
 			break;
 	}
 
 	return <>
-		<input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} {...newProps} />
+		<input className={name} name={name} required={flattenedValue.required} value={formState} onChange={e => setValue(e.target.value)} {...newProps} />
 	</>;
 })
