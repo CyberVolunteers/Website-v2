@@ -23,8 +23,5 @@ export async function updateOverallErrorsForRequests(res: Response, thisId: stri
         setOverallErrors(overallErrorsCopy);
         return false
     }
-
-    delete overallErrorsCopy[thisId];
-    setOverallErrors(overallErrorsCopy);
     return true
 }

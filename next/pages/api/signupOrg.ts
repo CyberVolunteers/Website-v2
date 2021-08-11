@@ -15,6 +15,7 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
+		return res.status(400).send("well, too bad!");
 
 		const signupResult = await signupOrg(req.body);
 

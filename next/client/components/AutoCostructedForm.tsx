@@ -6,10 +6,8 @@ import { Dispatch, FormEvent, SetStateAction } from "react";
 import { createRef, RefObject, useState } from "react";
 import { FC } from "react";
 import { ValidateClientResult } from "../types";
-import { undoCamelCase, updateOverallErrorsForRequests } from "../utils/misc";
-
-type PerElementValidatorCallback = (v: any) => boolean | Promise<boolean>;
-export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCallback | PerElementValidatorCallback[] };
+import { undoCamelCase } from "../utils/misc";
+import FormComponent, { PerElementValidatorCallbacks, PerElementValidatorCallback } from "./FormComponen";
 
 const AutoConstructedForm: FC<{
     fields: Flattened,
@@ -30,7 +28,6 @@ const AutoConstructedForm: FC<{
 
     const formRef: RefObject<HTMLFormElement> = createRef();
 
-
     // add states
     function createState(f: Flattened) {
         Object.entries(f).forEach(([k, v]) => {
@@ -44,7 +41,6 @@ const AutoConstructedForm: FC<{
         })
     }
 
-
     createState(fields)
 
     const [perElementErrors, setPerElementErrors] = useState({} as {
@@ -55,7 +51,6 @@ const AutoConstructedForm: FC<{
     useEffect(() => {
         setOverallErrors({})
         setPerElementErrors({})
-        Object.keys(overallErrors).forEach((k) => delete overallErrors[k]) // so that when setting values based off that, they are consistant, we need to loop over and not to assign to an empty object so that it is recognised by reference
 
     }, Object.values(formStates))
 
@@ -72,6 +67,8 @@ const AutoConstructedForm: FC<{
                 // check that all promises are fulfilled
 
                 // the parallel way
+                // it calls everything - we don't want that many calls to the endpoint
+                // TODO: maybe detect sync vs async?
                 // const promisesToCheck = (callbacks as PerElementValidatorCallback[]).map(async (cb) => await cb(v));
                 // const results = await Promise.all(promisesToCheck);
                 // hasPassed = results.every(v => v);
@@ -143,11 +140,7 @@ const AutoConstructedForm: FC<{
                 Object.entries(fields).map(([k, v], index) => {
 
                     return <p key={index}>
-                        {genInputElement(k, v, formStates, formStateSetters, connectPerElementValidator, perElementValidationCallbacks, presentableNames)}
-                        {
-                            perElementErrors[k] === undefined ? null :
-                                <span>{perElementErrors[k]}</span>
-                        }
+                        <FormComponent name={k} flattenedValue={v} formStates={formStates} formStateSetters={formStateSetters} connectPerElementValidator={connectPerElementValidator} perElementValidationCallbacks={perElementValidationCallbacks} perElementErrors={perElementErrors} presentableNames={presentableNames}/>
                     </p>
                 })
             }
@@ -161,113 +154,6 @@ export default AutoConstructedForm
 
 
 
-
-export function genInputElement(
-    name: string,
-    flattenedValue: FlattenedValue,
-    formStates: any,
-    formStateSetters: any,
-    connectPerElementValidator: (callbacks?: PerElementValidatorCallback | PerElementValidatorCallback[] | undefined) => ((k: string, v: any) => Promise<boolean>) | undefined,
-    perElementValidationCallbacks: PerElementValidatorCallbacks,
-    presentableNames?: { [key: string]: string }
-): ReactElement {
-    const validationCallback = connectPerElementValidator(perElementValidationCallbacks[name]);
-    const getPresentableName = (v: string) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
-    const outLabel = <label htmlFor={name}>{getPresentableName(name)} {flattenedValue.required ? "(required)" : null}</label>
-
-    const inputType = flattenedValue.type;
-
-    if (typeof inputType !== "string") return <>
-        {outLabel}
-        {/* recurse */}
-        {Object.entries(inputType).map(([newName, newVal]) => <span key={newName}>
-            {genInputElement(newName, newVal, formStates, formStateSetters, connectPerElementValidator, perElementValidationCallbacks, presentableNames)}
-        </span>
-        )}
-    </>
-
-    function setValue(v: any) {
-        formStateSetters[name]?.(v) // do it straight away for responsiveness
-        if (validationCallback !== undefined) { validationCallback(name, v); }
-    }
-
-    if (flattenedValue.enum !== undefined) {
-        if (flattenedValue.array === true) {
-            return <>
-                {outLabel}
-                <br />
-                {Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) => {
-                    return <span key={k}>
-
-                        <span style={{
-                            textDecoration: formStates[name].includes(v) ? "underline" : "none",
-                            cursor: "pointer"
-                        }}
-                            onClick={() => {
-                                const newState = [...formStates[name]] // clone
-                                const index = newState.indexOf(v);
-                                // delete r add
-                                if (index !== -1) newState.splice(index, 1)
-                                else newState.push(v)
-                                formStateSetters[name]?.(newState)
-                            }}
-                        >
-                            {getPresentableName(v)}
-                        </span>
-                        < br />
-                    </span>
-                }
-                )}
-            </>
-        }
-        return <>
-            {outLabel}
-            <select className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} >
-                {
-                    formStates[name] ? null : <option value="notSelected">Select:</option> // only show this if nothing else is selected
-                }
-                {Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) =>
-                    <option key={k} value={v}>
-                        {getPresentableName(v)}
-                    </option>
-                )}
-            </select>
-        </>
-    }
-
-    const newProps: any = {}
-
-    switch (inputType) {
-        case "string":
-            newProps.type = ["email", "password"].includes(name) ? name : "text"
-            newProps.maxLength = flattenedValue?.maxLength;
-            break;
-
-        case "number":
-            newProps.type = "text"
-            newProps.pattern = "\\d*"
-            newProps.title = "Please enter a number"
-            newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d]/g, "")) // remove non-digits
-            break;
-
-        case "date":
-            newProps.type = "date"
-            break;
-
-        case "boolean":
-            newProps.type = "checkbox";
-            newProps.required = false;
-            newProps.checked = formStates[name];
-            newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.checked);
-        default:
-            break;
-    }
-
-    return <>
-        {outLabel}
-        <input className={name} name={name} required={flattenedValue.required} value={formStates[name]} onChange={e => setValue(e.target.value)} {...newProps} />
-    </>;
-}
 
 function extractAndValidateFormData(formStates: any, fieldStructure: Flattened): ValidateClientResult {
     const errors: {
