@@ -24,7 +24,7 @@ export default function MyAccount({ accountData }: InferGetServerSidePropsType<t
 		{
 			Object.entries(accountData ?? {}).map(([k, v]) => {
 
-				if ((!isNaN(new Date(v).getDay()))) // check if it is a date
+				if (typeof v === "string" && !isNaN(new Date(v).getDay())) // check if it is a date
 					v = new Date(v).toDateString()
 
 				return <p key={k}>
@@ -85,8 +85,8 @@ export const getServerSideProps: GetServerSideProps<{
 	let fields: AccountDataType = null;
 	if (isLoggedIn(session)) {
 		const fieldNames = isOrg(session) ? orgFieldNamesToShow : userFieldNamesToShow;
-		const fieldKeys = Object.keys(fieldNames).filter(k => k in session);
-		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]]))
+		const fieldKeys = Object.keys(fieldNames).filter(k => k in session); // only show the keys that have been specified
+		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]])) // translate them
 	}
 
 	return {
