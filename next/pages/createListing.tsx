@@ -1,13 +1,14 @@
-import { flatten, Flattened } from "combined-validator";
+import { createAjvJTDSchema, flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React, { ReactElement, useState } from "react";
 import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { useViewProtection } from "../client/utils/otherHooks";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
-import { listings as listingsFields } from "../serverAndClient/publicFieldConstants";
+import { listings, listings as listingsFields } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
+import Ajv from "ajv/dist/jtd";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -23,20 +24,18 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	async function onSubmit(evt: React.FormEvent<HTMLFormElement>, data: {
 		[key: string]: any;
 	}) {
-		console.log(data)
-		// console.log("to be implemented");
-		// const res = await csrfFetch(csrfToken, "/api/signupUser", {
-		// 	method: "POST",
-		// 	credentials: "same-origin", // only send cookies for same-origin requests
-		// 	headers: {
+		const res = await csrfFetch(csrfToken, "/api/createListing", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
 
-		// 		"content-type": "application/json",
-		// 		"accept": "application/json",
-		// 	},
-		// 	body: JSON.stringify(data)
-		// });
+				"content-type": "application/json",
+				"accept": "application/json",
+			},
+			body: JSON.stringify(data)
+		});
 
-		// if (!await updateOverallErrorsForRequests(res, "userSignupPost", overallErrors, setOverallErrors)) return;
+		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
 	}
 
 	return <div>

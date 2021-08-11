@@ -1,5 +1,4 @@
 import { FieldConstraintsCollection, flatten } from "combined-validator";
-import { userFieldNamesToShow } from "./displayNames";
 
 export const users: FieldConstraintsCollection = {
     required: {
@@ -61,7 +60,7 @@ export const listings: FieldConstraintsCollection = {
             title: { maxLength: 150 },
             desc: { maxLength: 7000 },
             category: { enum: ["Advocacy & Human Rights", "Arts & Culture", "Community", "Computers & Technology", "Education", "Healthcare & Medicine", "Elderly"] },
-            requiredData: {array: true, enum: Object.keys(flatten(users)).filter(k => k !== "password")}
+            requiredData: {enum: Object.keys(flatten(users)).filter(k => k !== "password"), array: true}
         },
         object: {
             targetAudience: {

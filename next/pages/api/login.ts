@@ -6,6 +6,7 @@ import { createAjvJTDSchema } from "combined-validator";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 import { loginSpec } from "../../serverAndClient/publicFieldConstants";
+import { Org } from "../../server/mongo/mongoModels";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -18,7 +19,7 @@ const handlers: HandlerCollection = {
 
 		const session = await getSession(req);
 
-		if (isLoggedIn(session)) console.log("Signing in a someone else")
+		if (isLoggedIn(session)) console.log("Signing in a someone else") //TODO: replace with logging
 
 		const loginResult = await login(req.body);
 
