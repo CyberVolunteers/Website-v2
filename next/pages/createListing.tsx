@@ -1,19 +1,21 @@
-import { createAjvJTDSchema, flatten, Flattened } from "combined-validator";
+import { flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import React, { ReactElement, useState } from "react";
-import AutoConstructedForm from "../client/components/AutoCostructedForm";
+import React, { ReactElement, useRef, useState } from "react";
+import FormFieldCollection from "../client/components/FormFieldCollection";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { useViewProtection } from "../client/utils/otherHooks";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
-import { listings, listings as listingsFields } from "../serverAndClient/publicFieldConstants";
+import { listings } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
-import Ajv from "ajv/dist/jtd";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
+import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
+
+	const autoFormRef = useRef();
 
 	const [overallErrors, setOverallErrors] = useState({} as {
 		[key: string]: string
@@ -22,9 +24,12 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 	};
 
-	async function onSubmit(evt: React.FormEvent<HTMLFormElement>, data: {
-		[key: string]: any;
-	}) {
+	async function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
+		evt.preventDefault();
+
+		const data: { [key: string]: any } | null = (autoFormRef.current as any)?.getData();
+
+
 		const res = await csrfFetch(csrfToken, "/api/createListing", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -42,7 +47,11 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	return <div>
 		<Head title="Create a listing - cybervolunteers" />
 
-		<AutoConstructedForm fields={listingFields} presentableNames={listingFieldNamesToShow} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<form onSubmit={onSubmit}>
+			<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
+			<FormFieldCollection ref={autoFormRef} fields={listingFields} presentableNames={listingFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+			<button className="submit" type="submit">click me</button>
+		</form>
 
 	</div>;
 }
@@ -54,7 +63,7 @@ export const getServerSideProps: GetServerSideProps<{
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			listingFields: flatten(listingsFields)
+			listingFields: flatten(listings)
 		}, // will be passed to the page component as props
 	};
 };

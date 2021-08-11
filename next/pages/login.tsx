@@ -4,14 +4,14 @@ import { useRouter } from "next/dist/client/router";
 import React, { FormEvent, ReactElement } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
-import AutoConstructedForm from "../client/components/AutoCostructedForm";
-import { AutoConstructedFormData } from "../client/types";
+import { FormFieldCollectionData } from "../client/types";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { updateLoginState } from "../client/utils/userState";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { loginSpec } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
+import SimpleForm from "../client/components/SimpleForm";
 
 export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
@@ -23,7 +23,7 @@ export default function Login({ csrfToken, fields }: InferGetServerSidePropsType
 		email: [isEmail],
 	};
 
-	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: AutoConstructedFormData) {
+	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
 		const res = await csrfFetch(csrfToken, "/api/login", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -47,7 +47,7 @@ export default function Login({ csrfToken, fields }: InferGetServerSidePropsType
 		Hello and welcome to my secure website
 		<br />
 
-		<AutoConstructedForm fields={fields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<SimpleForm fields={fields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors}>Log in!</SimpleForm>
 	</div>;
 }
 

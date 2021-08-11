@@ -8,7 +8,7 @@ export type ValidateClientResult = [{
     [key: string]: any
 }]
 
-export type AutoConstructedFormData = {
+export type FormFieldCollectionData = {
     // we don't want to check the types here
     // eslint-disable-next-line
     [key: string]: any;

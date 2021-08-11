@@ -5,12 +5,12 @@ import { organisations as organisationsFieldSpec } from "../serverAndClient/publ
 import { flatten, Flattened } from "combined-validator";
 
 import isEmail from "validator/lib/isEmail";
-import AutoConstructedForm from "../client/components/AutoCostructedForm";
+import SimpleForm from "../client/components/SimpleForm";
 import { useRouter } from "next/dist/client/router";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { createIsEmailIsAvailableValidator } from "../client/utils/formUtils";
-import { AutoConstructedFormData } from "../client/types";
+import { FormFieldCollectionData } from "../client/types";
 import Head from "../client/components/Head";
 import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
@@ -26,7 +26,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
 		email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
 	};
 
-	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: AutoConstructedFormData) {
+	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
 		const res = await csrfFetch(csrfToken, "/api/signupOrg", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -47,7 +47,7 @@ export default function OrganisationSignup({ csrfToken, signupFields }: InferGet
 
 		<p>Hello and welcome to my secure website</p>
 
-		<AutoConstructedForm fields={signupFields} onSubmit={onSubmit} presentableNames={orgFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+		<SimpleForm fields={signupFields} onSubmit={onSubmit} presentableNames={orgFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors}>Sign up!</SimpleForm>
 	</div>;
 }
 
