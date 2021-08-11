@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { isOrgCookieName, isSessionActiveCookieName } from "../../serverAndClient/cookiesConfig";
+import { accountInfoCookieName } from "../../serverAndClient/cookiesConfig";
 import { ViewerType } from "../types";
 
 function getCookie(name: string) {
@@ -11,7 +11,13 @@ function getCookie(name: string) {
             if (endIndex == -1) {
                 endIndex = document.cookie.length;
             }
-            return decodeURI(document.cookie.substring(startIndex, endIndex));
+            const out = decodeURIComponent(document.cookie.substring(startIndex, endIndex));
+            // try decode
+            try{
+                return JSON.parse(out);
+            }catch{
+                return out;
+            }
         }
     }
     return undefined;
@@ -21,22 +27,31 @@ function isServer() { return typeof window === "undefined" }
 
 function isOrg() {
     if (isServer()) return false;
-    else return getCookie(isOrgCookieName) === "true";
+    else return getAccountInfo()?.isOrg === true;
 }
 
 function isLoggedIn() {
     if (isServer()) return false;
     else {
-        return getCookie(isSessionActiveCookieName) === "true";
+        return getAccountInfo()?.isSessionActive === true;
     }
 }
 
 function getPureViewerType(): ViewerType { // "pure" means that it can't be hydrating
     if (isServer()) return "server";
     if (!isLoggedIn()) return "loggedOut";
-    return isOrg() ? "org" : "user"
+    const accountInfo = getAccountInfo();
+    if(isOrg()){
+        // is it verified?
+        return accountInfo?.isEmailVerified === true && accountInfo?.isOrganisationVerified === true ? "org" : "unverified_org";
+    }else{
+        return accountInfo?.isEmailVerified === true ? "user" : "unverified_user";
+    }
 }
 
+export function getAccountInfo(){
+    return getCookie(accountInfoCookieName)
+}
 
 export function updateLoginState() {
     const bc = new BroadcastChannel("loginEvents");
@@ -52,7 +67,7 @@ export function useViewerType(): ViewerType {
     useEffect(() => {
         setViewerType(getPureViewerType())
 
-        const bc = new BroadcastChannel("loginEvents");
+        const bc = new BroadcastChannel("loginEvents"); //TODO: a channel specifically for verifying
         bc.onmessage = function () {
             setViewerType(getPureViewerType());
         }

@@ -1,6 +1,5 @@
 import NextHead from 'next/head'
 import { FC } from "react";
-import { useViewerType } from '../utils/userState';
 
 const Head: FC<{
 	title: string

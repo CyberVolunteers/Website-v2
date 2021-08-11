@@ -1,12 +1,12 @@
 import { seal, unseal } from "./iron"
 import { serialize, CookieSerializeOptions } from "cookie"
 import { NextApiResponse } from "next"
-import { isOrgCookieName, isSessionActiveCookieName, sessionCookieMaxAge, sessionCookieName, csrfCookieName } from "../../serverAndClient/cookiesConfig"
+import { accountInfoCookieName, cookieMaxAge, sessionCookieName, csrfCookieName } from "../../serverAndClient/cookiesConfig"
 import { deepAssign } from "combined-validator";
 import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../types";
 
 const sessionCookieOptions: CookieSerializeOptions = {
-    maxAge: sessionCookieMaxAge,
+    maxAge: cookieMaxAge,
     httpOnly: true, // stop the client from accessing the cookie
     sameSite: "strict",
     secure: true,
@@ -14,22 +14,15 @@ const sessionCookieOptions: CookieSerializeOptions = {
 }
 
 const csrfCookieOptions: CookieSerializeOptions = {
-    maxAge: sessionCookieMaxAge,
+    maxAge: cookieMaxAge,
     httpOnly: true, // stop the client from accessing the cookie
     sameSite: "strict",
     secure: true,
     path: "/"
 }
 
-const isSessionActiveCookieOptions: CookieSerializeOptions = {
-    maxAge: sessionCookieMaxAge,
-    sameSite: "strict",
-    secure: true,
-    path: "/"
-}
-
-const isOrgCookieOptions: CookieSerializeOptions = {
-    maxAge: sessionCookieMaxAge,
+const accountInfoCookieOptions: CookieSerializeOptions = {
+    maxAge: cookieMaxAge,
     sameSite: "strict",
     secure: true,
     path: "/"
@@ -71,14 +64,19 @@ async function setSession(res: NextApiResponse, data: any) {
     const payloadWithoutCsrfToken = await seal(dataCopyNoCsrf);
     const sessionCookie = serialize(sessionCookieName, payloadWithoutCsrfToken, sessionCookieOptions)
 
+    const publicData = {
+        "isOrg": data?.isOrg === true,
+        "isSessionActive": true,
+        "isEmailVerified": data?.isEmailVerified === true,
+        "isOrganisationVerified": data?.isOrganisationVerified === true,
+    }
+
     // keep a cookie that tells the client that it is logged in
-    const isSessionActiveCookie = serialize(isSessionActiveCookieName, "true", isSessionActiveCookieOptions)
+    const accountInfoCookie = serialize(accountInfoCookieName, JSON.stringify(publicData), accountInfoCookieOptions)
 
     const csrfCookie = serialize(csrfCookieName, await seal(data.csrfToken), csrfCookieOptions)
 
-    const isOrgCookieNameCookie = serialize(isOrgCookieName, `${data?.isOrg === true}`, isOrgCookieOptions)
-
-    res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie, csrfCookie, isOrgCookieNameCookie])
+    res.setHeader('Set-Cookie', [sessionCookie, accountInfoCookie, csrfCookie])
 }
 
 export function removeSession(res: NextApiResponse) {
@@ -87,11 +85,10 @@ export function removeSession(res: NextApiResponse) {
         path: '/',
     }
     const sessionCookie = serialize(sessionCookieName, '', Object.assign({}, sessionCookieOptions, emptyCookieSettings)) // empty objects because the target object is modified
-    const isSessionActiveCookie = serialize(isSessionActiveCookieName, '', Object.assign({}, isSessionActiveCookieOptions, emptyCookieSettings))
-    const isOrgCookieNameCookie = serialize(isOrgCookieName, '', Object.assign({}, isOrgCookieOptions, emptyCookieSettings))
+    const accountInfoCookie = serialize(accountInfoCookieName, '', Object.assign({}, accountInfoCookieOptions, emptyCookieSettings))
 
     // NOTE: leaving the csrf cookie
 
 
-    res.setHeader('Set-Cookie', [sessionCookie, isSessionActiveCookie, isOrgCookieNameCookie])
+    res.setHeader('Set-Cookie', [sessionCookie, accountInfoCookie])
 }

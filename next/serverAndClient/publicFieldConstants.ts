@@ -3,6 +3,7 @@ import { FieldConstraintsCollection, flatten } from "combined-validator";
 export const users: FieldConstraintsCollection = {
     required: {
         string: {
+            // uuid: {TODO: exactlength},
             firstName: { maxLength: 30 },
             lastName: { maxLength: 30 },
             email: { maxLength: 320 },

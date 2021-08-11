@@ -4,13 +4,14 @@ import { useRouter } from "next/dist/client/router";
 import React, { FormEvent, ReactElement } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
-import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
+import AutoConstructedForm from "../client/components/AutoCostructedForm";
 import { AutoConstructedFormData } from "../client/types";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { updateLoginState } from "../client/utils/userState";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import { loginSpec } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
+import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 
 export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();

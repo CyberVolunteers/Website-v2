@@ -1,4 +1,4 @@
-export type ViewerType = "loggedOut" | "user" | "org" | "server" | "hydrating"
+export type ViewerType = "loggedOut" | "user" | "org" | "server" | "hydrating" | "unverified_user" | "unverified_org"
 
 export type ValidateClientResult = [{
     [key: string]: string

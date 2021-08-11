@@ -1,7 +1,7 @@
 import { createAjvJTDSchema, flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React, { ReactElement, useState } from "react";
-import AutoConstructedForm, { PerElementValidatorCallbacks } from "../client/components/AutoCostructedForm";
+import AutoConstructedForm from "../client/components/AutoCostructedForm";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { useViewProtection } from "../client/utils/otherHooks";
 import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
@@ -9,6 +9,7 @@ import { listings, listings as listingsFields } from "../serverAndClient/publicF
 import Head from "../client/components/Head";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
 import Ajv from "ajv/dist/jtd";
+import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {

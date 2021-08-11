@@ -9,13 +9,14 @@ import { useViewerType } from "../utils/userState";
 
 import styles from "../styles/header.module.css"
 import { useIsAfterRehydration } from '../utils/otherHooks';
+import { ViewerType } from '../types';
 
 function Header() {
     const sidebarLimitWidth = 600;
     const isAfterRehydration = useIsAfterRehydration();
 
     const userType = useViewerType();
-    const isLoggedIn = ["user", "org"].includes(userType);
+    const isLoggedIn = (["user", "org", "unverified_user", "unverified_org"] as ViewerType[]).includes(userType);
 
     const [isSidebarUp, setisSidebarUp] = useState(false);
 

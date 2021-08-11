@@ -22,7 +22,5 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 		)
 	});
 
-	console.log(await Org.find({}), await Listing.find({}))
-
 	mongoSession.endSession()
 }

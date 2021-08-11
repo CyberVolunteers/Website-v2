@@ -1,5 +1,6 @@
 import { hash, verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
+import { NextApiResponse } from "next";
 
 export async function login({ email, password }: { email: string, password: string }) {
     // find instead of findOne to keep the time roughly constant relative to when there are no results
@@ -86,5 +87,9 @@ export function isLoggedIn(session: any) {
 }
 
 export function isOrg(session: any) {
-    return isLoggedIn(session) && session?.isOrg === true;
+    return isLoggedIn(session) && session?.isEmailVerified === true && session?.isOrganisationVerified === true && session?.isOrg === true;
+}
+
+export function isUser(session: any) {
+    return isLoggedIn(session) && session?.isEmailVerified === true && session?.isOrg === false;
 }

@@ -8,7 +8,7 @@ import { getSession, updateSession, removeSession } from "../../server/auth/auth
 import { NextApiRequest, NextApiResponse } from "next"
 import { parse } from "cookie"
 import * as dotenv from "dotenv";
-import { sessionCookieMaxAge } from "../../serverAndClient/cookiesConfig"
+import { cookieMaxAge } from "../../serverAndClient/cookiesConfig"
 
 const cookie = require("cookie")
 
@@ -195,7 +195,7 @@ describe("auth-cookies.ts", function () {
             const cookie2 = serialiseSpy.args[1][2];
 
             expect(cookie1).to.deep.equal({
-                maxAge: sessionCookieMaxAge,
+                maxAge: cookieMaxAge,
                 httpOnly: true,
                 sameSite: "strict",
                 secure: true,
@@ -203,7 +203,7 @@ describe("auth-cookies.ts", function () {
             })
 
             expect(cookie2).to.deep.equal({
-                maxAge: sessionCookieMaxAge,
+                maxAge: cookieMaxAge,
                 sameSite: "strict",
                 secure: true,
                 path: "/"

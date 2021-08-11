@@ -1,12 +1,9 @@
-import { capitalize } from "@material-ui/core";
-import { Flattened, FlattenedValue } from "combined-validator";
-import { ChangeEvent, ForwardRefExoticComponent, MutableRefObject, useEffect } from "react";
-import { ReactElement } from "react";
+import { Flattened } from "combined-validator";
+import { MutableRefObject, useEffect } from "react";
 import { useRef } from "react";
 import { Dispatch, FormEvent, SetStateAction } from "react";
 import { createRef, RefObject, useState } from "react";
 import { FC } from "react";
-import { ValidateClientResult } from "../types";
 import FormComponent, { PerElementValidatorCallbacks, PerElementValidatorCallback } from "./FormComponent";
 
 const AutoConstructedForm: FC<{
@@ -63,7 +60,6 @@ const AutoConstructedForm: FC<{
         //TODO: don't resubmit without change
         //  do not submit if there is an error
         const allCorrect = Object.entries(fieldRefs).every(([k, v]) => (v.current as any)?.doesHaveNoErrors() === true);
-        console.log("allCorrect", allCorrect)
         if (!allCorrect) return;
 
         // TODO: highlight those errors 
@@ -83,7 +79,6 @@ const AutoConstructedForm: FC<{
                 setOverallErrors(newErrors);
             }
         })
-        console.log(cleanedData)
         // actual request
         if (!noErrorsFound) return;
 
