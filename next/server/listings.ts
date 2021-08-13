@@ -1,7 +1,9 @@
 import { getMongo } from "./mongo";
 import { Listing, Org } from "./mongo/mongoModels";
+import sharp from "sharp";
+import { baseListingImagePath } from "../serverAndClient/staticDetails";
 
-export async function createListing(params: { [key: string]: any }, orgSession: { [key: string]: any }) {
+export async function createListing(params: { [key: string]: any }, orgSession: { [key: string]: any }, fileExt: string, fileBuffer: Buffer) {
 	const mongoConn = await getMongo();
 	const createdDate = new Date();
 	const org = orgSession._id;
@@ -13,13 +15,18 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 
 	await mongoSession.withTransaction(async () => {
 		const newListing = new Listing(dataToSupply);
-		await newListing.save();
+		const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+		const filePath = process.env.baseDir + "/public" + baseListingImagePath + uniqueSuffix + fileExt;
+		await Promise.all([
+			sharp(fileBuffer).resize({ width: 1024 }).toFile(filePath),
+			newListing.save(),
+			// add the new id to the organisation
+			Org.updateOne(
+				{ _id: orgSession._id },
+				{ $push: { listings: newListing._id } }
+			)
+		])
 
-		// add the new id to the organisation
-		await Org.updateOne(
-			{ _id: orgSession._id },
-			{ $push: { listings: newListing._id } }
-		)
 	});
 
 	mongoSession.endSession()

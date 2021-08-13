@@ -6,6 +6,9 @@ import Footer from "../client/components/Footer";
 import { ReactElement } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/dist/client/router";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
 
 function MyApp({ Component, pageProps }: AppProps): ReactElement {
 	const router = useRouter();
@@ -17,7 +20,7 @@ function MyApp({ Component, pageProps }: AppProps): ReactElement {
 	</>;
 
 	// don't bother with that if it is not a development server
-	if(!process.env.IS_DEV) return out;
+	if(!publicRuntimeConfig.IS_DEV) return out;
 
 	if (typeof window !== "undefined") window.wasHeadIncluded = false;
 

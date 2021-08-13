@@ -16,6 +16,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	useViewProtection(["org"]);
 
 	const autoFormRef = useRef();
+	const listingImageInputRef = useRef<HTMLInputElement>(null);
 
 	const [overallErrors, setOverallErrors] = useState({} as {
 		[key: string]: string
@@ -27,18 +28,27 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	async function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
 		evt.preventDefault();
 
+		const file = listingImageInputRef.current?.files?.[0];
+		if(!file) {
+			const overallErrorsCopy = Object.assign({}, overallErrors); 
+			overallErrorsCopy["createListingImageFileUpload"] = "Please select an image for your listing.";
+			setOverallErrors(overallErrorsCopy);
+			return;
+		}
+		
 		const data: { [key: string]: any } | null = (autoFormRef.current as any)?.getData();
-
+		if(data === null) return;
+		const formData = new FormData();
+		Object.entries(data).forEach(([k, v]) => formData.append(k, JSON.stringify(v))); // also remove the quotes when needed so that a string "dsafadf" does not become "\"dsafadf\""
+		formData.append("listingImage", file);
 
 		const res = await csrfFetch(csrfToken, "/api/createListing", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
-
-				"content-type": "application/json",
 				"accept": "application/json",
 			},
-			body: JSON.stringify(data)
+			body: formData
 		});
 
 		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
@@ -50,7 +60,12 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 		<form onSubmit={onSubmit}>
 			<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
 			<FormFieldCollection ref={autoFormRef} fields={listingFields} presentableNames={listingFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
-			<button className="submit" type="submit">click me</button>
+
+			<p>
+				<label htmlFor="listing-img-upload">Can i haz image please? (required)</label>
+				<input type="file" name="listing-img-upload" ref={listingImageInputRef} onChange={() => setOverallErrors({})}></input>
+			</p>
+			<button className="submit" type="submit">Create a listing!</button>
 		</form>
 
 	</div>;

@@ -25,3 +25,7 @@ export type ExtendedNextApiRequest = NextApiRequest & {
 export type ExtendedNextApiResponse = NextApiResponse & {
 
 }
+
+export type MulterReq = ExtendedNextApiRequest & {
+    file?: Express.Multer.File
+}

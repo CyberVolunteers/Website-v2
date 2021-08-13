@@ -8,6 +8,8 @@
 /.pnp
 .pnp.js
 
+/public/userUploads
+
 # testing
 /coverage
 
