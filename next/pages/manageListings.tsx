@@ -49,6 +49,7 @@ export default function ManageListings({ listings }: InferGetServerSidePropsType
 export const getServerSideProps: GetServerSideProps<{
 	listings: any[] //{[key: string]: any}[]
 }> = async (context) => {
+	await getMongo(); // connect
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 	const org = (await Org.findById(session._id).populate("listings")).toJSON({
 		versionKey: false,
