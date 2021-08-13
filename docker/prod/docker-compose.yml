@@ -3,9 +3,16 @@ services:
   web-next-prod:
     image: "next-prod"
     restart: always
+
+    ports: 
+      - "3000:3000"
     
     depends_on:
       - mongo-prod
+
+    env_file:
+      - ../../next/.env.local
+
     environment:
       WAIT_HOSTS: mongo-prod:27017
       WAIT_HOSTS_TIMEOUT: 120
@@ -35,4 +42,5 @@ secrets:
     file: ../../mongo/auth/root/user
   mongo_root_pass:
     file: ../../mongo/auth/root/pass
+
 

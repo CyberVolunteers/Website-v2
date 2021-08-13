@@ -41,7 +41,7 @@ export function createHandler(handlers: HandlerCollection, options: HandlerOptio
 			if (options.useCsrf) await checkCsrf(req, res);
 			if (res.headersSent) return;
 
-			// TODO: maybe change this to a more elegant way?
+			// There is no better way. Just try to add this if mongo might be needed
 			await getMongo(); // connect if not connected
 
 			await handlers[method]?.(req, res);

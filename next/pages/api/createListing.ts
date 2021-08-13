@@ -18,7 +18,7 @@ type Data = {
 }
 
 
-const listingImageStorage = multer.memoryStorage()
+const listingImageStorage = multer.memoryStorage();
 
 
 const upload = multer({
@@ -28,12 +28,14 @@ const upload = multer({
 		fileSize: 512 * 1024 * 1024,
 		files: 1
 	}
-})
+});
 const bodyParser = ajv.compileParser(createAjvJTDSchema(deepAssign(listings, {
 	required: {
 		string: {
+			// eslint-disable-next-line
 			//@ts-ignore
 			imagePath: undefined, // delete the image path from user input
+			// eslint-disable-next-line
 			//@ts-ignore
 			uuid: undefined // delete the uuid from user input
 		}
@@ -57,7 +59,7 @@ const handlers: HandlerCollection = {
 		const fileExt = getFileExtension(file.originalname);
 		if (fileExt === null || !allowedFileTypes.includes(fileExt)) return res.status(400).send("Please upload a valid image file");
 
-		await createListing(req.body, session, fileExt, file.buffer)
+		await createListing(req.body, session, fileExt, file.buffer);
 
 		return res.end();
 	}

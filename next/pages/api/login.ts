@@ -8,6 +8,8 @@ import { HandlerCollection } from "../../server/types";
 import { loginSpec, users } from "../../serverAndClient/publicFieldConstants";
 import { Listing, Org, User } from "../../server/mongo/mongoModels";
 
+import { connection } from "mongoose";
+
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
@@ -18,7 +20,7 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		if (isLoggedIn(session)) console.log("Signing in a someone else") //TODO: replace with logging
+		if (isLoggedIn(session)) console.log("Signing in a someone else"); //TODO: replace with logging
 
 		const loginResult = await login(req.body);
 

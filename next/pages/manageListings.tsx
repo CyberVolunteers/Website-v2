@@ -7,13 +7,13 @@ import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 import { Org } from "../server/mongo/mongoModels";
 
+// eslint-disable-next-line
 //@ts-ignore
 import ObjectId from "mongoose/lib/types/objectid";
 import Card from "../client/components/Card";
 
 export default function ManageListings({ listings }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
-	console.log(listings)
 
 	return <div>
 		<Head title="Manage listings - cybervolunteers" />
@@ -22,7 +22,6 @@ export default function ManageListings({ listings }: InferGetServerSidePropsType
 		<div className="listings">
 			{
 				listings.map((l, i) => {
-					console.log(l)
 					const listingData = {
 						img: l.imagePath,
 						title: l.title, 
@@ -31,8 +30,8 @@ export default function ManageListings({ listings }: InferGetServerSidePropsType
 						currentVolunteers: l.currentNumVolunteers, 
 						requestedVolunteers: l.requestedNumVolunteers, 
 						uuid: l.uuid
-					}
-					return <Card key={i} {...listingData} />
+					};
+					return <Card key={i} {...listingData} />;
 				})
 			}
 		</div>
@@ -57,7 +56,7 @@ export const getServerSideProps: GetServerSideProps<{
 			Object.keys(out).forEach(k => {
 				if (out[k] instanceof ObjectId) return delete out[k]; // delete all the id keys
 				if (out[k] instanceof Date) return out[k] = out[k].toISOString(); // delete all the id keys
-			})
+			});
 			return out;
 		}
 	}); // TODO: maybe try aggregate? some people say it's faster

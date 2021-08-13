@@ -25,11 +25,11 @@ export default function MyAccount({ accountData }: InferGetServerSidePropsType<t
 			Object.entries(accountData ?? {}).map(([k, v]) => {
 
 				if (typeof v === "string" && !isNaN(new Date(v).getDay())) // check if it is a date
-					v = new Date(v).toDateString()
+					v = new Date(v).toDateString();
 
 				return <p key={k}>
 					<span>{k}: {v}</span>
-				</p>
+				</p>;
 			})
 		}
 		{
@@ -39,24 +39,24 @@ export default function MyAccount({ accountData }: InferGetServerSidePropsType<t
 				if (!isAfterRehydration) return null;
 
 				switch (userType) {
-					case "org":
-						return <>
-							<div>
-								<Link href="/manageListings" passHref>
-									<a>
-										<p>
+				case "org":
+					return <>
+						<div>
+							<Link href="/manageListings" passHref>
+								<a>
+									<p>
 											Manage listings
-										</p>
-									</a>
-								</Link>
-							</div>
-						</>;
-					case "user":
-						return <div>
+									</p>
+								</a>
+							</Link>
+						</div>
+					</>;
+				case "user":
+					return <div>
 							Do stuff as a volunteer
-						</div>;
-					default:
-						return <p>Please log in to view this</p>;
+					</div>;
+				default:
+					return <p>Please log in to view this</p>;
 				}
 			})()
 
@@ -86,7 +86,7 @@ export const getServerSideProps: GetServerSideProps<{
 	if (isLoggedIn(session)) {
 		const fieldNames = isOrg(session) ? orgFieldNamesToShow : userFieldNamesToShow;
 		const fieldKeys = Object.keys(fieldNames).filter(k => k in session); // only show the keys that have been specified
-		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]])) // translate them
+		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]])); // translate them
 	}
 
 	return {

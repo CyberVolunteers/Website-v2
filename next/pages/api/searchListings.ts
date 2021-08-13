@@ -29,5 +29,5 @@ export default async function searchListings (
 		{
 			GET: ajv.compileParser(createAjvJTDSchema(searchListingsSpec))
 		}
-		)(req, res);
+	)(req, res);
 }

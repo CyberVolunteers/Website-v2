@@ -1,11 +1,10 @@
-import { getMongo } from "./mongo";
 import { Listing, Org } from "./mongo/mongoModels";
 import sharp from "sharp";
 import { baseListingImagePath } from "../serverAndClient/staticDetails";
 import { v4 as uuidv4 } from "uuid";
+import { connection } from "mongoose";
 
 export async function createListing(params: { [key: string]: any }, orgSession: { [key: string]: any }, fileExt: string, fileBuffer: Buffer) {
-	const mongoConn = await getMongo();
 	const createdDate = new Date();
 	const organisation = orgSession._id;
 	const uuid = uuidv4();
@@ -15,7 +14,7 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 
 	Object.assign(dataToSupply, { createdDate, organisation, imagePath, uuid })
 
-	const mongoSession = await mongoConn.startSession();
+	const mongoSession = await connection.startSession();
 
 	await mongoSession.withTransaction(async () => {
 		const newListing = new Listing(dataToSupply);
