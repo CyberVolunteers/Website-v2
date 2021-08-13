@@ -4,9 +4,7 @@ import React from 'react'
 
 import styles from "../styles/card.module.css"
 
-function Card({ img, listing }) {
-
-    const { title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid } = listing;
+function Card({ img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid }) {
 
     return (
         <div className={`${styles["Card"]}`}>
@@ -28,7 +26,11 @@ function Card({ img, listing }) {
                 <p className={`${styles["description"]}`}>
                     {desc}
 
-                    <a href="#" >Read more</a>
+                    <Link href={`/listing?uuid=${uuid}`} passHref>
+                        <a>
+                            Read more
+                        </a>
+                    </Link>
                 </p>
 
                 {/* <div className={`${styles["meter-total"]}`}>

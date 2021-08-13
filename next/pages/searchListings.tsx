@@ -62,7 +62,7 @@ export default function SearchListings(): ReactElement {
 			<div className={`${styles["cards-grid"]} w-1000`}>
 
 				{
-					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="/img/listing2.jpg" listing={value} />)
+					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="/img/listing2.jpg" {...value} />)
 				}
 			</div>
 

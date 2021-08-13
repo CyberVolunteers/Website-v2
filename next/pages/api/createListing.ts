@@ -33,7 +33,9 @@ const bodyParser = ajv.compileParser(createAjvJTDSchema(deepAssign(listings, {
 	required: {
 		string: {
 			//@ts-ignore
-			imagePath: undefined // delete the image path from user input
+			imagePath: undefined, // delete the image path from user input
+			//@ts-ignore
+			uuid: undefined // delete the uuid from user input
 		}
 	}
 })));

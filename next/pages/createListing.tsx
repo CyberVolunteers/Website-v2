@@ -17,6 +17,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 
 	const fieldsToDisplay = Object.assign({}, listingFields);
 	delete fieldsToDisplay.imagePath;
+	delete fieldsToDisplay.uuid;
 
 	const autoFormRef = useRef();
 	const listingImageInputRef = useRef<HTMLInputElement>(null);

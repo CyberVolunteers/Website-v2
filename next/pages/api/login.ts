@@ -16,8 +16,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		console.log(await Org.find({}))
-		console.log(await Listing.find({}));
 		const session = await getSession(req);
 
 		if (isLoggedIn(session)) console.log("Signing in a someone else") //TODO: replace with logging

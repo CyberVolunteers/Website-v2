@@ -1,7 +1,9 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import { createAjvJTDSchema } from "combined-validator";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createHandler } from "../../server/apiRequests";
+import { ajv, createHandler } from "../../server/apiRequests";
 import { HandlerCollection } from "../../server/types";
+import { searchListingsSpec } from "../../serverAndClient/publicFieldConstants";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -22,6 +24,10 @@ export default async function searchListings (
 	await createHandler(
 		handlers,
 		{
-			useCsrf: true,
-		})(req, res);
+			useCsrf: false,
+		},
+		{
+			GET: ajv.compileParser(createAjvJTDSchema(searchListingsSpec))
+		}
+		)(req, res);
 }

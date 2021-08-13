@@ -63,6 +63,7 @@ export const listings: FieldConstraintsCollection = {
             category: { enum: ["Advocacy & Human Rights", "Arts & Culture", "Community", "Computers & Technology", "Education", "Healthcare & Medicine", "Elderly"] },
             requiredData: { enum: Object.keys(flatten(users)).filter(k => k !== "password"), array: true },
             imagePath: {},
+            uuid: {exactLength: 36}
         },
         object: {
             targetAudience: {
@@ -95,3 +96,11 @@ export const loginSpec: FieldConstraintsCollection = {
         },
     },
 };
+
+export const searchListingsSpec: FieldConstraintsCollection = {
+    optional: {
+        string: {
+            orgName: {}
+        }
+    }
+}

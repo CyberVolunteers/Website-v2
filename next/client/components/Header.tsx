@@ -24,7 +24,7 @@ function Header() {
 
     const windowWidth = windowSize.width ?? 1000; // to make sure that the larger version is displayed otherwise
 
-    const actionSlot = !isAfterRehydration ? null : userType === "org" ?
+    const actionSlot = !isAfterRehydration ? null : ["org", "unverified_org"].includes(userType) ?
         <Link href="/manageListings" passHref>
             <a>
                 <p>
