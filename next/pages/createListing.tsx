@@ -10,16 +10,18 @@ import Head from "../client/components/Head";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
+import CircularProgress from "@material-ui/core/CircularProgress";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
-
+	
 	const fieldsToDisplay = Object.assign({}, listingFields);
 	delete fieldsToDisplay.imagePath;
 	delete fieldsToDisplay.uuid;
-
+	
 	const autoFormRef = useRef();
+	const [isLoading, setIsLoading] = useState(false);
 	const listingImageInputRef = useRef<HTMLInputElement>(null);
 
 	const [overallErrors, setOverallErrors] = useState({} as {
@@ -31,6 +33,9 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 
 	async function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
 		evt.preventDefault();
+		if(isLoading) return; // do not submit the form twice in a row
+
+		setIsLoading(true);
 
 		const file = listingImageInputRef.current?.files?.[0];
 		if (!file) {
@@ -56,6 +61,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 		});
 
 		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
+		setIsLoading(false);
 	}
 
 	return <div>
@@ -69,7 +75,12 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 				<label htmlFor="listing-img-upload">Can i haz image please? (required)</label>
 				<input type="file" name="listing-img-upload" ref={listingImageInputRef} onChange={() => setOverallErrors({})}></input>
 			</p>
-			<button className="submit" type="submit">Create a listing!</button>
+			<p><button className="submit" type="submit">Create a listing!</button></p>
+			{
+				isLoading ?
+					<CircularProgress /> :
+					null
+			}
 		</form>
 
 	</div>;
