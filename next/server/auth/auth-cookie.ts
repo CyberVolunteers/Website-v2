@@ -64,6 +64,7 @@ async function setSession(res: NextApiResponse, data: any) {
     const payloadWithoutCsrfToken = await seal(dataCopyNoCsrf);
     const sessionCookie = serialize(sessionCookieName, payloadWithoutCsrfToken, sessionCookieOptions)
 
+    
     const publicData = {
         "isOrg": data?.isOrg === true,
         "isSessionActive": true,

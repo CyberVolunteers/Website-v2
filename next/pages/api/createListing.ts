@@ -1,5 +1,5 @@
 import multer from "multer";
-import { createAjvJTDSchema } from "combined-validator";
+import { createAjvJTDSchema, deepAssign } from "combined-validator";
 import { NextApiRequest, NextApiResponse } from "next";
 import { ajv, createHandler, runMiddleware, verifyJSONShape } from "../../server/apiRequests";
 import { getSession } from "../../server/auth/auth-cookie";
@@ -29,7 +29,14 @@ const upload = multer({
 		files: 1
 	}
 })
-const bodyParser = ajv.compileParser(createAjvJTDSchema(listings));
+const bodyParser = ajv.compileParser(createAjvJTDSchema(deepAssign(listings, {
+	required: {
+		string: {
+			//@ts-ignore
+			imagePath: undefined // delete the image path from user input
+		}
+	}
+})));
 
 const handlers: HandlerCollection = {
 	POST: async function (req: MulterReq, res) {

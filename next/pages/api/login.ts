@@ -6,7 +6,7 @@ import { createAjvJTDSchema } from "combined-validator";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 import { loginSpec, users } from "../../serverAndClient/publicFieldConstants";
-import { Org, User } from "../../server/mongo/mongoModels";
+import { Listing, Org, User } from "../../server/mongo/mongoModels";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -16,6 +16,8 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
+		console.log(await Org.find({}))
+		console.log(await Listing.find({}));
 		const session = await getSession(req);
 
 		if (isLoggedIn(session)) console.log("Signing in a someone else") //TODO: replace with logging

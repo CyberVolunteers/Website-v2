@@ -18,7 +18,7 @@ function constructOrgSchema(){
 function constructListingSchema(){
 	const schema = constructSchema(deepAssign(listingPublic, listingPrivate));
 	schema.add({
-		organisation: { type: Schema.Types.ObjectId, ref: "Orgs" }
+		organisation: { type: Schema.Types.ObjectId, required: true, ref: "Orgs" }
 	})
 	return schema
 }

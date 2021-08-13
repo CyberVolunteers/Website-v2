@@ -61,7 +61,8 @@ export const listings: FieldConstraintsCollection = {
             title: { maxLength: 150 },
             desc: { maxLength: 7000 },
             category: { enum: ["Advocacy & Human Rights", "Arts & Culture", "Community", "Computers & Technology", "Education", "Healthcare & Medicine", "Elderly"] },
-            requiredData: {enum: Object.keys(flatten(users)).filter(k => k !== "password"), array: true}
+            requiredData: { enum: Object.keys(flatten(users)).filter(k => k !== "password"), array: true },
+            imagePath: {},
         },
         object: {
             targetAudience: {

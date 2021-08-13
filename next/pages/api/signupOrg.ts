@@ -15,8 +15,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		return res.status(400).send("well, too bad!");
-
 		const signupResult = await signupOrg(req.body);
 
 		if (!signupResult) return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?");

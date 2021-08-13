@@ -109,8 +109,7 @@ export function verifyJSONShape(req: NextApiRequest, res: NextApiResponse, bodyP
 		   }
 		   we need to remove the quotes to have usable data
 		*/
-
-	if (typeof req.body === "object" && req.body !== null) {
+		if (typeof req.body === "object" && req.body !== null) {
 		const isSuccess = Object.entries(req.body).every(([k, v]) => {
 			try{
 				req.body[k] = JSON.parse(v as any);
