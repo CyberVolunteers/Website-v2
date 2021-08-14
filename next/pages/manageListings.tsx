@@ -6,6 +6,7 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 import { Org } from "../server/mongo/mongoModels";
+import { getMongo } from "../server/mongo";
 
 // eslint-disable-next-line
 //@ts-ignore
