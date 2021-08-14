@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import getRawBody from "raw-body";
-import { sanitiseForMongo } from "./security";
+import { sanitizeForMongo } from "./security";
 import { FieldConstraintsCollection, extract, flatten } from "combined-validator";
 
 import Ajv, { JTDParser } from "ajv/dist/jtd";
@@ -34,8 +34,8 @@ export function createHandler(handlers: HandlerCollection, options: HandlerOptio
 
 			const bodyParser = (bodyParsers as { [key: string]: JTDParser | undefined })?.[method];
 			const queryFieldRules = (queryRequiredFields as { [key: string]: FieldConstraintsCollection | undefined })?.[method];
-			await sanitise(req, res, bodyParser, queryFieldRules, options);
-			// if sanitising already sent a response
+			await sanitize(req, res, bodyParser, queryFieldRules, options);
+			// if sanitizing already sent a response
 			if (res.headersSent) return;
 
 			if (options.useCsrf) await checkCsrf(req, res);
@@ -52,7 +52,7 @@ export function createHandler(handlers: HandlerCollection, options: HandlerOptio
 	};
 }
 
-async function sanitise(req: NextApiRequest, res: NextApiResponse, bodyParser: JTDParser | undefined, queryFieldRules: FieldConstraintsCollection | undefined, options: HandlerOptions) {
+async function sanitize(req: NextApiRequest, res: NextApiResponse, bodyParser: JTDParser | undefined, queryFieldRules: FieldConstraintsCollection | undefined, options: HandlerOptions) {
 	// protect against prototype pollution - force a more strict parser
 	if (req.body !== undefined) throw new Error("You did not disable the body-parser. For extra security, please do so by including 'export * from \"../../lib/defaultEndpointConfig\"' in your endpoint");
 
@@ -76,9 +76,9 @@ async function sanitise(req: NextApiRequest, res: NextApiResponse, bodyParser: J
 	} else req.query = null; // disable queries
 
 	// technically not needed, but here just in case someone allows all keys
-	req.body = sanitiseForMongo(req.body);
+	req.body = sanitizeForMongo(req.body);
 
-	req.query = sanitiseForMongo(req.query);
+	req.query = sanitizeForMongo(req.query);
 }
 
 function extendReqRes(req: NextApiRequest, res: NextApiResponse) {

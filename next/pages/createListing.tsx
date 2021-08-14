@@ -11,6 +11,7 @@ import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
 import CircularProgress from "@material-ui/core/CircularProgress";
+import { useRouter } from "next/dist/client/router";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -19,7 +20,9 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	const fieldsToDisplay = Object.assign({}, listingFields);
 	delete fieldsToDisplay.imagePath;
 	delete fieldsToDisplay.uuid;
-	
+
+	const router = useRouter();
+
 	const autoFormRef = useRef();
 	const [isLoading, setIsLoading] = useState(false);
 	const listingImageInputRef = useRef<HTMLInputElement>(null);
@@ -48,7 +51,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 		const data: { [key: string]: any } | null = (autoFormRef.current as any)?.getData();
 		if (data === null) return;
 		const formData = new FormData();
-		Object.entries(data).forEach(([k, v]) => formData.append(k, JSON.stringify(v))); // also remove the quotes when needed so that a string "dsafadf" does not become "\"dsafadf\""
+		Object.entries(data).forEach(([k, v]) => formData.append(k, JSON.stringify(v)));
 		formData.append("listingImage", file);
 
 		const res = await csrfFetch(csrfToken, "/api/createListing", {
@@ -62,6 +65,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 
 		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
 		setIsLoading(false);
+		router.push("/manageListings");
 	}
 
 	return <div>
