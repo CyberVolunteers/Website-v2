@@ -5,3 +5,5 @@
 # db
 /mongo/
 initMongo.js
+
+.vscode

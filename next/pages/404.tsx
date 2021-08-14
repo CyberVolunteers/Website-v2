@@ -9,11 +9,9 @@ export default function Error404(): ReactElement {
 		<Link href="/" passHref>
 			<a>
 				<p>
-					Back to home page!
+					Back to the home page!
 				</p>
 			</a>
 		</Link>
-
-		{/* Etc */}
 	</div>;
 }

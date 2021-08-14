@@ -18,5 +18,5 @@ export const getStaticProps: GetStaticProps<{
 		props: {
 			email: contactEmail
 		}
-	};
-};
+	}
+}
