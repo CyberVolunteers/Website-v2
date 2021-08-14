@@ -4,7 +4,8 @@ import { useRef } from "react";
 import { ReactElement, ChangeEvent, useState, forwardRef, useImperativeHandle } from "react";
 import { undoCamelCase } from "../utils/misc";
 
-export type PerElementValidatorCallback = (v: any) => boolean | Promise<boolean>;
+type PerElementValidatorCallbackReturnType = boolean | string;
+export type PerElementValidatorCallback = (v: any) => PerElementValidatorCallbackReturnType | Promise<PerElementValidatorCallbackReturnType>;
 export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCallback | PerElementValidatorCallback[] };
 
 const getPresentableName = (v: string, presentableNames?: { [key: string]: string }) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
@@ -17,6 +18,16 @@ const FormComponent = forwardRef((props: {
 	onErrorSet?: (msg: string) => void,
 	onChange?: (newVal: any) => void
 }, ref) => {
+
+	const {
+		name,
+		flattenedValue,
+		perElementValidationCallbacks,
+		presentableNames,
+		onErrorSet,
+		onChange,
+	} = props;
+
 	const childRef = useRef();
 	const [elementError, setElementError] = useState("");
 
@@ -27,24 +38,29 @@ const FormComponent = forwardRef((props: {
 
 		return async (k: string, v: any) => {
 			let hasPassed = true;
-			let message = `Please enter a valid value for ${k}`;
+			let message = `Please enter a valid value for ${getPresentableName(k, presentableNames).toLocaleLowerCase()}`;
 
 			try {
-				// check that all promises are fulfilled
+				// if empty and not required, don't bother
+				// do not return early - what if we add something below in the future?
+				if (flattenedValue.required || v !== "") {
+					// check that all promises are fulfilled
 
-				// the parallel way
-				// it calls everything - we don't want that many calls to the endpoint
-				// TODO: maybe detect sync vs async?
-				// const promisesToCheck = (callbacks as PerElementValidatorCallback[]).map(async (cb) => await cb(v));
-				// const results = await Promise.all(promisesToCheck);
-				// hasPassed = results.every(v => v);
+					// the parallel way
+					// it calls everything - we don't want that many calls to the endpoint
+					// TODO: maybe detect sync vs async?
+					// const promisesToCheck = (callbacks as PerElementValidatorCallback[]).map(async (cb) => await cb(v));
+					// const results = await Promise.all(promisesToCheck);
+					// hasPassed = results.every(v => v);
 
-				// the serial way
-				for (let cb of (callbacks as PerElementValidatorCallback[])) {
-					const result = await cb(v)
-					if (!result) { hasPassed = false; break; }
+					// the serial way
+					for (let cb of (callbacks as PerElementValidatorCallback[])) {
+						const result = await cb(v);
+
+						if (result === false) { hasPassed = false; break; }
+						if (typeof result === "string") { hasPassed = false; message = result; break; }
+					}
 				}
-
 			} catch (e) {
 				hasPassed = false;
 				message = e.message
@@ -53,7 +69,7 @@ const FormComponent = forwardRef((props: {
 			const newMsg = hasPassed ? "" : message;
 			if (newMsg !== elementError) {
 				setElementError(newMsg);
-				props.onErrorSet?.(newMsg)
+				onErrorSet?.(newMsg)
 			}
 
 			return hasPassed
@@ -66,10 +82,10 @@ const FormComponent = forwardRef((props: {
 		},
 		getData: () => {
 			const newData = (childRef.current as any)?._getData()
-			const errorObj = new Error(`Please supply an appropriate value for "${getPresentableName(props.name, props.presentableNames)}"`);
+			const errorObj = new Error(`Please supply an appropriate value for "${getPresentableName(name, presentableNames)}"`);
 			if (newData === null) throw errorObj
 			if (newData === "") {
-				if (props.flattenedValue.required) throw errorObj
+				if (flattenedValue.required) throw errorObj
 				else return undefined;
 			}
 
@@ -78,11 +94,11 @@ const FormComponent = forwardRef((props: {
 
 	}));
 
-	const outLabel = <label htmlFor={props.name}>{getPresentableName(props.name, props.presentableNames)} {props.flattenedValue.required ? "(required)" : null}</label>
+	const outLabel = <label htmlFor={name}>{getPresentableName(name, presentableNames)} {flattenedValue.required ? "(required)" : null}</label>
 
 	return <span>
 		{outLabel}
-		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={props.onChange} />
+		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={onChange} />
 		{
 			elementError === "" ? null :
 				<span>{elementError}</span>
@@ -150,11 +166,11 @@ const InputElement = forwardRef((props: {
 	}
 
 	if (flattenedValue.enum !== undefined) {
-		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} formState={formState as any[]} formStateSetter={formStateSetter}/>
+		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} formState={formState as any[]} formStateSetter={formStateSetter} />
 		else return <DropdownComponent ref={ref} {...props} setValue={setValue} formState={formState} />
 	}
 
-	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} formState={formState as any[]}/>
+	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} formState={formState as any[]} />
 })
 
 const MultiSelect = forwardRef(({ name, flattenedValue, formState, formStateSetter, presentableNames }: { name: string, flattenedValue: FlattenedValue, formState: any[], formStateSetter: any, presentableNames?: { [key: string]: string } }, ref) => {
@@ -233,7 +249,9 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 
 	switch (inputType) {
 		case "string":
-			newProps.type = ["email", "password"].includes(name) ? name : "text"
+			newProps.type = flattenedValue.isEmail ? "email" :
+				flattenedValue.isPassword ? "password" :
+					"text"
 			newProps.maxLength = flattenedValue?.maxLength;
 			break;
 
@@ -241,7 +259,7 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 			newProps.type = "text"
 			newProps.pattern = "\\d*"
 			newProps.title = "Please enter a number"
-			newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d]/g, "")) // remove non-digits
+			newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d\.-]/g, "")) // remove non-digits
 			break;
 
 		case "date":

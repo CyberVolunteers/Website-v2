@@ -12,11 +12,13 @@ import { PerElementValidatorCallbacks } from "../client/components/FormComponent
 import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { useRouter } from "next/dist/client/router";
+import { isNonNegative } from "../serverAndClient/validation";
+import { addError } from "../client/utils/formUtils";
 
 
 export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
-	
+
 	const fieldsToDisplay = Object.assign({}, listingFields);
 	delete fieldsToDisplay.imagePath;
 	delete fieldsToDisplay.uuid;
@@ -32,28 +34,31 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	});
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
+		minHoursPerWeek: isNonNegative,
+		maxHoursPerWeek: isNonNegative,
+		requestedNumVolunteers: isNonNegative,
 	};
 
 	async function onSubmit(evt: React.FormEvent<HTMLFormElement>) {
 		evt.preventDefault();
-		if(isLoading) return; // do not submit the form twice in a row
+		if (isLoading) return; // do not submit the form twice in a row
 
-		setIsLoading(true);
-
+		
+		
+		// the file is a requirement
 		const file = listingImageInputRef.current?.files?.[0];
-		if (!file) {
-			const overallErrorsCopy = Object.assign({}, overallErrors);
-			overallErrorsCopy["createListingImageFileUpload"] = "Please select an image for your listing.";
-			setOverallErrors(overallErrorsCopy);
-			return;
-		}
-
+		if (!file) return addError(overallErrors, setOverallErrors, "createListingImageFileUpload", "Please select an image for your listing.");
+		
 		const data: { [key: string]: any } | null = (autoFormRef.current as any)?.getData();
 		if (data === null) return;
+		
+		if (data.minHoursPerWeek > data.maxHoursPerWeek) return addError(overallErrors, setOverallErrors, "createListingMaxAndMinHoursComparison", "Please make sure that the minimum number of hours of volunteering is not greater than the maximum.");
+		
 		const formData = new FormData();
 		Object.entries(data).forEach(([k, v]) => formData.append(k, JSON.stringify(v)));
 		formData.append("listingImage", file);
-
+		
+		setIsLoading(true);
 		const res = await csrfFetch(csrfToken, "/api/createListing", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -62,9 +67,9 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 			},
 			body: formData
 		});
-
-		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
+		
 		setIsLoading(false);
+		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
 		router.push("/manageListings");
 	}
 

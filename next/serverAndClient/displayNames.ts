@@ -7,7 +7,8 @@ export const orgFieldNamesToShow = {
 	orgDesc: "The description of your organisation",
 	orgLocation: "The location of your organisation",
 	phoneNumber: "Your phone number",
-	websiteUrl: "The address of your website",
+	websiteUrl: "The web address of your website",
+	password2: "Repeat your password",
 }
 
 export const userFieldNamesToShow = {
@@ -21,6 +22,7 @@ export const userFieldNamesToShow = {
 	birthDate: "Your date of birth",
 	nationality: "Your nationality",
 	phoneNumber: "Your phone number",
+	password2: "Repeat your password",
 }
 
 export const listingFieldNamesToShow = {
