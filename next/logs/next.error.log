@@ -1,2 +1,0 @@
-{"level":"error","message":"client.misc:updateOverallErrorsForRequests: failed with text blablabla, status 421, statusText: Misdirected Request; User: Logged out user","timestamp":"2021-08-15 15:53:34"}
-{"level":"error","message":"client.misc:updateOverallErrorsForRequests: failed with text blablabla, status 421, statusText: Misdirected Request; User: Logged out user","timestamp":"2021-08-15 16:02:09"}

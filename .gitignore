@@ -7,3 +7,5 @@
 initMongo.js
 
 .vscode
+
+**/logs

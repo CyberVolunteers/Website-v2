@@ -1,5 +1,6 @@
 import { MutableRefObject } from "react";
 import zxcvbn from "zxcvbn"
+import { PerElementValidatorCallback } from "../client/components/FormComponent";
 import { minPasswordScore } from "./staticDetails";
 
 const dayLength = 24 * 60 * 60 * 1000;
@@ -42,9 +43,7 @@ export function passwordStrengthSuggestions(p: string){
 	return base + warning + suggestions;
 }
 
-export function passwordEquality(password2: string, container: {
-	[key: string]: MutableRefObject<any>
-}){
-	const password1 = container.password.current.formState;
+export const passwordEquality: PerElementValidatorCallback= (password2, root ) => {
+	const password1 = root.current.formState.password;
 	return password1 === password2 ? true : "The two passwords do not match";
 }

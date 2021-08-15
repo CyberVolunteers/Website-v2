@@ -42,7 +42,7 @@ export function Signup({
 	const signupFields = setFieldOrder(fields, ["email", "password", "password2"], true);
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
-		email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
+		email: [(v:string) => isEmail(v), createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
 		password: passwordStrengthSuggestions,
 		password2: passwordEquality,
 		phoneNumber: (v: string) => isMobilePhone(v),
