@@ -19,3 +19,77 @@
 {"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 15:11:51"}
 {"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 15:11:51"}
 {"message":"server.searchListings:Search all","level":"info","timestamp":"2021-08-15 15:11:51"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:30:58"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:30:58"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:46:37"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:46:37"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:46:44"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:46:44"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:46:44"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:46:44"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:46:44"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:49:06"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:49:06"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:49:13"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:13"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:49:13"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:49:13"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:13"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 15:49:13"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:13"}
+{"message":"server.csrf:Incorrect or undefined current page header","level":"info","timestamp":"2021-08-15 15:49:13"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:49:30"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:30"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:49:30"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:49:30"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:30"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 15:49:30"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:49:30"}
+{"message":"server.csrf:Incorrect or undefined current page header","level":"info","timestamp":"2021-08-15 15:49:30"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:50:07"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:50:07"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:50:07"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:50:07"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:50:07"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 15:50:07"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:50:07"}
+{"message":"server.csrf:Incorrect or undefined current page header","level":"info","timestamp":"2021-08-15 15:50:07"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:52:11"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:52:11"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:52:11"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:52:12"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:52:12"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 15:52:12"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:52:12"}
+{"message":"server.csrf:Incorrect or undefined current page header","level":"info","timestamp":"2021-08-15 15:52:12"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:53:34"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:53:34"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:53:34"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 15:53:34"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:53:34"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 15:53:34"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 15:53:34"}
+{"level":"error","message":"client.misc:updateOverallErrorsForRequests: failed with text blablabla, status 421, statusText: Misdirected Request; User: Logged out user","timestamp":"2021-08-15 15:53:34"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:55:43"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:55:43"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:55:49"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:55:49"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 15:58:32"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:58:33"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 16:00:17"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:00:17"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 16:00:55"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:00:55"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 16:02:09"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 16:02:09"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 16:02:09"}
+{"level":"info","message":"server.apiRequests:Request to url /api/login","timestamp":"2021-08-15 16:02:09"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 16:02:09"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logger","timestamp":"2021-08-15 16:02:09"}
+{"message":"Make sure to use csrf tokens with post","level":"warn","timestamp":"2021-08-15 16:02:09"}
+{"message":"server.apiRequests:Checking JSON format (not GET and no file sent)","level":"info","timestamp":"2021-08-15 16:02:09"}
+{"level":"error","message":"client.misc:updateOverallErrorsForRequests: failed with text blablabla, status 421, statusText: Misdirected Request; User: Logged out user","timestamp":"2021-08-15 16:02:09"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 16:03:19"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:03:19"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 16:03:24"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:03:24"}

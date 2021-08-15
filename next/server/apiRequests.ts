@@ -9,11 +9,15 @@ import { checkCsrf } from "./csrf";
 import { HandlerCollection, AjvParserCollection, QueryFieldsCollection, ExtendedNextApiRequest, ExtendedNextApiResponse, SupportedMethods } from "./types";
 import { contactEmail } from "../serverAndClient/staticDetails";
 import { logger } from "./logger";
+import getConfig from "next/config";
+
 export const ajv = new Ajv({
 	strictRequired: true,
 	allErrors: true,
 	removeAdditional: "all"
 });
+
+const { publicRuntimeConfig } = getConfig();
 
 type HandlerOptions = { useCsrf: boolean, allowFiles?: boolean };
 export function createHandler(handlers: HandlerCollection, options: HandlerOptions, bodyParsers?: AjvParserCollection, queryRequiredFields?: QueryFieldsCollection) {
@@ -30,7 +34,7 @@ export function createHandler(handlers: HandlerCollection, options: HandlerOptio
 		}
 		
 		// expect to use csrf at least with post
-		if (method === "POST" && !options.useCsrf) throw new Error("Make sure to use csrf tokens with post");
+		if (method === "POST" && !options.useCsrf && publicRuntimeConfig.IS_DEV) logger.warn("Make sure to use csrf tokens with post");
 		
 		try {
 			extendReqRes(req, res);

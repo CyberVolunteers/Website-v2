@@ -58,7 +58,7 @@ export async function signupOrg(params: any) {
     const newUser = new Org(params);
 
     if (await isEmailFree(params.email) === false) {
-        logger.info("server.auth.session:Email used for org");
+        logger.info("server.auth.session:Email used for user");
         return false;
     }
     await newUser.save();

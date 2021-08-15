@@ -32,6 +32,9 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 			})
 
 			const resText = await res.text();
+
+			if(res.status !== 200) info("mongo", `Res declined: ${res.statusText}, resText: ${resText}`)
+
 			let out;
 			try{
 				out = JSON.parse(resText);

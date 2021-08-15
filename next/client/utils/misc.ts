@@ -1,4 +1,5 @@
 import { Dispatch, SetStateAction } from "react";
+import { error } from "./logger";
 
 export function undoCamelCase(s: string) {
     let out =  s.replace(/([A-Z])/g, ' $1'); // add a space before all the capital letters
@@ -7,8 +8,8 @@ export function undoCamelCase(s: string) {
     return out;
 }
 
-async function createErrorMessage(res: Response) { // it is a separate function to account for a possible improvement
-    return `${res.status >= 500 ? "Server" : "Client"} error: ${await res.text()}`
+async function createErrorMessage(resStatus: number, resContents: string) { // it is a separate function to account for a possible improvement
+    return `${resStatus >= 500 ? "Server" : "Client"} error: ${resContents}`
 }
 
 export async function updateOverallErrorsForRequests(res: Response, thisId: string, overallErrors: {
@@ -19,8 +20,10 @@ export async function updateOverallErrorsForRequests(res: Response, thisId: stri
     }>>) {
     const overallErrorsCopy = Object.assign({}, overallErrors); // so that when react compares the previous and the current value, it does not find them to be the same
     if (res.status >= 400) {
-        overallErrorsCopy[thisId] = await createErrorMessage(res);
+        const resContents = await res.text();
+        overallErrorsCopy[thisId] = await createErrorMessage(res.status, resContents);
         setOverallErrors(overallErrorsCopy);
+        error("misc", `updateOverallErrorsForRequests: failed with text ${resContents}, status ${res.status}, statusText: ${res.statusText}`)
         return false
     }
     return true
