@@ -1,6 +1,9 @@
 import { hash, verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
-import { NextApiResponse } from "next";
+import getConfig from "next/config";
+
+const { publicRuntimeConfig } = getConfig();
+
 
 export async function login({ email, password }: { email: string, password: string }) {
     // find instead of findOne to keep the time roughly constant relative to when there are no results
@@ -63,7 +66,7 @@ export async function signupOrg(params: any) {
 }
 
 export async function isEmailFree(email: string) {
-    // parallelise to make it as quick as possible
+    // parallelize to make it as quick as possible
 
     async function failOnNoElements(p: Promise<any>) {
         const res = (await p);
@@ -92,4 +95,8 @@ export function isOrg(session: any) {
 
 export function isUser(session: any) {
     return isLoggedIn(session) && session?.isEmailVerified === true && session?.isOrg === false;
+}
+
+export function isAdminLevel(session: any, level: number){
+    return isLoggedIn(session) && (session.adminLevel >= level || publicRuntimeConfig.IS_DEV);
 }
