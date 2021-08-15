@@ -12,7 +12,7 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 
 	const dataToSupply = Object.assign({}, params);
 
-	Object.assign(dataToSupply, { createdDate, organisation, imagePath, uuid })
+	Object.assign(dataToSupply, { createdDate, organisation, imagePath, uuid, users: [] }) //TODO: check if this leaks when listings are queried
 
 	const mongoSession = await connection.startSession();
 

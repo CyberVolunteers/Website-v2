@@ -58,13 +58,11 @@ async function sanitize(req: NextApiRequest, res: NextApiResponse, bodyParser: J
 
 
 	// if not a formidable form, do processing, else leave it up to multer
-	if (options.allowFiles !== true) {
+	if (options.allowFiles !== true && req.method !== "GET") {
 		// read from the stream
 		req.body = await (await getRawBody(req)).toString();
 		if (verifyJSONShape(req, res, bodyParser) === false) return;
 	}
-
-
 
 	if (queryFieldRules) {
 		try {

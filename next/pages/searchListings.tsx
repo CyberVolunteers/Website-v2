@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Card from "../client/components/Card";
 import FeaturedCard from "../client/components/FeaturedCard";
 import Pagination from "@material-ui/lab/Pagination";
@@ -8,23 +8,43 @@ import Image from "next/image";
 import styles from "../client/styles/searchListings.module.css";
 import { ReactElement } from "react";
 import Head from "../client/components/Head";
+import { useRouter } from "next/dist/client/router";
+import { Flattened } from "combined-validator";
 
 
 export default function SearchListings(): ReactElement {
+	const router = useRouter();
+
+	const rawKeywords = router.query.keywords;
+	const [keywords, setKeywords] = useState(undefined as string | undefined);
+	// when the router updates, set the keywords
+	useEffect(() => { if (router.isReady) setKeywords(typeof rawKeywords !== "string" ? "" : rawKeywords) }, [router]);
+
+
 	const listingsPerPage = 6;
 
-	const listings = [];
+	const [listings, setListings] = useState([] as any[]);
 
-	for (let i = 0; i < 7; i++) {
-		listings.push({
-			uuid: "abcd-uuid-asafs",
-			title: `<title> ${i}`,
-			desc: "<desc>",
-			organisationName: "<org name>",
-			currentVolunteers: 4,
-			requestedVolunteers: 10,
+	// fetch
+	async function updateListings() {
+		if (keywords === undefined) return; // do not fetch twice
+
+		const res = await fetch(`/api/searchListings?${new URLSearchParams({
+			keywords
+		})}`, {
+			method: "GET",
+			headers: {
+				"content-type": "application/json",
+				"accept": "application/json",
+			},
 		});
+		console.log(res)
+		// TODO: see if there are no listings and say so 
+		// TODO: add an error message somewhere here
+		setListings(await res.json());
 	}
+
+	useEffect(() => { updateListings() }, [keywords]) // only run once on rehydration
 
 	const pagesNum = Math.ceil(listings.length / listingsPerPage);
 	const [listingsPage, setListingsPage] = useState(0);
@@ -51,12 +71,15 @@ export default function SearchListings(): ReactElement {
 				</span>
 			</div >
 
-
-			<div className={`${styles["featured-card-wrapper"]}`}>
-				<h1 className="w-1000">Featured: Loans with research backed impact</h1>
-				<p className="w-1000">{listings[0].title}</p>
-				<FeaturedCard listing={listings[0]} img="/img/listing1.jpg" />
-			</div>
+			{
+				keywords === "" && listings.length > 0 ? // only show when showing everything
+					<div className={`${styles["featured-card-wrapper"]}`}>
+						<h1 className="w-1000">Featured: Loans with research backed impact</h1>
+						<p className="w-1000">{listings[0].title}</p>
+						<FeaturedCard listing={listings[0]} img="/img/listing1.jpg" />
+					</div>
+					: null
+			}
 
 
 			<div className={`${styles["cards-grid"]} w-1000`}>

@@ -6,12 +6,9 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 import { Org } from "../server/mongo/mongoModels";
-import { getMongo } from "../server/mongo";
-
-// eslint-disable-next-line
-//@ts-ignore
-import ObjectId from "mongoose/lib/types/objectid";
+import { getMongo } from "../server/mongo";	
 import Card from "../client/components/Card";
+import { toStrippedObject } from "../server/mongo/util";
 
 export default function ManageListings({ listings }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
@@ -52,16 +49,7 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context) => {
 	await getMongo(); // connect
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	const org = (await Org.findById(session._id).populate("listings")).toJSON({
-		versionKey: false,
-		transform: (doc: any, out: any) => {
-			Object.keys(out).forEach(k => {
-				if (out[k] instanceof ObjectId) return delete out[k]; // delete all the id keys
-				if (out[k] instanceof Date) return out[k] = out[k].toISOString(); // delete all the id keys
-			});
-			return out;
-		}
-	}); // TODO: maybe try aggregate? some people say it's faster
+	const org = toStrippedObject(await Org.findById(session._id).populate("listings")) // TODO: maybe try aggregate? some people say it's faster
 	const orgName = org.orgName;
 
 	const listings = org.listings;

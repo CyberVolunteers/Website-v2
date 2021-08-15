@@ -98,9 +98,9 @@ export const loginSpec: FieldConstraintsCollection = {
 };
 
 export const searchListingsSpec: FieldConstraintsCollection = {
-    optional: {
+    required: {
         string: {
-            orgName: {}
+            keywords: {}
         }
     }
 }

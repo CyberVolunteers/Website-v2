@@ -10,15 +10,26 @@ import { useViewerType } from "../utils/userState";
 import styles from "../styles/header.module.css"
 import { useIsAfterRehydration } from '../utils/otherHooks';
 import { ViewerType } from '../types';
+import { useRouter } from 'next/dist/client/router';
 
 function Header() {
     const sidebarLimitWidth = 600;
     const isAfterRehydration = useIsAfterRehydration();
 
+    const router = useRouter();
+
     const userType = useViewerType();
     const isLoggedIn = (["user", "org", "unverified_user", "unverified_org"] as ViewerType[]).includes(userType);
 
-    const [isSidebarUp, setisSidebarUp] = useState(false);
+    const [isSidebarUp, setIsSidebarUp] = useState(false);
+    const [searchKeywords, setSearchKeywords] = useState("");
+
+    const onSearch: React.FormEventHandler<HTMLFormElement> = (evt) => {
+        evt.preventDefault()
+        router.push(`/searchListings?${new URLSearchParams({
+            keywords: searchKeywords
+        })}`)
+    }
 
     const windowSize = useWindowSize();
 
@@ -135,10 +146,10 @@ function Header() {
 
                     {
                         isAfterRehydration ? // because it resizes automatically, we need to disable it to prevent flicker
-                            <form action="">
+                            <form onSubmit={onSearch}>
                                 <div className={`${styles["input-wrapper"]} dflex-align-center`}>
                                     <SearchIcon />
-                                    <input type="text" placeholder="Search Here..." />
+                                    <input type="text" placeholder="Search Here..." value={searchKeywords} onChange={v => setSearchKeywords(v.currentTarget.value)} />
                                 </div>
                             </form>
                             : null
@@ -193,7 +204,7 @@ function Header() {
                         }
                     </ul>
 
-                    <div className={`${styles["burger-icon"]}`} onClick={e => setisSidebarUp(!isSidebarUp)}>
+                    <div className={`${styles["burger-icon"]}`} onClick={e => setIsSidebarUp(!isSidebarUp)}>
                         <MenuIcon />
                     </div>
                 </div>
