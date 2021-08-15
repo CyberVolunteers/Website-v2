@@ -16,6 +16,7 @@ import { FormFieldCollectionData } from "../client/types";
 import Head from "../client/components/Head";
 import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
+import { passwordStrengthSuggestions } from "../serverAndClient/validation";
 
 
 export default function OrganisationSignup({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -35,6 +36,7 @@ export default function OrganisationSignup({ csrfToken, fields }: InferGetServer
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 		email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
+		password: passwordStrengthSuggestions,
 		phoneNumber: isMobilePhone,
 		websiteUrl: isURL
 	};

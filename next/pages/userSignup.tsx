@@ -13,7 +13,7 @@ import { FormFieldCollectionData } from "../client/types";
 import Head from "../client/components/Head";
 import { userFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
-import { isDateInPast } from "../serverAndClient/validation";
+import { isDateInPast, passwordStrengthSuggestions } from "../serverAndClient/validation";
 
 
 export default function UserSignup({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -33,6 +33,7 @@ export default function UserSignup({ csrfToken, fields }: InferGetServerSideProp
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 		email: [isEmail, createIsEmailIsAvailableValidator(overallErrors, setOverallErrors)],
+		password: passwordStrengthSuggestions,
 		phoneNumber: isMobilePhone,
 		birthDate: isDateInPast,
 	};
