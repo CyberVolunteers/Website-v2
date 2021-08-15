@@ -1,6 +1,6 @@
 import { randomBytes } from "crypto";
 import { GetServerSidePropsContext, NextApiRequest, NextApiResponse } from "next";
-import { getSession, updateSession } from "../server/auth/auth-cookie";
+import { getCsrf, getSession, updateSession } from "../server/auth/auth-cookie";
 import { fixedTimeComparison } from "@hapi/cryptiles";
 import { csrfHeaderName, csrfTokenLength, currentPageHeaderName } from "./headersConfig";
 
@@ -11,16 +11,15 @@ function genRandomToken(length: number) {
 
 export async function updateCsrf(context: GetServerSidePropsContext<any>) {
     const newToken = genRandomToken(csrfTokenLength);
-    const additionalSessionEntries: any = {};
 
     let index = context.resolvedUrl.indexOf("?");
     if (index === -1) index = context.resolvedUrl.length // remove everything up to the question mark
     const simpleUrl = context.resolvedUrl.substr(0, index);
 
-    additionalSessionEntries.csrfToken = {};
-    additionalSessionEntries.csrfToken[simpleUrl] = newToken;
+    const csrfTokens = {} as {[key: string]: any};
+    csrfTokens[simpleUrl] = newToken;
 
-    await updateSession(context.req as any, context.res as any, additionalSessionEntries);
+    await updateSession(context.req as any, context.res as any, undefined, csrfTokens);
     return newToken;
 }
 
@@ -28,7 +27,7 @@ export async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
     const receivedPageName = req.headers[currentPageHeaderName.toLowerCase()];
     if (typeof receivedPageName !== "string") return res.status(400).send("Incorrect or undefined current page header");
 
-    const expectedCsrfToken = (await getSession(req))?.csrfToken?.[receivedPageName]; // from the sealed csrf cookie
+    const expectedCsrfToken = (await getCsrf(req))?.[receivedPageName]; // from the sealed csrf cookie
     const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()]; // from the headers
 
 

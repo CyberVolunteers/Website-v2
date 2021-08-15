@@ -31,9 +31,15 @@ const accountInfoCookieOptions: CookieSerializeOptions = {
 export async function getSession(req: ExtendedNextApiRequest) {
     if (req.session !== undefined) return req.session;
 
-    const out = req.session = deepAssign(await getCookieRaw(req.cookies?.[sessionCookieName]), {
-        csrfToken: await getCookieRaw(req.cookies?.[csrfCookieName])
-    });
+    const out = req.session = await getCookieRaw(req.cookies?.[sessionCookieName]);
+
+    return out;
+}
+
+export async function getCsrf(req: ExtendedNextApiRequest) {
+    if (req.csrfData !== undefined) return req.csrfData;
+
+    const out = req.csrfData = await getCookieRaw(req.cookies?.[csrfCookieName]);
 
     return out;
 }
@@ -47,24 +53,21 @@ async function getCookieRaw(data: any) {
     }
 }
 
-export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNextApiResponse, updateInstructions: any) {
+export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNextApiResponse, data?: any, csrf?: any) {
     const session = await getSession(req) ?? {};
+    const oldCsrf = await getCsrf(req) ?? {};
 
-    const newData = deepAssign(session, updateInstructions);
+    const newData = data === undefined ? session : deepAssign(session, data);
+    const newCsrf = csrf === undefined ? oldCsrf : deepAssign(oldCsrf, csrf);
 
-    await setSession(res, newData);
+    await setSession(res, newData, newCsrf);
     req.session = newData;
 }
 
-async function setSession(res: NextApiResponse, data: any) {
-    // delete all proto stuff
-    const dataCopyNoCsrf = Object.assign({}, data);
-    delete dataCopyNoCsrf["csrfToken"];
+async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
+    console.log("set session", data, csrf);
 
-    const payloadWithoutCsrfToken = await seal(dataCopyNoCsrf);
-    const sessionCookie = serialize(sessionCookieName, payloadWithoutCsrfToken, sessionCookieOptions)
-
-    
+    // keep a cookie that tells the client that it is logged in and other data
     const publicData = {
         "isOrg": data?.isOrg === true,
         "isSessionActive": true,
@@ -72,12 +75,12 @@ async function setSession(res: NextApiResponse, data: any) {
         "isOrganisationVerified": data?.isOrganisationVerified === true,
     }
 
-    // keep a cookie that tells the client that it is logged in
-    const accountInfoCookie = serialize(accountInfoCookieName, JSON.stringify(publicData), accountInfoCookieOptions)
+    const cookies = [serialize(accountInfoCookieName, JSON.stringify(publicData), accountInfoCookieOptions)];
 
-    const csrfCookie = serialize(csrfCookieName, await seal(data.csrfToken), csrfCookieOptions)
+    if (csrf !== undefined) cookies.push(serialize(csrfCookieName, await seal(csrf), csrfCookieOptions))
+    if (data !== undefined) serialize(sessionCookieName, await seal(data), sessionCookieOptions)
 
-    res.setHeader('Set-Cookie', [sessionCookie, accountInfoCookie, csrfCookie])
+    res.setHeader('Set-Cookie', cookies)
 }
 
 export function removeSession(res: NextApiResponse) {
@@ -89,7 +92,6 @@ export function removeSession(res: NextApiResponse) {
     const accountInfoCookie = serialize(accountInfoCookieName, '', Object.assign({}, accountInfoCookieOptions, emptyCookieSettings))
 
     // NOTE: leaving the csrf cookie
-
 
     res.setHeader('Set-Cookie', [sessionCookie, accountInfoCookie])
 }

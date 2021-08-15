@@ -19,7 +19,8 @@ export type QueryFieldsCollection = {
 
 export type ExtendedNextApiRequest = NextApiRequest & {
     originalUrl?: string,
-    session?: any
+    session?: any,
+    csrfData?: any
 }
 
 export type ExtendedNextApiResponse = NextApiResponse & {
