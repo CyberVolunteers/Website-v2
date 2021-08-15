@@ -12,6 +12,7 @@ import { loginSpec } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import SimpleForm from "../client/components/SimpleForm";
+import Link from "next/link";
 
 export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
@@ -48,6 +49,16 @@ export default function Login({ csrfToken, fields }: InferGetServerSidePropsType
 		<br />
 
 		<SimpleForm fields={fields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors}>Log in!</SimpleForm>
+
+		<Link href="/signupSelect" passHref>
+			<a>
+				<li>
+					<p>
+						Or sign up
+					</p>
+				</li>
+			</a>
+		</Link>
 	</div>;
 }
 
