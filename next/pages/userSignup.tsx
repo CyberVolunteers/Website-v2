@@ -7,13 +7,14 @@ import isMobilePhone from "validator/lib/isMobilePhone";
 import SimpleForm from "../client/components/SimpleForm";
 import { useRouter } from "next/dist/client/router";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
-import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
+import { updateCsrf } from "../server/csrf";
 import { addError, createIsEmailIsAvailableValidator, setFieldsOrder } from "../client/utils/formUtils";
 import { FormFieldCollectionData } from "../client/types";
 import Head from "../client/components/Head";
 import { userFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import { isDateInPast, passwordStrengthSuggestions } from "../serverAndClient/validation";
+import { csrfFetch } from "../client/utils/csrf";
 
 
 export default function UserSignup({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {

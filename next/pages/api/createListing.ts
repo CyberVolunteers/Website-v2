@@ -9,6 +9,7 @@ import { HandlerCollection, MulterReq } from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";
 import { getFileExtension } from "../../serverAndClient/utils";
 import { allowedFileTypes } from "../../serverAndClient/staticDetails";
+import { logger } from "../../server/logger";
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 export * from "../../server/defaultEndpointConfig";
@@ -45,19 +46,28 @@ const bodyParser = ajv.compileParser(createAjvJTDSchema(deepAssign(listings, {
 const handlers: HandlerCollection = {
 	POST: async function (req: MulterReq, res) {
 		await runMiddleware(req, res, upload.single("listingImage") as any);
-
+		
 		const file = req.file;
-		if (file === undefined) return res.status(400).send("Please send us an image file");
-
+		if (file === undefined) {
+			logger.info("server.createListing:No image file");
+			return res.status(400).send("Please send us an image file");
+		}
+		
 		//IMPORTANT: do not forget to check the json shape as well
 		if (verifyJSONShape(req, res, bodyParser) === false) return;
-
+		
 		const session = await getSession(req);
-
-		if (!isOrg(session)) return res.status(403).send("You need to be an organisation to do that");
-
+		
+		if (!isOrg(session)) {
+			logger.info("server.createListing:Not an org");
+			return res.status(403).send("You need to be an organisation to do that");
+		}
+		
 		const fileExt = getFileExtension(file.originalname);
-		if (fileExt === null || !allowedFileTypes.includes(fileExt)) return res.status(400).send("Please upload a valid image file");
+		if (fileExt === null || !allowedFileTypes.includes(fileExt)) {
+			logger.info("server.createListing:Invalid extension");
+			return res.status(400).send("Please upload a valid image file");
+		}
 
 		await createListing(req.body, session, fileExt, file.buffer);
 

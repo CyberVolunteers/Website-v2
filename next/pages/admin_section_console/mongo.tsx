@@ -1,9 +1,9 @@
 import { InferGetServerSidePropsType, GetServerSideProps } from "next";
-import Link from "next/link";
 import { useState } from "react";
 import { ReactElement } from "react";
 import Head from "../../client/components/Head";
-import { csrfFetch, updateCsrf } from "../../serverAndClient/csrf";
+import { csrfFetch } from "../../client/utils/csrf";
+import { updateCsrf } from "../../server/csrf";
 
 export default function Console({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const [query1, setQuery1] = useState("");

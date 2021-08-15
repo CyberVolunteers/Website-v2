@@ -4,8 +4,9 @@ import { useState } from "react";
 import { ReactElement } from "react";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { updateLoginState } from "../client/utils/userState";
-import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
 import Head from "../client/components/Head";
+import { csrfFetch } from "../client/utils/csrf";
+import { updateCsrf } from "../server/csrf";
 
 
 export default function Logout({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {

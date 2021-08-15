@@ -7,12 +7,13 @@ import isEmail from "validator/lib/isEmail";
 import { FormFieldCollectionData } from "../client/types";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { updateLoginState } from "../client/utils/userState";
-import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
+import { updateCsrf } from "../server/csrf";
 import { loginSpec } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import SimpleForm from "../client/components/SimpleForm";
 import Link from "next/link";
+import { csrfFetch } from "../client/utils/csrf";
 
 export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();

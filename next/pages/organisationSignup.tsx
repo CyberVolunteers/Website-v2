@@ -10,13 +10,14 @@ import isMobilePhone from "validator/lib/isMobilePhone";
 import SimpleForm from "../client/components/SimpleForm";
 import { useRouter } from "next/dist/client/router";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
-import { csrfFetch, updateCsrf } from "../serverAndClient/csrf";
+import { updateCsrf } from "../server/csrf";
 import { createIsEmailIsAvailableValidator, setFieldsOrder, addError } from "../client/utils/formUtils";
 import { FormFieldCollectionData } from "../client/types";
 import Head from "../client/components/Head";
 import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import { passwordStrengthSuggestions } from "../serverAndClient/validation";
+import { csrfFetch } from "../client/utils/csrf";
 
 
 export default function OrganisationSignup({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {

@@ -5,6 +5,7 @@ import { ajv, createHandler } from "../../server/apiRequests";
 import { Listing } from "../../server/mongo/mongoModels";
 import { toStrippedObject } from "../../server/mongo/util";
 import { HandlerCollection } from "../../server/types";
+import { logger } from "../../server/logger";
 import { searchListingsSpec } from "../../serverAndClient/publicFieldConstants";
 
 export * from "../../server/defaultEndpointConfig";
@@ -18,8 +19,12 @@ const handlers: HandlerCollection = {
 		const keywords = req.query.keywords;
 
 		let listings;
-		if (keywords === "" || typeof keywords !== "string") listings = await Listing.find();
+		if (keywords === "" || typeof keywords !== "string") {
+			logger.info("server.searchListings:Search all");
+			listings = await Listing.find();
+		}
 		else {
+			logger.info("server.searchListings:Search keywords '%s'", keywords);
 			listings = await Listing.find(
 				{ $text: { $search: keywords } },
 				{ score: { $meta: "textScore" } }
@@ -31,7 +36,7 @@ const handlers: HandlerCollection = {
 
 /*
 async getLatAndLong(placeDesc) {
-    this.logger.info("Pinging google services");
+    logger.info("Pinging google services");
     const geocodeString = `https://maps.googleapis.com/maps/api/geocode/json?address=${escape(
       placeDesc.replace(" ", "+")
     )}&key=<key>`;

@@ -7,6 +7,7 @@ import { getSession } from "../../../server/auth/auth-cookie";
 import { isAdminLevel } from "../../../server/auth/session";
 import { HandlerCollection } from "../../../server/types";
 import { Listing, Org, User } from "../../../server/mongo/mongoModels";
+import { logger } from "../../../server/logger";
 
 export * from "../../../server/defaultEndpointConfig";
 
@@ -18,12 +19,16 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		if (!isAdminLevel(session, 3)) return res.status(400).send("Unauthorized");
+		if (!isAdminLevel(session, 3)) {
+			logger.warn("server.admin_section_console.mongo.ts:Unauthorized");
+			return res.status(400).send("Unauthorized");
+		}
+		logger.info("server.admin_section_console.mongo.ts:executing");
 
 		let q1, q2, q3: any;
-		try {q1 = JSON.parse(req.body?.query1)} catch { }
-		try {q2 = JSON.parse(req.body?.query2)} catch { }
-		try {q3 = JSON.parse(req.body?.query3)} catch { }
+		try { q1 = JSON.parse(req.body?.query1) } catch { }
+		try { q2 = JSON.parse(req.body?.query2) } catch { }
+		try { q3 = JSON.parse(req.body?.query3) } catch { }
 
 		const model = (() => {
 			switch (req.body?.model) {

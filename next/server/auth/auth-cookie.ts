@@ -4,6 +4,7 @@ import { NextApiResponse } from "next"
 import { accountInfoCookieName, cookieMaxAge, sessionCookieName, csrfCookieName } from "../../serverAndClient/cookiesConfig"
 import { deepAssign } from "combined-validator";
 import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../types";
+import { logger } from "../logger";
 
 const sessionCookieOptions: CookieSerializeOptions = {
     maxAge: cookieMaxAge,
@@ -57,20 +58,14 @@ export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNe
     const session = await getSession(req) ?? {};
     const oldCsrf = await getCsrf(req) ?? {};
 
-
-    console.log("session", session)
-    
     const newData = data === undefined ? session : deepAssign(session, data);
     const newCsrf = csrf === undefined ? oldCsrf : deepAssign(oldCsrf, csrf);
-    console.log("update", newData, newCsrf, data === undefined);
 
     await setSession(res, newData, newCsrf);
     req.session = newData;
 }
 
 async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
-    console.log("set session", data, csrf);
-
     // keep a cookie that tells the client that it is logged in and other data
     const publicData = {
         "isOrg": data?.isOrg === true,
@@ -84,6 +79,8 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
     if (csrf !== undefined) cookies.push(serialize(csrfCookieName, await seal(csrf), csrfCookieOptions));
     if (data !== undefined) cookies.push(serialize(sessionCookieName, await seal(data), sessionCookieOptions));
 
+    logger.info("server.auth.auth-cookie:Setting session");
+
     res.setHeader('Set-Cookie', cookies)
 }
 
@@ -96,6 +93,9 @@ export function removeSession(res: NextApiResponse) {
     const accountInfoCookie = serialize(accountInfoCookieName, '', Object.assign({}, accountInfoCookieOptions, emptyCookieSettings))
 
     // NOTE: leaving the csrf cookie
+
+    logger.info("server.auth.auth-cookie:Destroying session");
+
 
     res.setHeader('Set-Cookie', [sessionCookie, accountInfoCookie])
 }

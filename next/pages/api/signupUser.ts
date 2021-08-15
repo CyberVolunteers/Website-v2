@@ -5,6 +5,7 @@ import { signupUser } from "../../server/auth/session";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
+import { logger } from "../../server/logger";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -17,7 +18,10 @@ const handlers: HandlerCollection = {
 
 		const signupResult = await signupUser(req.body);
 
-		if (!signupResult) return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?");
+		if (!signupResult) {
+			logger.info("server.signupUser:Signup failed");
+			return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?");
+		}
 
 		return res.end();
 	}

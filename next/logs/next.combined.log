@@ -1,0 +1,21 @@
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 14:55:56"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:09:24"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:09:29"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:10:35"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logout","timestamp":"2021-08-15 15:10:40"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:10:40"}
+{"message":"server.auth.auth-cookie:Destroying session","level":"info","timestamp":"2021-08-15 15:10:40"}
+{"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 15:10:43"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:10:43"}
+{"message":"server.searchListings:Search all","level":"info","timestamp":"2021-08-15 15:10:43"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:10:56"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:10:57"}
+{"message":"server.auth.auth-cookie:    session","level":"info","timestamp":"2021-08-15 15:11:36"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 15:11:38"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logout","timestamp":"2021-08-15 15:11:49"}
+{"level":"info","message":"server.apiRequests:Request to url /api/logout","timestamp":"2021-08-15 15:11:49"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 15:11:49"}
+{"message":"server.auth.auth-cookie:Destroying session","level":"info","timestamp":"2021-08-15 15:11:49"}
+{"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 15:11:51"}
+{"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 15:11:51"}
+{"message":"server.searchListings:Search all","level":"info","timestamp":"2021-08-15 15:11:51"}

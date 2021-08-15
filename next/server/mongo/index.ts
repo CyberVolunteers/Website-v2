@@ -1,5 +1,6 @@
 import { dbServer, dbName } from "./config"
 import { connect, Mongoose } from "mongoose"
+import { logger } from "../logger";
 
 interface MongoConnectionDetails {
     instance: Mongoose | null,
@@ -11,6 +12,7 @@ const mongoConnectionDetails: MongoConnectionDetails = {
 }
 
 async function getNewMongo() {
+    logger.info("server.mongo:Getting new instance");
     return await connect(`mongodb://${dbServer}/${dbName}`, {
         useNewUrlParser: true,
         useUnifiedTopology: true,
@@ -30,7 +32,7 @@ export const getMongo = async function () {
     mongoConnectionDetails.promise.then((newInstance) => {
         mongoConnectionDetails.instance = newInstance;
     }).catch((err) => {
-        console.error(err);
+        logger.error("server.mongo.index:", err);
         mongoConnectionDetails.instance = mongoConnectionDetails.promise = null;
     })
 

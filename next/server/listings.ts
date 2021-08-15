@@ -3,6 +3,7 @@ import sharp from "sharp";
 import { baseListingImagePath } from "../serverAndClient/staticDetails";
 import { v4 as uuidv4 } from "uuid";
 import { connection } from "mongoose";
+import { logger } from "./logger";
 
 export async function createListing(params: { [key: string]: any }, orgSession: { [key: string]: any }, fileExt: string, fileBuffer: Buffer) {
 	const createdDate = new Date();
@@ -16,22 +17,23 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 
 	const mongoSession = await connection.startSession();
 
-	await mongoSession.withTransaction(async () => {
-		const newListing = new Listing(dataToSupply);
-		await Promise.all([
-			sharp(fileBuffer).resize({ width: 1024 }).toFile(process.env.baseDir + "/public" + imagePath),
-			newListing.save(),
-			// add the new id to the organisation
-			Org.updateOne(
-				{ _id: orgSession._id },
-				{ $push: { listings: newListing._id } }
-			)
-		])
-
-	})//.catch((e) => {
-	// 	console.error(e);
-	// 	throw e;
-	// });
+	try{
+		await mongoSession.withTransaction(async () => {
+			const newListing = new Listing(dataToSupply);
+			await Promise.all([
+				sharp(fileBuffer).resize({ width: 1024 }).toFile(process.env.baseDir + "/public" + imagePath),
+				newListing.save(),
+				// add the new id to the organisation
+				Org.updateOne(
+					{ _id: orgSession._id },
+					{ $push: { listings: newListing._id } }
+				)
+			])
+	
+		})
+	} catch(e){
+		logger.error("server.listings:Error creating a listing: '%s'", e);
+	}
 
 	mongoSession.endSession()
 }

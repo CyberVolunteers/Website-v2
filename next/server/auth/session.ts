@@ -1,6 +1,7 @@
 import { hash, verifyHash } from "./password"
 import { Org, User } from "../mongo/mongoModels"
 import getConfig from "next/config";
+import { logger } from "../logger";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -21,6 +22,8 @@ export async function login({ email, password }: { email: string, password: stri
             passwordHash: "this should never match" // a dummy "hash" against timing attacks
         }
 
+    logger.info("server.auth.session:Login db retrieval success: %s", emailWasFound);
+
     const isCorrectHash = await verifyHash(password, storedInfo.passwordHash, (newHash) => {
         const schema = doesEmailBelongToUser ? User : Org;
         schema.updateOne({ email }, { passwordHash: newHash })
@@ -37,15 +40,15 @@ export async function signupUser(params: any) {
     params.passwordHash = passwordHash;
     const newUser = new User(params);
 
-    try {
-        if (await isEmailFree(params.email) === false) throw new Error("This email is already used")
-        await newUser.save()
-    } catch (e) {
-        console.error(e);
+    if (await isEmailFree(params.email) === false) {
+        logger.info("server.auth.session:Email used for user");
+
         return false;
     }
 
+    await newUser.save()
     return true;
+
 }
 
 export async function signupOrg(params: any) {
@@ -54,14 +57,11 @@ export async function signupOrg(params: any) {
     params.passwordHash = passwordHash;
     const newUser = new Org(params);
 
-    try {
-        if (await isEmailFree(params.email) === false) throw new Error("This email is already used")
-        await newUser.save()
-    } catch (e) {
-        console.error(e);
+    if (await isEmailFree(params.email) === false) {
+        logger.info("server.auth.session:Email used for org");
         return false;
     }
-
+    await newUser.save();
     return true;
 }
 
@@ -97,6 +97,6 @@ export function isUser(session: any) {
     return isLoggedIn(session) && session?.isEmailVerified === true && session?.isOrg === false;
 }
 
-export function isAdminLevel(session: any, level: number){
+export function isAdminLevel(session: any, level: number) {
     return isLoggedIn(session) && (session.adminLevel >= level || publicRuntimeConfig.IS_DEV);
 }
