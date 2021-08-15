@@ -57,8 +57,12 @@ export async function updateSession(req: ExtendedNextApiRequest, res: ExtendedNe
     const session = await getSession(req) ?? {};
     const oldCsrf = await getCsrf(req) ?? {};
 
+
+    console.log("session", session)
+    
     const newData = data === undefined ? session : deepAssign(session, data);
     const newCsrf = csrf === undefined ? oldCsrf : deepAssign(oldCsrf, csrf);
+    console.log("update", newData, newCsrf, data === undefined);
 
     await setSession(res, newData, newCsrf);
     req.session = newData;
@@ -77,8 +81,8 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
 
     const cookies = [serialize(accountInfoCookieName, JSON.stringify(publicData), accountInfoCookieOptions)];
 
-    if (csrf !== undefined) cookies.push(serialize(csrfCookieName, await seal(csrf), csrfCookieOptions))
-    if (data !== undefined) serialize(sessionCookieName, await seal(data), sessionCookieOptions)
+    if (csrf !== undefined) cookies.push(serialize(csrfCookieName, await seal(csrf), csrfCookieOptions));
+    if (data !== undefined) cookies.push(serialize(sessionCookieName, await seal(data), sessionCookieOptions));
 
     res.setHeader('Set-Cookie', cookies)
 }

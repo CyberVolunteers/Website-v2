@@ -89,6 +89,8 @@ export const getServerSideProps: GetServerSideProps<{
 		fields = Object.fromEntries(fieldKeys.map(k => [(fieldNames as any)[k] ?? k, session[k]])); // translate them
 	}
 
+	console.log(session)
+
 	return {
 		props: {
 			accountData: fields
