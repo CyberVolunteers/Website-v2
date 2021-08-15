@@ -17,19 +17,16 @@ type Data = {
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
-		console.log(req.body)
 
 		if (!isAdminLevel(session, 3)) return res.status(400).send("Unauthorized");
 
 		let q1, q2, q3: any;
-		try {
-			q1 = JSON.parse(req.body?.query1)
-			q2 = JSON.parse(req.body?.query2)
-			q3 = JSON.parse(req.body?.query3)
-		} catch { }
+		try {q1 = JSON.parse(req.body?.query1)} catch { }
+		try {q2 = JSON.parse(req.body?.query2)} catch { }
+		try {q3 = JSON.parse(req.body?.query3)} catch { }
 
 		const model = (() => {
-			switch (req.body?.type) {
+			switch (req.body?.model) {
 				case "users":
 					return User;
 				case "orgs":
@@ -43,10 +40,12 @@ const handlers: HandlerCollection = {
 				case "find":
 					return await model.find(q1, q2, q3);
 				default: // update all
-					await model.updateMany(q1, q2);
+					const out = await model.updateMany(q1, q2, q3);
+					console.log(out, q1, q2, q3) 
 					return await model.find(q1);
 			}
 		})()
+
 
 		return res.json(queryRes);
 	}

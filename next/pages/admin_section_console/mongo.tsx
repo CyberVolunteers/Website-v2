@@ -28,7 +28,7 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 					"content-type": "application/json",
 					"accept": "application/json",
 				},
-				body: JSON.stringify({ query1, query2, query3, model, type })
+				body: JSON.stringify({ query1, query2, query3, model: model.toLowerCase(), type: type.toLowerCase() })
 			})
 
 			const resText = await res.text();
@@ -48,15 +48,15 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 			setResText("Response: " + out);
 
 		}}>
-			<input value={query1} onChange={v => setQuery1(v.currentTarget.value.toLowerCase())}></input>
-			<input value={query2} onChange={v => setQuery2(v.currentTarget.value.toLowerCase())}></input>
-			<input value={query3} onChange={v => setQuery3(v.currentTarget.value.toLowerCase())}></input>
-			<select value={type} onChange={v => setType(v.currentTarget.value.toLowerCase())}>
+			<input value={query1} onChange={v => setQuery1(v.currentTarget.value)}></input>
+			<input value={query2} onChange={v => setQuery2(v.currentTarget.value)}></input>
+			<input value={query3} onChange={v => setQuery3(v.currentTarget.value)}></input>
+			<select value={type} onChange={v => setType(v.currentTarget.value)}>
 				{type === "" ? <option>Select</option> : null}
 				<option>Find</option>
 				<option>Update_all</option>
 			</select>
-			<select value={model} onChange={v => setModel(v.currentTarget.value.toLowerCase())}>
+			<select value={model} onChange={v => setModel(v.currentTarget.value)}>
 				{model === "" ? <option>Select</option> : null}
 				<option>Users</option>
 				<option>Orgs</option>
