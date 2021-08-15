@@ -54,6 +54,7 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 			<select value={type} onChange={v => setType(v.currentTarget.value)}>
 				{type === "" ? <option>Select</option> : null}
 				<option>Find</option>
+				<option>Delete_all</option>
 				<option>Update_all</option>
 			</select>
 			<select value={model} onChange={v => setModel(v.currentTarget.value)}>

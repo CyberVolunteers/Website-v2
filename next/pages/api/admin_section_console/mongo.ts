@@ -39,10 +39,11 @@ const handlers: HandlerCollection = {
 			switch (req.body?.type) {
 				case "find":
 					return await model.find(q1, q2, q3);
+				case "delete_all":
+					return await model.deleteMany(q1, q2);
 				default: // update all
 					const out = await model.updateMany(q1, q2, q3);
-					console.log(out, q1, q2, q3) 
-					return await model.find(q1);
+					return [out, await model.find(q1)];
 			}
 		})()
 
