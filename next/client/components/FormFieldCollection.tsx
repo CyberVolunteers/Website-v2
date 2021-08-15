@@ -4,13 +4,13 @@ import { useRef } from "react";
 import { useImperativeHandle } from "react";
 import { forwardRef } from "react";
 import { Dispatch, SetStateAction } from "react";
-import FormComponent, { PerElementValidatorCallbacks, PerElementValidatorCallback } from "./FormComponent";
+import FormComponent, { PerElementValidatorCallbacks } from "./FormComponent";
 
 const FormFieldCollection = forwardRef((
     { fields, perElementValidationCallbacks, overallErrors, setOverallErrors, presentableNames }:
         {
             fields: Flattened,
-            perElementValidationCallbacks: PerElementValidatorCallbacks,
+            perElementValidationCallbacks?: PerElementValidatorCallbacks,
             presentableNames?: { [key: string]: string },
             overallErrors: {
                 [key: string]: string
@@ -74,7 +74,7 @@ const FormFieldCollection = forwardRef((
                     <FormComponent ref={fieldRefs[k]}
                         name={k}
                         flattenedValue={v}
-                        perElementValidationCallbacks={perElementValidationCallbacks}
+                        perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
                         presentableNames={presentableNames}
                         onChange={() => setOverallErrors({})} /> {/* delete the error messages on field change*/}
                 </p>

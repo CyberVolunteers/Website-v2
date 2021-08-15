@@ -9,7 +9,7 @@ import CircularProgress from "@material-ui/core/CircularProgress/CircularProgres
 
 const SimpleForm: FC<{
 	fields: Flattened,
-	perElementValidationCallbacks: PerElementValidatorCallbacks,
+	perElementValidationCallbacks?: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
 	onSubmit: (evt: FormEvent<HTMLFormElement>, data: {
 		[key: string]: any

@@ -4,9 +4,7 @@ import React from 'react'
 
 import styles from "../styles/featuredCard.module.css"
 
-function FeaturedCard({ img, listing }) {
-
-    const { title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid } = listing;
+function FeaturedCard({ imagePath: img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid }) {
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
             <div className={`img-container`}>

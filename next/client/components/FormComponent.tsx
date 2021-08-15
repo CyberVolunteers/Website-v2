@@ -276,6 +276,6 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 	}
 
 	return <>
-		<input className={name} name={name} required={flattenedValue.required} value={formState} onChange={e => setValue(e.target.value)} {...newProps} />
+		<input className={name} id={name} name={name} required={flattenedValue.required} value={formState} onChange={e => setValue(e.target.value)} {...newProps} />
 	</>;
 })

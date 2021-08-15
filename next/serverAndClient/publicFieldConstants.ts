@@ -102,5 +102,10 @@ export const searchListingsSpec: FieldConstraintsCollection = {
         string: {
             keywords: {}
         }
+    },
+    optional: {
+        string: {
+            targetLoc: {}
+        }
     }
 }

@@ -4,7 +4,7 @@ import React from 'react'
 
 import styles from "../styles/card.module.css"
 
-function Card({ img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid }) {
+function Card({ imagePath: img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid }) {
 
     return (
         <div className={`${styles["Card"]}`}>

@@ -30,7 +30,7 @@ export const listingFieldNamesToShow = {
 	duration: "How long will your opportunity last?",
 	place: "Where will it take place?",
 	time: "When will it take place?",
-	skills: "The skills that will be appriciated",
+	skills: "The skills that will be appreciated",
 	requirements: "The listing's requirements",
 	desc: "Description",
 	requiredData: "What do you need to know about the volunteers?",
@@ -40,4 +40,8 @@ export const listingFieldNamesToShow = {
 	minHoursPerWeek: "Minimal hours of volunteering (per week)",
 	maxHoursPerWeek: "Maximum hours of volunteering (per week)",
 
+}
+
+export const searchListingsSpecNamesToShow = {
+	targetLoc: "Search near this location: "
 }

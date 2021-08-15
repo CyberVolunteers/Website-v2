@@ -9,10 +9,15 @@ import styles from "../client/styles/searchListings.module.css";
 import { ReactElement } from "react";
 import Head from "../client/components/Head";
 import { useRouter } from "next/dist/client/router";
-import { Flattened } from "combined-validator";
+import SimpleForm from "../client/components/SimpleForm";
+import { updateOverallErrorsForRequests } from "../client/utils/misc";
+import { searchListingsSpec } from "../serverAndClient/publicFieldConstants";
+import { GetStaticProps, InferGetStaticPropsType } from "next";
+import { flatten, Flattened } from "combined-validator";
+import { searchListingsSpecNamesToShow } from "../serverAndClient/displayNames";
 
 
-export default function SearchListings(): ReactElement {
+export default function SearchListings({ fields }: InferGetStaticPropsType<typeof getStaticProps>): ReactElement {
 	const router = useRouter();
 
 	const rawKeywords = router.query.keywords;
@@ -20,10 +25,13 @@ export default function SearchListings(): ReactElement {
 	// when the router updates, set the keywords
 	useEffect(() => { if (router.isReady) setKeywords(typeof rawKeywords !== "string" ? "" : rawKeywords) }, [router]);
 
-
 	const listingsPerPage = 6;
 
 	const [listings, setListings] = useState([] as any[]);
+	const [areExtraOptionsShown, setAreExtraOptionsShown] = useState(false);
+	const [overallErrors, setOverallErrors] = useState({} as {
+		[key: string]: string
+	});
 
 	// fetch
 	async function updateListings() {
@@ -38,7 +46,8 @@ export default function SearchListings(): ReactElement {
 				"accept": "application/json",
 			},
 		});
-		// TODO: add an error message somewhere here
+		if (!await updateOverallErrorsForRequests(res, "searchListingsRequest", overallErrors, setOverallErrors)) return;
+
 		const receivedData = await res.json() as any[];
 		receivedData.sort((a, b) => b.score - a.score) // sort them
 		setListings(receivedData);
@@ -57,7 +66,7 @@ export default function SearchListings(): ReactElement {
 			<div className={`${styles["top-area"]} dflex w-1000`}>
 				<span className="w-100 dflex-align-center">
 					<h1>Volunteer now</h1>
-					<span className={`${styles["right-side"]}`}>
+					<span className={`${styles["right-side"]}`} onClick={() => setAreExtraOptionsShown(!areExtraOptionsShown)}>
 						<div className={`${styles["icon-container"]}`}>
 							<Image
 								src="/img/filter.svg"
@@ -71,12 +80,21 @@ export default function SearchListings(): ReactElement {
 				</span>
 			</div >
 
+			{/* Extra search options */}
+			{
+				!areExtraOptionsShown ? null :
+					<div>
+						<p>I am sorry for this horrendous mess. Anyways, "Advanced search options"</p>
+						<SimpleForm presentableNames={searchListingsSpecNamesToShow} fields={fields} overallErrors={overallErrors} setOverallErrors={setOverallErrors} onSubmit={updateListings}>Search!</SimpleForm>
+					</div>
+			}
+
 			{
 				keywords === "" && listings.length > 0 ? // only show when showing everything
 					<div className={`${styles["featured-card-wrapper"]}`}>
 						<h1 className="w-1000">Featured: Loans with research backed impact</h1>
 						<p className="w-1000">{listings[0].title}</p>
-						<FeaturedCard listing={listings[0]} img="/img/listing1.jpg" />
+						<FeaturedCard {...listings[0]} />
 					</div>
 					: null
 			}
@@ -85,14 +103,14 @@ export default function SearchListings(): ReactElement {
 			<div className={`${styles["cards-grid"]} w-1000`}>
 
 				{
-					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="/img/listing2.jpg" {...value} />)
+					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} {...value} />)
 				}
 			</div>
 
 			{
-				listings.length === 0 ? 
-				<p>We could not find anything that matched your search query</p>
-				: null
+				listings.length === 0 ?
+					<p>We could not find anything that matched your search query</p>
+					: null
 			}
 
 
@@ -105,4 +123,14 @@ export default function SearchListings(): ReactElement {
 		</div >
 	</>
 	);
+}
+
+export const getStaticProps: GetStaticProps<{
+	fields: Flattened
+}> = async () => {
+	return {
+		props: {
+			fields: flatten(searchListingsSpec)
+		}
+	}
 }
