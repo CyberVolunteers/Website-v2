@@ -38,10 +38,10 @@ export default function SearchListings(): ReactElement {
 				"accept": "application/json",
 			},
 		});
-		console.log(res)
-		// TODO: see if there are no listings and say so 
 		// TODO: add an error message somewhere here
-		setListings(await res.json());
+		const receivedData = await res.json() as any[];
+		receivedData.sort((a, b) => b.score - a.score) // sort them
+		setListings(receivedData);
 	}
 
 	useEffect(() => { updateListings() }, [keywords]) // only run once on rehydration
@@ -88,6 +88,12 @@ export default function SearchListings(): ReactElement {
 					listings.filter((val, index) => index >= listingsPage * listingsPerPage && index < (listingsPage + 1 * listingsPerPage)).map((value, index) => <Card key={index} img="/img/listing2.jpg" {...value} />)
 				}
 			</div>
+
+			{
+				listings.length === 0 ? 
+				<p>We could not find anything that matched your search query</p>
+				: null
+			}
 
 
 			<div className={`${styles["pagination-area"]} w-1000`}>

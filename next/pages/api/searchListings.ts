@@ -16,7 +16,6 @@ type Data = {
 const handlers: HandlerCollection = {
 	GET: async function (req, res) {
 		const keywords = req.query.keywords;
-		console.log("kw", [req.query.keywords])
 
 		let listings;
 		if (keywords === "" || typeof keywords !== "string") listings = await Listing.find();
@@ -29,6 +28,19 @@ const handlers: HandlerCollection = {
 		return res.json(listings.map(toStrippedObject));
 	}
 };
+
+/*
+async getLatAndLong(placeDesc) {
+    this.logger.info("Pinging google services");
+    const geocodeString = `https://maps.googleapis.com/maps/api/geocode/json?address=${escape(
+      placeDesc.replace(" ", "+")
+    )}&key=<key>`;
+    const response = await axios.get(geocodeString);
+    if (response.data.results.length === 0) return {};
+    return response.data.results[0].geometry.location; //lat, lng
+  }
+
+*/
 
 export default async function searchListings(
 	req: NextApiRequest,
