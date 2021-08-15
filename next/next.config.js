@@ -12,6 +12,8 @@ module.exports = {
     return config
   },
 
+  poweredByHeader: false,
+
   env: {
     baseDir: __dirname
   }

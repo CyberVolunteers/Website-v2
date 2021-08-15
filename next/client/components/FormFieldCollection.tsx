@@ -76,6 +76,7 @@ const FormFieldCollection = forwardRef((
                         flattenedValue={v}
                         perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
                         presentableNames={presentableNames}
+                        container={fieldRefs}
                         onChange={() => setOverallErrors({})} /> {/* delete the error messages on field change*/}
                 </p>
             })

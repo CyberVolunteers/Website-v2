@@ -32,7 +32,7 @@ const accountInfoCookieOptions: CookieSerializeOptions = {
 export async function getSession(req: ExtendedNextApiRequest) {
     if (req.session !== undefined) return req.session;
 
-    const out = req.session = await getCookieRaw(req.cookies?.[sessionCookieName]);
+    const out = req.session = await unsealCookieRaw(req.cookies?.[sessionCookieName]);
 
     return out;
 }
@@ -40,12 +40,12 @@ export async function getSession(req: ExtendedNextApiRequest) {
 export async function getCsrf(req: ExtendedNextApiRequest) {
     if (req.csrfData !== undefined) return req.csrfData;
 
-    const out = req.csrfData = await getCookieRaw(req.cookies?.[csrfCookieName]);
+    const out = req.csrfData = await unsealCookieRaw(req.cookies?.[csrfCookieName]);
 
     return out;
 }
 
-async function getCookieRaw(data: any) {
+async function unsealCookieRaw(data: any) {
     if (data === undefined) return null;
     try {
         return await unseal(data);

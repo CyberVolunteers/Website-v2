@@ -1,11 +1,13 @@
 import { capitalize } from "@material-ui/core";
 import { FlattenedValue } from "combined-validator";
-import { useRef } from "react";
-import { ReactElement, ChangeEvent, useState, forwardRef, useImperativeHandle } from "react";
+import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef } from "react";
+import { ChangeEvent, useState, forwardRef, useImperativeHandle } from "react";
 import { undoCamelCase } from "../utils/misc";
 
 type PerElementValidatorCallbackReturnType = boolean | string;
-export type PerElementValidatorCallback = (v: any) => PerElementValidatorCallbackReturnType | Promise<PerElementValidatorCallbackReturnType>;
+export type PerElementValidatorCallback = (v: any, container: {
+	[key: string]: MutableRefObject<any>
+}) => PerElementValidatorCallbackReturnType | Promise<PerElementValidatorCallbackReturnType>;
 export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCallback | PerElementValidatorCallback[] };
 
 const getPresentableName = (v: string, presentableNames?: { [key: string]: string }) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
@@ -16,7 +18,10 @@ const FormComponent = forwardRef((props: {
 	perElementValidationCallbacks: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
 	onErrorSet?: (msg: string) => void,
-	onChange?: (newVal: any) => void
+	onChange?: (newVal: any) => void,
+	container: {
+		[key: string]: MutableRefObject<any>
+	}
 }, ref) => {
 
 	const {
@@ -26,10 +31,16 @@ const FormComponent = forwardRef((props: {
 		presentableNames,
 		onErrorSet,
 		onChange,
+		container
 	} = props;
 
 	const childRef = useRef();
 	const [elementError, setElementError] = useState("");
+	const [formState, formStateSetter] = useState(
+		flattenedValue.array === true ? [] as any[] :
+			flattenedValue.type === "boolean" ? false :
+				typeof flattenedValue.type !== "string" ? {} as { [k: string]: any; } : ""
+	);
 
 	function connectPerElementValidator(callbacks?: PerElementValidatorCallback | PerElementValidatorCallback[]) {
 		if (callbacks === undefined) return undefined;
@@ -55,7 +66,7 @@ const FormComponent = forwardRef((props: {
 
 					// the serial way
 					for (let cb of (callbacks as PerElementValidatorCallback[])) {
-						const result = await cb(v);
+						const result = await cb(v, container);
 
 						if (result === false) { hasPassed = false; break; }
 						if (typeof result === "string") { hasPassed = false; message = result; break; }
@@ -80,6 +91,7 @@ const FormComponent = forwardRef((props: {
 		doesHaveNoErrors: () => {
 			return elementError === ""
 		},
+		formState,
 		getData: () => {
 			const newData = (childRef.current as any)?._getData()
 			const errorObj = new Error(`Please supply an appropriate value for "${getPresentableName(name, presentableNames)}"`);
@@ -98,7 +110,7 @@ const FormComponent = forwardRef((props: {
 
 	return <span>
 		{outLabel}
-		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={onChange} />
+		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={onChange} {...{ formState, formStateSetter }} />
 		{
 			elementError === "" ? null :
 				<span>{elementError}</span>
@@ -115,14 +127,22 @@ const InputElement = forwardRef((props: {
 	perElementValidationCallbacks: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
 	onErrorSet?: (msg: string) => void,
-	onChange?: (newVal: any) => void
+	onChange?: (newVal: any) => void,
+	formState: string | boolean | {
+		[k: string]: any;
+	},
+	formStateSetter: Dispatch<SetStateAction<string | boolean | {
+		[k: string]: any;
+	}>>
 }, ref) => {
 	const { name,
 		flattenedValue,
 		connectPerElementValidator,
 		perElementValidationCallbacks,
 		presentableNames,
-		onChange
+		onChange,
+		formState,
+		formStateSetter
 	} = props;
 
 	const validationCallback = connectPerElementValidator(perElementValidationCallbacks[name]);
@@ -131,33 +151,32 @@ const InputElement = forwardRef((props: {
 
 	// nested things
 	if (typeof inputType !== "string") {
-		const nestedRefs = Object.fromEntries(Object.entries(inputType).map(([k, v]) => [k, useRef()]));
+		const nestedRefs = Object.fromEntries(Object.entries(inputType).map(([k, v]) => [k, useRef<any>()]));
 
 		useImperativeHandle(ref, () => ({
 			_getData: () => {
-				// NOTE: we are not handling errors so that they rise up the call stack
-				const newData = Object.fromEntries(Object.entries(nestedRefs).map(([k, v]) => {
-					const newNestedEntry = (v.current as any)?.getData();
-					return [k, newNestedEntry]
-				}));
-				return newData
+				return formState;
 			}
 		}));
+
+		console.log(Object.values(nestedRefs).map(v => v.current.formState))
+		useEffect(() => {
+			const newVals = Object.fromEntries(Object.entries(nestedRefs).map(([k, v]) => [k, v.current.formState]));
+			console.log(newVals);
+			formStateSetter(newVals);
+		}, Object.values(nestedRefs).map(v => v.current.formState))
+
 		return <>
 			{Object.entries(inputType).map(([newName, newVal]) => {
 				//TODO: use on error set
 				//TODO: test if problems in nested components are indeed processed
 				return <span key={newName}>
-					<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ connectPerElementValidator, perElementValidationCallbacks, presentableNames }} onChange={onChange} />
+					<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ connectPerElementValidator, perElementValidationCallbacks, presentableNames }} onChange={onChange} container={nestedRefs} />
 				</span>
 			}
 			)}
 		</>
 	}
-	const [formState, formStateSetter] = useState(
-		flattenedValue.array === true ? [] as any[] :
-			flattenedValue.type === "boolean" ? false : ""
-	);
 
 	function setValue(v: any) {
 		formStateSetter(v) // do it straight away for responsiveness

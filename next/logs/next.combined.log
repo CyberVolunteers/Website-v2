@@ -93,3 +93,27 @@
 {"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:03:19"}
 {"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 16:03:24"}
 {"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 16:03:24"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 18:58:46"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 18:58:46"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 18:59:47"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 18:59:47"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 18:59:50"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 18:59:50"}
+{"level":"info","message":"server.apiRequests:Request to url /api/isEmailFree?email=sdf%40dsfads.cp","timestamp":"2021-08-15 19:00:13"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 19:00:13"}
+{"level":"info","message":"server.apiRequests:Request to url /api/isEmailFree?email=sdf%40dsfads.co","timestamp":"2021-08-15 19:00:13"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:16:21"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:16:22"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:45:44"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:45:44"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:45:50"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:45:50"}
+{"level":"info","message":"server.apiRequests:Request to url /api/searchListings?keywords=","timestamp":"2021-08-15 19:45:58"}
+{"message":"server.mongo:Getting new instance","level":"info","timestamp":"2021-08-15 19:45:58"}
+{"message":"server.searchListings:Search all","level":"info","timestamp":"2021-08-15 19:45:58"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:46:02"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:46:02"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:46:21"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:46:21"}
+{"message":"server.csrf:Setting csrf cookie","level":"info","timestamp":"2021-08-15 19:46:32"}
+{"message":"server.auth.auth-cookie:Setting session","level":"info","timestamp":"2021-08-15 19:46:32"}

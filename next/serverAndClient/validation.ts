@@ -1,3 +1,4 @@
+import { MutableRefObject } from "react";
 import zxcvbn from "zxcvbn"
 import { minPasswordScore } from "./staticDetails";
 
@@ -31,7 +32,7 @@ export function isNonNegative(v: string){
 export function passwordStrengthSuggestions(p: string){
 	const result = zxcvbn(p);
 	const score = result.score;
-	// if(score >= minPasswordScore) return true;
+	if(score >= minPasswordScore) return true;
 	const base = ["A very weak password", "A weak password", "A medium password", "A strong password", "A very strong password"][score] + ". "
 
 	const feedback = result.feedback;
@@ -39,4 +40,11 @@ export function passwordStrengthSuggestions(p: string){
 	const suggestions = feedback.suggestions.length === 0 ? "" : `Optional suggestions: ${feedback.suggestions.join(", ")} `;
 	
 	return base + warning + suggestions;
+}
+
+export function passwordEquality(password2: string, container: {
+	[key: string]: MutableRefObject<any>
+}){
+	const password1 = container.password.current.formState;
+	return password1 === password2 ? true : "The two passwords do not match";
 }
