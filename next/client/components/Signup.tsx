@@ -2,6 +2,7 @@ import { capitalize } from "@material-ui/core";
 import { Flattened } from "combined-validator";
 import { useRouter } from "next/dist/client/router";
 import React, { Dispatch, FormEvent, ReactElement, SetStateAction } from "react";
+import { Ref } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
 import isMobilePhone from "validator/lib/isMobilePhone";
@@ -47,12 +48,12 @@ export function Signup({
 		password2: passwordEquality,
 		phoneNumber: (v: string) => isMobilePhone(v),
 		birthDate: isDateInPast,
-		websiteUrl: isURL,
+		websiteUrl: (v: string) => isURL(v),
 	};
 
 	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
-		// if (data.password !== data.password2) return addError(overallErrors, setOverallErrors, `${target}SignupPasswordEqual`, "The two passwords do not match");
 		delete data.password2;
+		console.log(JSON.stringify(data));
 		const res = await csrfFetch(csrfToken, `/api/signup${capitalize(target)}`, {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -68,7 +69,17 @@ export function Signup({
 		router.push("/login");
 	}
 	return <div>
-		<SimpleForm fields={signupFields} onSubmit={onSubmit} presentableNames={presentableNames} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} >Sign up!</SimpleForm>
+		<SimpleForm 
+		fields={signupFields} 
+		onSubmit={onSubmit} 
+		presentableNames={presentableNames} 
+		perElementValidationCallbacks={perElementValidationCallbacks} 
+		overallErrors={overallErrors} 
+		setOverallErrors={setOverallErrors} 
+		onChange={(name: string, newVal: any, root: any) => {
+			if(name === "password") root?.getChild("password2")?.validate?.()
+		}}
+		>Sign up!</SimpleForm>
 	</div>;
 }
 

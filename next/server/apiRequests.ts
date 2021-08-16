@@ -68,6 +68,7 @@ async function sanitize(req: NextApiRequest, res: NextApiResponse, bodyParser: J
 		logger.info("server.apiRequests:Checking JSON format (not GET and no file sent)");
 		// read from the stream
 		req.body = await (await getRawBody(req)).toString();
+		console.log(req.body)
 		if (verifyJSONShape(req, res, bodyParser) === false) return;
 	}
 

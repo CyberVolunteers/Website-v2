@@ -3,6 +3,7 @@ import { useState } from "react";
 import { ReactElement } from "react";
 import Head from "../../client/components/Head";
 import { csrfFetch } from "../../client/utils/csrf";
+import { info } from "../../client/utils/logger";
 import { updateCsrf } from "../../server/csrf";
 
 export default function Console({ csrfToken }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -38,7 +39,6 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 			let out;
 			try{
 				out = JSON.parse(resText);
-				console.log(out);
 				out = JSON.stringify(out, null, "<br/>");
 			}catch{
 				out = resText;

@@ -43,7 +43,7 @@ export function passwordStrengthSuggestions(p: string){
 	return base + warning + suggestions;
 }
 
-export const passwordEquality: PerElementValidatorCallback= (password2, root ) => {
-	const password1 = root.current.formState.password;
+export const passwordEquality: PerElementValidatorCallback= (password2, root) => {
+	const password1 = root.getChild("password").formState;
 	return password1 === password2 ? true : "The two passwords do not match";
 }

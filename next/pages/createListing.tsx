@@ -83,7 +83,7 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 
 			<p>
 				<label htmlFor="listing-img-upload">Can i haz image please? (required)</label>
-				<input type="file" name="listing-img-upload" ref={listingImageInputRef} onChange={() => setOverallErrors({})}></input>
+				<input type="file" name="listing-img-upload" ref={listingImageInputRef}></input>
 			</p>
 			<p><button className="submit" type="submit">Create a listing!</button></p>
 			{

@@ -15,7 +15,6 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-
 		const signupResult = await signupUser(req.body);
 
 		if (!signupResult) {

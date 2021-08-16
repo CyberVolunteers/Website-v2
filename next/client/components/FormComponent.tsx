@@ -1,37 +1,62 @@
 import { capitalize } from "@material-ui/core";
 import { FlattenedValue } from "combined-validator";
-import { Dispatch, MutableRefObject, SetStateAction, useEffect, useRef } from "react";
+import { ForwardedRef } from "react";
+import { Dispatch, SetStateAction, useEffect, useRef } from "react";
 import { ChangeEvent, useState, forwardRef, useImperativeHandle } from "react";
 import { undoCamelCase } from "../utils/misc";
 
 type PerElementValidatorCallbackReturnType = boolean | string;
-export type PerElementValidatorCallback = (v: any, root: MutableRefObject<any>) => PerElementValidatorCallbackReturnType | Promise<PerElementValidatorCallbackReturnType>;
+export type PerElementValidatorCallback = ((v: any, root: any) => PerElementValidatorCallbackReturnType | Promise<PerElementValidatorCallbackReturnType>)
 export type PerElementValidatorCallbacks = { [k: string]: PerElementValidatorCallback | PerElementValidatorCallback[] };
 
 const getPresentableName = (v: string, presentableNames?: { [key: string]: string }) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
 
-const FormComponent = forwardRef((props: {
+export type PropsType = {
 	name: string,
 	flattenedValue: FlattenedValue,
 	perElementValidationCallbacks: PerElementValidatorCallbacks,
 	presentableNames?: { [key: string]: string },
-	onErrorSet?: (msg: string) => void,
-	onChange?: (newVal: any) => void,
-	root: MutableRefObject<any>
-}, ref) => {
+	onChange?: (name: string, newVal: any, root: any) => void,
+	root: any
+}
 
+const FormComponent = forwardRef((props: PropsType, ref) => {
+
+	const {
+		name,
+		flattenedValue,
+		presentableNames,
+	} = props;
+
+	const [elementError, setElementError] = useState("");
+
+	const outLabel = <label htmlFor={name}>{getPresentableName(name, presentableNames)} {flattenedValue.required ? "(required)" : null}</label>
+
+	return <span>
+		{/* Hide underscored values */}
+		{name[0] === "_" ? null : outLabel} 
+		<InputElement ref={ref} {...props} elementError={elementError} setElementError={setElementError} />
+		{
+			elementError === "" ? null :
+				<span>{elementError}</span>
+		}
+	</span>
+})
+
+export default FormComponent;
+
+const InputElement = forwardRef((props: PropsType & { elementError: string, setElementError: Dispatch<SetStateAction<string>> }, ref) => {
 	const {
 		name,
 		flattenedValue,
 		perElementValidationCallbacks,
 		presentableNames,
-		onErrorSet,
+		elementError,
+		setElementError,
 		onChange,
 		root
 	} = props;
 
-	const childRef = useRef();
-	const [elementError, setElementError] = useState("");
 	const [formState, formStateSetter] = useState(
 		flattenedValue.array === true ? [] as any[] :
 			flattenedValue.type === "boolean" ? false :
@@ -62,7 +87,7 @@ const FormComponent = forwardRef((props: {
 
 					// the serial way
 					for (let cb of (callbacks as PerElementValidatorCallback[])) {
-						const result = await cb(v, root);
+						const result = await cb(v, root?.current);
 
 						if (result === false) { hasPassed = false; break; }
 						if (typeof result === "string") { hasPassed = false; message = result; break; }
@@ -74,133 +99,92 @@ const FormComponent = forwardRef((props: {
 			}
 
 			const newMsg = hasPassed ? "" : message;
-			if (newMsg !== elementError) {
-				setElementError(newMsg);
-				onErrorSet?.(newMsg)
-			}
+			if (newMsg !== elementError) setElementError(newMsg);
 
 			return hasPassed
 		}
 	}
 
-	useImperativeHandle(ref, () => ({
-		doesHaveNoErrors: () => {
-			return elementError === ""
-		},
-		formState,
-		getData: () => {
-			const newData = (childRef.current as any)?._getData()
-			const errorObj = new Error(`Please supply an appropriate value for "${getPresentableName(name, presentableNames)}"`);
-			if (newData === null) throw errorObj
-			if (newData === "") {
-				if (flattenedValue.required) throw errorObj
-				else return undefined;
-			}
-
-			return newData
-		}
-
-	}));
-
-	const outLabel = <label htmlFor={name}>{getPresentableName(name, presentableNames)} {flattenedValue.required ? "(required)" : null}</label>
-
-	return <span>
-		{outLabel}
-		<InputElement ref={childRef} {...props} onErrorSet={setElementError} connectPerElementValidator={connectPerElementValidator} onChange={onChange} {...{ formState, formStateSetter }} />
-		{
-			elementError === "" ? null :
-				<span>{elementError}</span>
-		}
-	</span>
-})
-
-export default FormComponent;
-
-const InputElement = forwardRef((props: {
-	name: string,
-	flattenedValue: FlattenedValue,
-	connectPerElementValidator: (callbacks?: PerElementValidatorCallback | PerElementValidatorCallback[] | undefined) => ((k: string, v: any) => Promise<boolean>) | undefined,
-	perElementValidationCallbacks: PerElementValidatorCallbacks,
-	presentableNames?: { [key: string]: string },
-	onErrorSet?: (msg: string) => void,
-	onChange?: (newVal: any) => void,
-	formState: string | boolean | {
-		[k: string]: any;
-	},
-	formStateSetter: Dispatch<SetStateAction<string | boolean | {
-		[k: string]: any;
-	}>>,
-	root: MutableRefObject<any>
-}, ref) => {
-	const { name,
-		flattenedValue,
-		connectPerElementValidator,
-		perElementValidationCallbacks,
-		presentableNames,
-		onChange,
-		formState,
-		formStateSetter,
-		root
-	} = props;
-
 	const validationCallback = connectPerElementValidator(perElementValidationCallbacks[name]);
 
 	const inputType = flattenedValue.type;
+
+	const baseRefProps = {
+		formState,
+	} as { [key: string]: any };
 
 	// nested things
 	if (typeof inputType !== "string") {
 		const nestedRefs = Object.fromEntries(Object.entries(inputType).map(([k, v]) => [k, useRef<any>()]));
 
-		useImperativeHandle(ref, () => ({
-			_getData: () => {
-				return formState;
-			}
-		}));
+		function doesHaveNoErrors() {return Object.entries(nestedRefs).every(([k, r]) => (r as any)?.current?.doesHaveNoErrors())}
 
-		// update when a child updates
-		useEffect(() => {
-			const newVals = Object.fromEntries(Object.entries(nestedRefs).map(([k, v]) => [k, v?.current?.formState]));
-			formStateSetter(newVals);
-		}, Object.values(nestedRefs).map(v => v?.current?.formState))
+		useImperativeHandle(ref, () => ({
+			getData: () => {
+				if(!doesHaveNoErrors()) return null;
+				const out: {[key: string]: any} = {};
+				Object.entries(nestedRefs).forEach(([k, v]) => {
+					const state = v?.current?.formState;
+					if(state !== "") out[k] = v?.current?.getData?.();
+				});
+				return out;
+			},
+			doesHaveNoErrors,
+			getChild: (name: string) => nestedRefs[name]?.current,
+			nestedRefs,
+			...baseRefProps
+		}));
 
 		return <>
 			{Object.entries(inputType).map(([newName, newVal]) => {
-				//TODO: use on error set
-				//TODO: test if problems in nested components are indeed processed
 				return <span key={newName}>
-						<FormComponent ref={nestedRefs[newName]} name={newName} flattenedValue={newVal} {...{ connectPerElementValidator, perElementValidationCallbacks, presentableNames }} onChange={onChange} root={root} />
-						<br />
-					</span>
-				
+					<FormComponent
+						ref={nestedRefs[newName]}
+						name={newName}
+						flattenedValue={newVal}
+						{...{ perElementValidationCallbacks, presentableNames }}
+						onChange={onChange}
+						root={root} 
+						/>
+					<br />
+				</span>
 			}
 			)}
 		</>
 	}
 
 	// validation checks
-	useEffect(() => {
-		console.log(name, formState)
-		if (validationCallback !== undefined) { validationCallback(name, formState); }
-	}, [formState])
+	function validate(state?: typeof formState) {
+		if(state === undefined) state = formState
+		if (validationCallback !== undefined) validationCallback(name, state);
+	}
+
+	baseRefProps.validate = validate;
+	baseRefProps.doesHaveNoErrors = () => elementError === ""
 
 	function setValue(v: any) {
 		formStateSetter(v) // do it straight away for responsiveness
-		onChange?.(v)
+		validate(v);
 	}
+
+	useEffect(() => {
+		onChange?.(name, formState, root?.current); // so that the value actually updates
+	}, [formState])
 
 	if (flattenedValue.enum !== undefined) {
-		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} formState={formState as any[]} setValue={setValue} />
-		else return <DropdownComponent ref={ref} {...props} setValue={setValue} formState={formState} />
+		if (flattenedValue.array === true) return <MultiSelect ref={ref} {...props} formState={formState as any[]} setValue={setValue} baseRefProps={baseRefProps} />
+		else return <DropdownComponent ref={ref} {...props} setValue={setValue} formState={formState} baseRefProps={baseRefProps} />
 	}
 
-	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} formState={formState as any[]} />
+	return <PrimitiveFormComponent ref={ref} {...props} inputType={inputType} setValue={setValue} formState={formState as any[]} baseRefProps={baseRefProps} />
 })
 
-const MultiSelect = forwardRef(({ name, flattenedValue, formState, setValue, presentableNames }: { name: string, flattenedValue: FlattenedValue, formState: any[], setValue: (v: any) => void, presentableNames?: { [key: string]: string } }, ref) => {
+const MultiSelect = forwardRef(({ name, flattenedValue, formState, setValue, presentableNames, baseRefProps }: { name: string, flattenedValue: FlattenedValue, formState: any[], setValue: (v: any) => void, presentableNames?: { [key: string]: string }, baseRefProps: { [key: string]: any } }, ref) => {
 	useImperativeHandle(ref, () => ({
-		_getData: () => {
+		getData: () => {
 			return formState;
-		}
+		},
+		...baseRefProps
 	}));
 	return <span>
 		<br />
@@ -214,7 +198,7 @@ const MultiSelect = forwardRef(({ name, flattenedValue, formState, setValue, pre
 					onClick={() => {
 						const newState = [...formState] // clone
 						const index = newState.indexOf(v);
-						// delete r add
+						// delete or add
 						if (index !== -1) newState.splice(index, 1)
 						else newState.push(v)
 						setValue(newState);
@@ -229,13 +213,14 @@ const MultiSelect = forwardRef(({ name, flattenedValue, formState, setValue, pre
 	</span>
 })
 
-const DropdownComponent = forwardRef(({ name, flattenedValue, formState, presentableNames, setValue }: { name: string, flattenedValue: FlattenedValue, formState: any, presentableNames?: { [key: string]: string }, setValue: (v: any) => void }, ref) => {
+const DropdownComponent = forwardRef(({ name, flattenedValue, formState, presentableNames, setValue, baseRefProps }: { name: string, flattenedValue: FlattenedValue, formState: any, presentableNames?: { [key: string]: string }, setValue: (v: any) => void, baseRefProps: { [key: string]: any } }, ref) => {
 	useImperativeHandle(ref, () => ({
-		_getData: () => {
+		getData: () => {
 			// a check to make sure 
 			if (!flattenedValue.enum.includes(formState)) return null;
 			return formState
-		}
+		},
+		...baseRefProps
 	}));
 	return <select className={name} name={name} required={flattenedValue.required} value={formState} onChange={e => setValue(e.target.value)} >
 		{
@@ -249,9 +234,9 @@ const DropdownComponent = forwardRef(({ name, flattenedValue, formState, present
 	</select>
 })
 
-const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, formState, setValue }: { name: string, flattenedValue: FlattenedValue, inputType: string, formState: any, setValue: (v: any) => void }, ref) => {
+const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, formState, setValue, baseRefProps }: { name: string, flattenedValue: FlattenedValue, inputType: string, formState: any, setValue: (v: any) => void, baseRefProps: { [key: string]: any } }, ref) => {
 	useImperativeHandle(ref, () => ({
-		_getData: () => {
+		getData: () => {
 			switch (inputType) {
 				case "date":
 					// convert all dates to iso
@@ -266,7 +251,8 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 					break;
 			}
 			return formState;
-		}
+		},
+		...baseRefProps
 	}));
 	const newProps: any = {}
 

@@ -25,6 +25,8 @@ export default function Login({ csrfToken, fields }: InferGetServerSidePropsType
 		email: [isEmail],
 	};
 
+	fields.password.isPassword = true;
+
 	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
 		const res = await csrfFetch(csrfToken, "/api/login", {
 			method: "POST",

@@ -98,5 +98,5 @@ export function isUser(session: any) {
 }
 
 export function isAdminLevel(session: any, level: number) {
-    return isLoggedIn(session) && (session.adminLevel >= level || publicRuntimeConfig.IS_DEV);
+    return (isLoggedIn(session) && session.adminLevel >= level) || publicRuntimeConfig.IS_DEV === true;
 }
