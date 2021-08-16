@@ -43,8 +43,6 @@ const handlers: HandlerCollection = {
 			uuid: l.uuid
 		}))
 
-		console.log(listings);
-
 		return res.json(listings);
 	}
 };

@@ -53,7 +53,6 @@ export function Signup({
 
 	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
 		delete data.password2;
-		console.log(JSON.stringify(data));
 		const res = await csrfFetch(csrfToken, `/api/signup${capitalize(target)}`, {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests

@@ -41,7 +41,3 @@ export const listingFieldNamesToShow = {
 	maxHoursPerWeek: "Maximum hours of volunteering (per week)",
 
 }
-
-export const searchListingsSpecNamesToShow = {
-	targetLoc: "Search near this location: "
-}

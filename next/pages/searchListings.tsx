@@ -9,12 +9,10 @@ import styles from "../client/styles/searchListings.module.css";
 import { ReactElement } from "react";
 import Head from "../client/components/Head";
 import { useRouter } from "next/dist/client/router";
-import SimpleForm from "../client/components/SimpleForm";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { searchListingsSpec } from "../serverAndClient/publicFieldConstants";
 import { GetStaticProps, InferGetStaticPropsType } from "next";
 import { flatten, Flattened } from "combined-validator";
-import { searchListingsSpecNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function SearchListings({ fields }: InferGetStaticPropsType<typeof getStaticProps>): ReactElement {
@@ -28,7 +26,6 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 	useEffect(() => {
 		if (router.isReady) {
 			setKeywords(typeof rawKeywords !== "string" ? "" : rawKeywords)
-
 		}
 	}, [router]);
 
@@ -37,11 +34,10 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 	const [location, setLocation] = useState("");
 	const [minHours, setMinHours] = useState(0);
 	const [maxHours, setMaxHours] = useState(10); //TODO: set a max value
-	const [category, setCategory] = useState(null);
+	const [category, setCategory] = useState((fields.category.enum as any[])[0]);
 	useEffect(() => {
 		if (isAfterInitialUpdate || keywords === undefined) return; // make sure it is that specific update
 		updateListings();
-		console.log("updating", keywords)
 		setIsAfterInitialUpdate(true);
 	}, [keywords])
 
@@ -56,9 +52,14 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 	async function updateListings() {
 		if (keywords === undefined) return; // do not fetch twice
 
-		const res = await fetch(`/api/searchListings?${new URLSearchParams({
-			keywords
-		})}`, {
+		const queryObj = {
+			keywords,
+		} as {[key: string]: any};
+
+		queryObj.minHours = "" + minHours;
+		queryObj.maxHours = "" + maxHours;
+		if(location !== "") queryObj.targetLoc = "" + location;
+		const res = await fetch(`/api/searchListings?${new URLSearchParams(queryObj)}`, {
 			method: "GET",
 			headers: {
 				"content-type": "application/json",
@@ -106,13 +107,24 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 							evt.preventDefault();
 							updateListings()
 						}}>
+							<label htmlFor="loc">Search near this location (leave empty for any location)</label>
+							<input id="loc" value={location} onChange={e => setLocation(e.target.value)}></input>
+							<label htmlFor="minH">Min hours</label>
+							<input id="minH" type="number" value={minHours} onChange={e => setMinHours(parseInt(e.target.value))}></input>
+							<label htmlFor="maxH">Max hours</label>
+							<input id="maxH" type="number" value={maxHours} onChange={e => setMaxHours(parseInt(e.target.value))}></input>
+							<label htmlFor="keywords">Cause type</label>
+							<select id="category" value={category} onChange={e => setCategory(e.target.value)}>
+								{
+									(fields.category.enum as any[]).map((o, i) => (
+										<option key={i} value={o}>
+											{o}
+										</option>
+									))
+								}
+							</select>
 							<label htmlFor="keywords">Keywords</label>
 							<input id="keywords" value={keywords} onChange={e => setKeywords(e.target.value)}></input>
-							<label htmlFor="loc">Search near this location</label>
-							<input id="loc" value={location} onChange={e => setLocation(e.target.value)}></input>
-							<label htmlFor="minH">Keywords</label>
-							<input id="minH" type="number" value={minHours} onChange={e => setMinHours(e.target.value)}></input>
-							<label htmlFor="keywords">Keywords</label>
 							<button type="submit">Submit!</button>
 						</form>
 					</div>
@@ -144,10 +156,14 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 
 
 			<div className={`${styles["pagination-area"]} w-1000`}>
-				<div className={`${styles["pages"]}`}>
-					{/* because they start with 1 for some reason */}
-					<Pagination count={pagesNum} page={listingsPage + 1} onChange={(event, value) => setListingsPage(value - 1)} />
-				</div>
+				{
+					pagesNum > 1 ?
+						<div className={`${styles["pages"]}`}>
+							{/* because they start counting from 1 for some reason */}
+							<Pagination count={pagesNum} page={listingsPage + 1} onChange={(event, value) => setListingsPage(value - 1)} />
+						</div>
+						: null
+				}
 			</div>
 		</div >
 	</>

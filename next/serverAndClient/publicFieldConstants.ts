@@ -105,7 +105,10 @@ export const searchListingsSpec: FieldConstraintsCollection = {
     },
     optional: {
         string: {
-            targetLoc: {}
+            targetLoc: {},
+            category: {enum: ["Any", ...listings.required?.string?.category?.enum ?? []]},
+            minHours: {},
+            maxHours: {},
         }
     }
 }
