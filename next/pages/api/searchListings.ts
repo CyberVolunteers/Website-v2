@@ -1,7 +1,6 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-import { createAjvJTDSchema } from "combined-validator";
 import type { NextApiRequest, NextApiResponse } from "next";
-import { ajv, createHandler } from "../../server/apiRequests";
+import { createHandler } from "../../server/apiRequests";
 import { Listing } from "../../server/mongo/mongoModels";
 import { toStrippedObject } from "../../server/mongo/util";
 import { HandlerCollection } from "../../server/types";
@@ -16,33 +15,49 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	GET: async function (req, res) {
+		logger.info("server.searchListings: %s", req.query);
 		const keywords = req.query.keywords;
 
-		let listings;
-		if (keywords === "" || typeof keywords !== "string") {
-			logger.info("server.searchListings:Search all");
-			listings = await Listing.find();
+		const searchObj1 = {} as { [key: string]: any };
+		const searchObj2 = {} as { [key: string]: any };
+
+		if (keywords !== "" && typeof keywords === "string") {
+			searchObj1.$text = { $search: keywords };
+			searchObj2.score = { $meta: "textScore" };
 		}
 		else {
 			logger.info("server.searchListings:Search keywords '%s'", keywords);
-			listings = await Listing.find(
-				{ $text: { $search: keywords } },
-				{ score: { $meta: "textScore" } }
-			)
+
 		}
-		return res.json(listings.map(toStrippedObject));
+
+		let listings = await Listing.find(searchObj1, searchObj2).populate("organisation");
+
+		listings = listings.map(toStrippedObject)
+		listings = listings.map((l: any) => ({
+			imagePath: l.imagePath,
+			title: l.title,
+			organisationName: l.organisation?.orgName,
+			desc: l.desc,
+			currentVolunteers: l.currentNumVolunteers,
+			requestedVolunteers: l.requestedNumVolunteers,
+			uuid: l.uuid
+		}))
+
+		console.log(listings);
+
+		return res.json(listings);
 	}
 };
 
 /*
 async getLatAndLong(placeDesc) {
-    logger.info("Pinging google services");
-    const geocodeString = `https://maps.googleapis.com/maps/api/geocode/json?address=${escape(
-      placeDesc.replace(" ", "+")
-    )}&key=<key>`;
-    const response = await axios.get(geocodeString);
-    if (response.data.results.length === 0) return {};
-    return response.data.results[0].geometry.location; //lat, lng
+	logger.info("Pinging google services");
+	const geocodeString = `https://maps.googleapis.com/maps/api/geocode/json?address=${escape(
+	  placeDesc.replace(" ", "+")
+	)}&key=<key>`;
+	const response = await axios.get(geocodeString);
+	if (response.data.results.length === 0) return {};
+	return response.data.results[0].geometry.location; //lat, lng
   }
 
 */

@@ -24,7 +24,7 @@ module.exports = {
 	],
 	"rules": {
 		"react/react-in-jsx-scope": "off",
-		"no-console": "warn",
+		"no-console": "error",
 		"no-unsafe-optional-chaining": "warn",
 		"require-atomic-updates": "warn",
 		"eqeqeq": "warn",

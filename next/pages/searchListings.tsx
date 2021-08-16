@@ -18,14 +18,33 @@ import { searchListingsSpecNamesToShow } from "../serverAndClient/displayNames";
 
 
 export default function SearchListings({ fields }: InferGetStaticPropsType<typeof getStaticProps>): ReactElement {
+	const listingsPerPage = 6;
+
 	const router = useRouter();
 
 	const rawKeywords = router.query.keywords;
 	const [keywords, setKeywords] = useState(undefined as string | undefined);
 	// when the router updates, set the keywords
-	useEffect(() => { if (router.isReady) setKeywords(typeof rawKeywords !== "string" ? "" : rawKeywords) }, [router]);
+	useEffect(() => {
+		if (router.isReady) {
+			setKeywords(typeof rawKeywords !== "string" ? "" : rawKeywords)
 
-	const listingsPerPage = 6;
+		}
+	}, [router]);
+
+
+	const [isAfterInitialUpdate, setIsAfterInitialUpdate] = useState(false);
+	const [location, setLocation] = useState("");
+	const [minHours, setMinHours] = useState(0);
+	const [maxHours, setMaxHours] = useState(10); //TODO: set a max value
+	const [category, setCategory] = useState(null);
+	useEffect(() => {
+		if (isAfterInitialUpdate || keywords === undefined) return; // make sure it is that specific update
+		updateListings();
+		console.log("updating", keywords)
+		setIsAfterInitialUpdate(true);
+	}, [keywords])
+
 
 	const [listings, setListings] = useState([] as any[]);
 	const [areExtraOptionsShown, setAreExtraOptionsShown] = useState(false);
@@ -52,8 +71,6 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 		receivedData.sort((a, b) => b.score - a.score) // sort them
 		setListings(receivedData);
 	}
-
-	useEffect(() => { updateListings() }, [keywords]) // only run once on rehydration
 
 	const pagesNum = Math.ceil(listings.length / listingsPerPage);
 	const [listingsPage, setListingsPage] = useState(0);
@@ -85,7 +102,19 @@ export default function SearchListings({ fields }: InferGetStaticPropsType<typeo
 				!areExtraOptionsShown ? null :
 					<div>
 						<p>I am sorry for this horrendous mess. Anyways, "Advanced search options"</p>
-						<SimpleForm presentableNames={searchListingsSpecNamesToShow} fields={fields} overallErrors={overallErrors} setOverallErrors={setOverallErrors} onSubmit={updateListings}>Search!</SimpleForm>
+						<form onSubmit={(evt) => {
+							evt.preventDefault();
+							updateListings()
+						}}>
+							<label htmlFor="keywords">Keywords</label>
+							<input id="keywords" value={keywords} onChange={e => setKeywords(e.target.value)}></input>
+							<label htmlFor="loc">Search near this location</label>
+							<input id="loc" value={location} onChange={e => setLocation(e.target.value)}></input>
+							<label htmlFor="minH">Keywords</label>
+							<input id="minH" type="number" value={minHours} onChange={e => setMinHours(e.target.value)}></input>
+							<label htmlFor="keywords">Keywords</label>
+							<button type="submit">Submit!</button>
+						</form>
 					</div>
 			}
 

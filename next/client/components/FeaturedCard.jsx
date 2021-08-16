@@ -5,6 +5,7 @@ import React from 'react'
 import styles from "../styles/featuredCard.module.css"
 
 function FeaturedCard({ imagePath: img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid }) {
+    console.log({ imagePath: img, title, organisationName, desc, currentVolunteers, requestedVolunteers, uuid })
     return (
         <div className={`${styles["FeaturedCard"]} w-1000`}>
             <div className={`img-container`}>
@@ -31,7 +32,7 @@ function FeaturedCard({ imagePath: img, title, organisationName, desc, currentVo
 
                 <div className={`${styles["meter-total"]}`}>
                     <div className={`${styles["meter"]}`} style={{
-                        width: (currentVolunteers / requestedVolunteers) * 100 + "%"
+                        width: (currentVolunteers / requestedVolunteers) * 100 + "%" //TODO: set this
                     }}></div>
                 </div>
 

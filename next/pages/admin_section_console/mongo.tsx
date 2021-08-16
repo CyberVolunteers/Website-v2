@@ -39,6 +39,7 @@ export default function Console({ csrfToken }: InferGetServerSidePropsType<typeo
 			let out;
 			try{
 				out = JSON.parse(resText);
+				console.log(out);
 				out = JSON.stringify(out, null, "<br/>");
 			}catch{
 				out = resText;

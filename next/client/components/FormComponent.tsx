@@ -266,9 +266,9 @@ const PrimitiveFormComponent = forwardRef(({ name, flattenedValue, inputType, fo
 
 		case "number":
 			newProps.type = "text"
-			newProps.pattern = "\\d*"
+			newProps.pattern = "[\\d\\.-]*"
 			newProps.title = "Please enter a number"
-			newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d\.-]/g, "")) // remove non-digits
+			newProps.onChange = (e: ChangeEvent<HTMLInputElement>) => setValue(e.target.value.replace(/[^\d\.\-]/g, "")) // remove non-digits
 			break;
 
 		case "date":

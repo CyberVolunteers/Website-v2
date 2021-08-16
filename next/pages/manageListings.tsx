@@ -21,7 +21,7 @@ export default function ManageListings({ listings }: InferGetServerSidePropsType
 			{
 				listings.map((l, i) => {
 					const listingData = {
-						img: l.imagePath,
+						imagePath: l.imagePath,
 						title: l.title, 
 						organisationName: l.orgName, 
 						desc: l.desc, 
@@ -33,6 +33,8 @@ export default function ManageListings({ listings }: InferGetServerSidePropsType
 				})
 			}
 		</div>
+
+		{/* TODO: show it when there are no listings here */}
 
 		<Link href="/createListing" passHref>
 			<a>

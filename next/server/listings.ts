@@ -15,25 +15,18 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 
 	Object.assign(dataToSupply, { createdDate, organisation, imagePath, uuid, users: [] }) //TODO: check if this leaks when listings are queried
 
-	const mongoSession = await connection.startSession();
-
-	try{
-		await mongoSession.withTransaction(async () => {
+	try {
+		await connection.transaction(async () => {
 			const newListing = new Listing(dataToSupply);
-			await Promise.all([
-				sharp(fileBuffer).resize({ width: 1024 }).toFile(process.env.baseDir + "/public" + imagePath),
-				newListing.save(),
-				// add the new id to the organisation
-				Org.updateOne(
-					{ _id: orgSession._id },
-					{ $push: { listings: newListing._id } }
-				)
-			])
-	
+			await sharp(fileBuffer).resize({ width: 1024 }).toFile(process.env.baseDir + "/public" + imagePath);
+			await newListing.save();
+			// add the new id to the organisation
+			await Org.updateOne(
+				{ _id: orgSession._id },
+				{ $push: { listings: newListing._id } }
+			)
 		})
-	} catch(e){
+	} catch (e) {
 		logger.error("server.listings:Error creating a listing: '%s'", e);
 	}
-
-	mongoSession.endSession()
 }
