@@ -7,6 +7,7 @@ import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 import { loginSpec } from "../../serverAndClient/publicFieldConstants";
 import { logger } from "../../server/logger";
+import { getLatAndLong } from "../../server/location";
 
 export * from "../../server/defaultEndpointConfig";
 

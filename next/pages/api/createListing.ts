@@ -8,7 +8,7 @@ import { createListing } from "../../server/listings";
 import { HandlerCollection, MulterReq } from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";
 import { getFileExtension } from "../../serverAndClient/utils";
-import { allowedFileTypes } from "../../serverAndClient/staticDetails";
+import { allowedFileTypes, contactEmail } from "../../serverAndClient/staticDetails";
 import { logger } from "../../server/logger";
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
@@ -69,8 +69,10 @@ const handlers: HandlerCollection = {
 			return res.status(400).send("Please upload a valid image file");
 		}
 
-		await createListing(req.body, session, fileExt, file.buffer);
+		const result = await createListing(req.body, session, fileExt, file.buffer);
 
+		if(result === false) return res.status(400).send(`We could not process that. It is most likely that this image format is not supported. \
+		If you believe this is an error, please contact us at ${contactEmail}`)
 		return res.end();
 	}
 };

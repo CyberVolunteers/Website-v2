@@ -28,13 +28,15 @@ export const userFieldNamesToShow = {
 export const listingFieldNamesToShow = {
 
 	duration: "How long will your opportunity last?",
-	place: "Where will it take place?",
+	place: "What is the name of the place?",
 	time: "When will it take place?",
 	skills: "The skills that will be appreciated",
 	requirements: "The listing's requirements",
 	desc: "Description",
 	requiredData: "What do you need to know about the volunteers?",
 	isFlexible: "Are the required hours per week are flexible?",
+
+	isOnline: "Or is it online instead?",
 
 	requestedNumVolunteers: "How many volunteers do you need",
 	minHoursPerWeek: "Minimal hours of volunteering (per week)",

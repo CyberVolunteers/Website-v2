@@ -4,12 +4,21 @@ import { baseListingImagePath } from "../serverAndClient/staticDetails";
 import { v4 as uuidv4 } from "uuid";
 import { connection } from "mongoose";
 import { logger } from "./logger";
+import { getLatAndLong } from "./location";
 
 export async function createListing(params: { [key: string]: any }, orgSession: { [key: string]: any }, fileExt: string, fileBuffer: Buffer) {
 	const createdDate = new Date();
 	const organisation = orgSession._id;
 	const uuid = uuidv4();
 	const imagePath = baseListingImagePath + uuid + fileExt;
+
+	const address = params.location;
+	console.log(params)
+
+	const geocodingString = [address.place, address.street, address.city, address.county, "UK"].join(", ");
+
+	const location = await getLatAndLong(geocodingString);
+	console.log(location)
 
 	const dataToSupply = Object.assign({}, params);
 
@@ -28,5 +37,7 @@ export async function createListing(params: { [key: string]: any }, orgSession: 
 		})
 	} catch (e) {
 		logger.error("server.listings:Error creating a listing: '%s'", e);
+		return false;
 	}
+	return true;
 }

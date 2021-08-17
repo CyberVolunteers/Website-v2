@@ -55,7 +55,11 @@ export const getServerSideProps: GetServerSideProps<{
 	const orgName = org.orgName;
 
 	const listings = org.listings;
-	listings.forEach((l: any) => l.orgName = orgName);
+	listings.forEach((l: any) => {
+		l.orgName = orgName;
+		console.log(l.place)
+		delete l.place
+	});
 
 	return {
 		props: {

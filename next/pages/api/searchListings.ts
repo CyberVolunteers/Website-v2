@@ -47,19 +47,6 @@ const handlers: HandlerCollection = {
 	}
 };
 
-/*
-async getLatAndLong(placeDesc) {
-	logger.info("Pinging google services");
-	const geocodeString = `https://maps.googleapis.com/maps/api/geocode/json?address=${escape(
-	  placeDesc.replace(" ", "+")
-	)}&key=<key>`;
-	const response = await axios.get(geocodeString);
-	if (response.data.results.length === 0) return {};
-	return response.data.results[0].geometry.location; //lat, lng
-  }
-
-*/
-
 export default async function searchListings(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
