@@ -18,7 +18,6 @@ const handlers: HandlerCollection = {
 		const session = await getSession(req);
 
 		const {level, path, message} = req.body
-
 		const userInfo = isLoggedIn(session) ? session._id : "Logged out user";
 
 		logger.log(level, `client.${path}:${message}; User: ${userInfo}`);

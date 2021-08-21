@@ -1,6 +1,8 @@
+set -e
+
 # nextjs
 #docker run --rm -t next-dev
 
-set -e
+clear
 
 docker-compose up

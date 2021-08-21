@@ -7,41 +7,49 @@ import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 import { loginSpec } from "../../serverAndClient/publicFieldConstants";
 import { logger } from "../../server/logger";
+import { getLatAndLong } from "../../server/location";
 
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-	name: string
-}
+  name: string;
+};
 
 const handlers: HandlerCollection = {
-	POST: async function (req, res) {
-		const session = await getSession(req);
+  POST: async function (req, res) {
+    const session = await getSession(req);
 
-		if (isLoggedIn(session)) logger.info("server.login:Signing in a someone else");
+    if (isLoggedIn(session))
+      logger.info("server.login:Signing in a someone else");
 
-		const loginResult = await login(req.body);
+    const loginResult = await login(req.body);
 
-		if (!loginResult) {
-			logger.info("server.login:Incorrect username or password");
-			return res.status(400).send("This email and password combination does not appear to be correct");
-		}
+    if (!loginResult) {
+      logger.info("server.login:Incorrect username or password");
+      return res
+        .status(400)
+        .send(
+          "This email and password combination does not appear to be correct"
+        );
+    }
 
-		await updateSession(req, res, loginResult);
+    await updateSession(req, res, loginResult);
 
-		return res.end();
-	}
+    return res.end();
+  },
 };
 
 export default async function loginRequest(
-	req: NextApiRequest,
-	res: NextApiResponse<Data>
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
 ): Promise<void> {
-	await createHandler(handlers,
-		{
-			useCsrf: true,
-		},
-		{
-			POST: ajv.compileParser(createAjvJTDSchema(loginSpec))
-		})(req, res);
+  await createHandler(
+    handlers,
+    {
+      useCsrf: true,
+    },
+    {
+      POST: ajv.compileParser(createAjvJTDSchema(loginSpec)),
+    }
+  )(req, res);
 }

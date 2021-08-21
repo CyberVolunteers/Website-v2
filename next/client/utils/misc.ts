@@ -1,3 +1,4 @@
+import { capitalize } from "@material-ui/core";
 import { Dispatch, SetStateAction } from "react";
 import { error } from "./logger";
 
@@ -9,7 +10,7 @@ export function undoCamelCase(s: string) {
 }
 
 async function createErrorMessage(resStatus: number, resContents: string) { // it is a separate function to account for a possible improvement
-    return `${resStatus >= 500 ? "Server" : "Client"} error: ${resContents}`
+    return capitalize(`${resStatus >= 500 ? "server" : ""} error: ${resContents}`)
 }
 
 export async function updateOverallErrorsForRequests(res: Response, thisId: string, overallErrors: {

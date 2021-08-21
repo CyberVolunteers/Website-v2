@@ -54,7 +54,6 @@ export const listings: FieldConstraintsCollection = {
     required: {
         string: {
             duration: { maxLength: 1000 },
-            place: { maxLength: 1000 },
             time: { maxLength: 1000 },
             skills: { maxLength: 3000 },
             requirements: { maxLength: 3000 },
@@ -73,6 +72,19 @@ export const listings: FieldConstraintsCollection = {
                         between16And18: { default: false },
                         between18And55: { default: false },
                         over55: { default: false }
+                    }
+                }
+            },
+            location: {
+                required: {
+                    string: {
+                        place: {maxLength: 100},
+                        street: {maxLength: 100},
+                        city: {maxLength: 100},
+                        county: {maxLength: 100}
+                    },
+                    boolean: {
+                        isOnline: {}
                     }
                 }
             },

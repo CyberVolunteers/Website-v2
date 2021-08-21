@@ -7,9 +7,9 @@ export function toStrippedObject(obj: any){
 		versionKey: false,
 		transform: (doc: any, out: any) => {
 			Object.keys(out).forEach(k => {
-				if (out[k] instanceof ObjectId) return delete out[k]; // delete all the id keys
-				if (k[0] === "_") return delete out[k]; // delete all the underscore keys
-				if (out[k] instanceof Date) return out[k] = out[k].toISOString(); // delete all the id keys
+				if (out[k] instanceof ObjectId) delete out[k]; // delete all the id keys
+				if (k[0] === "_") delete out[k]; // delete all the underscore keys
+				if (out[k] instanceof Date) out[k] = out[k].toISOString(); // delete all the id keys
 			});
 			return out;
 		}
