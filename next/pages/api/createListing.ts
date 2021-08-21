@@ -15,7 +15,6 @@ import { listings } from "../../serverAndClient/publicFieldConstants";
 import { getFileExtension } from "../../serverAndClient/utils";
 import {
   allowedFileTypes,
-  contactEmail,
 } from "../../serverAndClient/staticDetails";
 import { logger } from "../../server/logger";
 import _default from "next/dist/client/router";
