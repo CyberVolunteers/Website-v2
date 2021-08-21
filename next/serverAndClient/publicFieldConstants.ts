@@ -1,126 +1,141 @@
 import { FieldConstraintsCollection, flatten } from "combined-validator";
 
+//TODO: separate into push and pull fields
 export const users: FieldConstraintsCollection = {
-    required: {
-        string: {
-            // uuid: {TODO: exactlength},
-            firstName: { maxLength: 30 },
-            lastName: { maxLength: 30 },
-            email: { maxLength: 320 },
-            password: {},
-            gender: { enum: ["male", "female", "other"] },
-            city: { maxLength: 85 },
-            country: { maxLength: 56 },
-            skillsAndInterests: { maxLength: 1000 },
-        },
-        date: {
-            birthDate: {},
-
-        },
+  required: {
+    string: {
+      // uuid: {TODO: exactLength},
+      firstName: { maxLength: 30 },
+      lastName: { maxLength: 30 },
+      email: { maxLength: 320 },
+      password: {},
+      gender: { enum: ["male", "female", "other"] },
+      city: { maxLength: 85 },
+      country: { maxLength: 56 },
+      skillsAndInterests: { maxLength: 1000 },
     },
-    optional: {
-        string: {
-            nationality: { maxLength: 60, },
-        },
-        number: {
-            phoneNumber: {},
-        }
+    date: {
+      birthDate: {},
     },
+  },
+  optional: {
+    string: {
+      nationality: { maxLength: 60 },
+    },
+    number: {
+      phoneNumber: {},
+    },
+  },
 };
 
-
 export const organisations: FieldConstraintsCollection = {
-    required: {
-        string: {
-            email: { maxLength: 320 },
-            password: {},
-            orgType: { maxLength: 60 },
-            orgName: { maxLength: 150 },
-            orgDesc: { maxLength: 5000 },
-            orgLocation: { maxLength: 150 }
-        },
-        number: {
-            phoneNumber: {},
-        }
+  required: {
+    string: {
+      email: { maxLength: 320 },
+      password: {},
+      orgType: { maxLength: 60 },
+      orgName: { maxLength: 150 },
+      orgDesc: { maxLength: 5000 },
+      orgLocation: { maxLength: 150 },
     },
-    optional: {
-        string: {
-            websiteUrl: { maxLength: 100 },
-        }
-    }
-}
+    number: {
+      phoneNumber: {},
+    },
+  },
+  optional: {
+    string: {
+      websiteUrl: { maxLength: 100 },
+    },
+  },
+};
 
 export const listings: FieldConstraintsCollection = {
-    required: {
-        string: {
-            duration: { maxLength: 1000 },
-            time: { maxLength: 1000 },
-            skills: { maxLength: 3000 },
-            requirements: { maxLength: 3000 },
-            title: { maxLength: 150 },
-            desc: { maxLength: 7000 },
-            category: { enum: ["Advocacy & Human Rights", "Arts & Culture", "Community", "Computers & Technology", "Education", "Healthcare & Medicine", "Elderly"] },
-            requiredData: { enum: Object.keys(flatten(users)).filter(k => k !== "password"), array: true },
-            imagePath: {},
-            uuid: {exactLength: 36}
-        },
-        object: {
-            targetAudience: {
-                optional: {
-                    boolean: {
-                        under16: { default: false },
-                        between16And18: { default: false },
-                        between18And55: { default: false },
-                        over55: { default: false }
-                    }
-                }
-            },
-            location: {
-                required: {
-                    string: {
-                        place: {maxLength: 100},
-                        street: {maxLength: 100},
-                        city: {maxLength: 100},
-                        county: {maxLength: 100}
-                    },
-                    boolean: {
-                        isOnline: {}
-                    }
-                }
-            },
-        },
-        boolean: {
-            isFlexible: {}
-        },
-        number: {
-            minHoursPerWeek: {},
-            maxHoursPerWeek: { greaterOrEqualTo: "minHoursPerWeek" },
-            requestedNumVolunteers: {},
-        },
+  required: {
+    string: {
+      duration: { maxLength: 1000 },
+      time: { maxLength: 1000 },
+      skills: { maxLength: 3000 },
+      requirements: { maxLength: 3000 },
+      title: { maxLength: 150 },
+      desc: { maxLength: 7000 },
+      category: {
+        enum: [
+          "Advocacy & Human Rights",
+          "Arts & Culture",
+          "Community",
+          "Computers & Technology",
+          "Education",
+          "Healthcare & Medicine",
+          "Elderly",
+        ],
+      },
+      requiredData: {
+        enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
+        array: true,
+      },
+      imagePath: {},
+      uuid: { exactLength: 36 },
     },
-}
+    object: {
+      targetAudience: {
+        optional: {
+          boolean: {
+            under16: { default: false },
+            between16And18: { default: false },
+            between18And55: { default: false },
+            over55: { default: false },
+          },
+        },
+      },
+      location: {
+        required: {
+          string: {
+            place: { maxLength: 100 },
+            street: { maxLength: 100 },
+            city: { maxLength: 100 },
+            county: { maxLength: 100 },
+          },
+          boolean: {
+            isOnline: {},
+          },
+        },
+      },
+    },
+    boolean: {
+      isFlexible: {},
+    },
+    number: {
+      minHoursPerWeek: {},
+      maxHoursPerWeek: { greaterOrEqualTo: "minHoursPerWeek" },
+      requestedNumVolunteers: {},
+    },
+  },
+};
 
 export const loginSpec: FieldConstraintsCollection = {
-    required: {
-        string: {
-            email: { maxLength: 320 },
-            password: {}
-        },
+  required: {
+    string: {
+      email: { maxLength: 320 },
+      password: {},
     },
+  },
 };
 
 export const searchListingsSpec: FieldConstraintsCollection = {
-    required: {
-        string: {
-            keywords: {}
-        }
+  required: {
+    string: {
+      keywords: {},
     },
-    optional: {
-        string: {
-            targetLoc: {},
-            category: {enum: ["Any", ...listings.required?.string?.category?.enum ?? []]},
-            minHours: {},
-            maxHours: {},
-        }
-    }
-}
+  },
+  optional: {
+    string: {
+      targetLoc: {},
+      category: {
+        enum: ["Any", ...(listings.required?.string?.category?.enum ?? [])],
+      },
+      minHours: {},
+      maxHours: {},
+      isOnline: {enum: ["true", "false"]},
+    },
+  },
+};

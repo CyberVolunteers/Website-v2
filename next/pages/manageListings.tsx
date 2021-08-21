@@ -62,8 +62,6 @@ export const getServerSideProps: GetServerSideProps<{
     delete l.place;
   });
 
-  console.log(listings);
-
   return {
     props: {
       listings,
