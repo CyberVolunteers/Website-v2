@@ -3,6 +3,7 @@ import { accountInfoCookieName } from "../../serverAndClient/cookiesConfig";
 import { ViewerType } from "../types";
 
 function getCookie(name: string) {
+    if(isServer()) return undefined;
     if (document.cookie.length > 0) {
         let startIndex = document.cookie.indexOf(name + "=");
         if (startIndex !== -1) {

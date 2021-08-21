@@ -13,7 +13,7 @@ function Card({ imagePath: img, title, organisationName, desc, currentVolunteers
                     src={img}
                     // width={100}
                     // height={100}
-                    size={"30vw"}
+                    sizes={"30vw"}
                     layout="fill"
                     objectPosition="center top"
                     objectFit="contain"

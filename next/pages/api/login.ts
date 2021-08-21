@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { isLoggedIn, login } from "../../server/auth/session";
 import { createAjvJTDSchema } from "combined-validator";
-import { getSession, updateSession } from "../../server/auth/auth-cookie";
+import { disableSession, getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 import { loginSpec } from "../../serverAndClient/publicFieldConstants";
 import { logger } from "../../server/logger";
@@ -19,8 +19,11 @@ const handlers: HandlerCollection = {
   POST: async function (req, res) {
     const session = await getSession(req);
 
-    if (isLoggedIn(session))
+    if (isLoggedIn(session)) {
       logger.info("server.login:Signing in a someone else");
+      // Delete the session cache so that the data does not persist
+      disableSession(req);
+    }
 
     const loginResult = await login(req.body);
 

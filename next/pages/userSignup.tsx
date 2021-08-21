@@ -10,6 +10,8 @@ import { Signup } from "../client/components/Signup";
 
 export default function UserSignup(props: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 
+	// hide "nationality"
+	delete props.fields.nationality;
 
 	return <div>
 		<Head title="Sign up as a volunteer - cybervolunteers" />

@@ -46,6 +46,8 @@ export default function ManageListings({
   );
 }
 
+const allowedFields = ["imagePath", "title", "orgName", "desc", "currentNumVolunteers", "requestedNumVolunteers", "uuid"] 
+
 export const getServerSideProps: GetServerSideProps<{
   listings: any[]; //{[key: string]: any}[]
 }> = async (context) => {
@@ -59,7 +61,11 @@ export const getServerSideProps: GetServerSideProps<{
   const listings = org.listings;
   listings.forEach((l: any) => {
     l.orgName = orgName;
-    delete l.place;
+    
+    // loop through the keys and delete them if they are not needed
+    Object.entries(l).forEach(([k, v]) => {
+      if(!allowedFields.includes(k)) delete l[k]
+    })
   });
 
   return {
