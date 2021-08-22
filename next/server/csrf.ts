@@ -46,6 +46,6 @@ export async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
     if (!fixedTimeComparison(expectedCsrfToken, receivedCsrfToken)) {
         logger.info("server.csrf:Invalid csrf token");
 
-        return res.status(403).send("Invalid csrf token");
+        return res.status(403).send("Invalid csrf token. Please try refreshing the page");
     }
 }

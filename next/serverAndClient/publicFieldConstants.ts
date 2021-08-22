@@ -24,9 +24,8 @@ export const users: FieldConstraintsCollection = {
   optional: {
     string: {
       nationality: { maxLength: 60 },
-    },
-    number: {
-      phoneNumber: {},
+      //@ts-ignore
+      phoneNumber: { isPhoneNumber: true },
     },
   },
 };
@@ -40,9 +39,8 @@ export const organisations: FieldConstraintsCollection = {
       orgName: { maxLength: 150 },
       orgDesc: { maxLength: 5000 },
       orgLocation: { maxLength: 150 },
-    },
-    number: {
-      phoneNumber: {},
+      //@ts-ignore
+      phoneNumber: { isPhoneNumber: true },
     },
   },
   optional: {
