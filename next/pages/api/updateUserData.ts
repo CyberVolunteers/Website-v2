@@ -4,9 +4,9 @@ import { createHandler, ajv } from "../../server/apiRequests";
 import { isUser, updateUserData } from "../../server/auth/session";
 import { createAjvJTDSchema } from "combined-validator";
 import { userDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
-import { HandlerCollection } from "../../server/types";
+import { ExtendedNextApiRequest, HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
-import { getSession, setSession } from "../../server/auth/auth-cookie";
+import { getSession, updateSession } from "../../server/auth/auth-cookie";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -24,7 +24,7 @@ const handlers: HandlerCollection = {
 
 		if(newDoc === null) return res.status(500).send("We could not update your data. Sorry for the inconvenience.");
 
-		await setSession(res, newDoc);
+		await updateSession(req, res, newDoc);
 
 		return res.end();
 	}

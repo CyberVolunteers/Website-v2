@@ -25,12 +25,15 @@ import { flatten, Flattened } from "combined-validator";
 import { csrfFetch } from "../client/utils/csrf";
 import { updateCsrf } from "../server/csrf";
 import { useEffect } from "react";
+import { useRouter } from "next/dist/client/router";
 
 export default function ListingPage({
   listing,
   csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
   useViewProtection(["org", "user"]);
+
+  const router = useRouter();
 
   const [showVolunteerPopup, setShowVolunteerPopup] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -42,8 +45,8 @@ export default function ListingPage({
 
   useEffect(() => {
     const missingFields = getAccountInfo()?.missingFields ?? [];
-    const requiredMissingFields = listing.requiredData.filter((v) =>
-      missingFields.includes(v) // not terribly efficient, but there are not many fields
+    const requiredMissingFields = listing.requiredData.filter(
+      (v) => missingFields.includes(v) // not terribly efficient, but there are not many fields
     );
     // get only the required fields, but set them to "required"
     setMissingFieldStructure(
@@ -99,7 +102,29 @@ export default function ListingPage({
         return setIsLoading(false);
     }
 
+    // do the actual sign-up
+    const res = await csrfFetch(csrfToken, `/api/joinListing`, {
+      method: "POST",
+      credentials: "same-origin", // only send cookies for same-origin requests
+      headers: {
+        "content-type": "application/json",
+        accept: "application/json",
+      },
+      body: JSON.stringify({ uuid: listing.uuid }),
+    });
+    if (
+      !(await updateOverallErrorsForRequests(
+        res,
+        `listingJoin`,
+        overallErrors,
+        setOverallErrors
+      ))
+    )
+      return setIsLoading(false);
+
     setIsLoading(false);
+
+    router.push("/listingJoinSuccess");
   }
 
   return (

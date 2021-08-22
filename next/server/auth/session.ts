@@ -1,5 +1,5 @@
 import { hash, verifyHash } from "./password";
-import { Org, User } from "../mongo/mongoModels";
+import { Listing, Org, User } from "../mongo/mongoModels";
 import getConfig from "next/config";
 import { logger } from "../logger";
 
@@ -105,7 +105,29 @@ export async function updateUserData(
     new: true,
     upsert: false, // do not create a new user
   });
-  return doc
+  return doc;
+}
+
+export async function addUserToListing(userId: string, listingUuid: string) {
+  const out = await Listing.findOneAndUpdate(
+    {
+      uuid: listingUuid,
+      users: {
+        $ne: userId,
+      },
+    },
+    {
+      $push: {
+        users: userId,
+      },
+    },
+    {
+      new: true,
+      upsert: false, // do not create a new one
+    }
+  );
+
+  return out;
 }
 
 export function isLoggedIn(session: any) {

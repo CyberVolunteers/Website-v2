@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isUser, signupUser } from "../../server/auth/session";
+import { addUserToListing, isUser, signupUser } from "../../server/auth/session";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
@@ -16,12 +16,20 @@ type Data = {
 
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
-    //TODO: check for missing fields here
     const session = await getSession(req);
+
+	console.log(session)
 
     if (!isUser(session))
       return res.status(400).send("You need to be a user to do this");
 
+    const missingFields = session.missingFields;
+    // TODO: check that all the fields are there
+
+	const newListingValue = await addUserToListing(session._id, req.body.uuid);
+
+	if(newListingValue === null) return res.status(400).send("It looks like you have already joined this listing");
+	
     return res.end();
   },
 };
@@ -36,7 +44,15 @@ export default async function signUp(
       useCsrf: true,
     },
     {
-      POST: ajv.compileParser(createAjvJTDSchema(users)),
+      POST: ajv.compileParser(
+        createAjvJTDSchema({
+          required: {
+            string: {
+              uuid: {},
+            },
+          },
+        })
+      ),
     }
   )(req, res);
 }

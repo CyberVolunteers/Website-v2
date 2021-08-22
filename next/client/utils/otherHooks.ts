@@ -43,8 +43,6 @@ export function useViewProtection(allow: ViewerType[]) {
   const currentViewType = useViewerType();
   const [out, setOut] = useState(true);
 
-  console.log(router);
-
   useEffect(() => {
     if (currentViewType === "hydrating") return; // race conditions are fun
     if (!allow.includes(currentViewType)) {

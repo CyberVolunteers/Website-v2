@@ -86,7 +86,7 @@ export async function updateSession(
   req.session = newData;
 }
 
-export async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
+async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
   // keep a cookie that tells the client that it is logged in and other data
   const isOrg = data?.isOrg === true;
   const publicData = {
@@ -102,7 +102,10 @@ export async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
     (v) => !Object.keys(data).includes(v) && !["password"].includes(v)
   );
 
-  if (!isOrg) publicData.missingFields = missingFieldNames;
+  if (!isOrg) {
+    publicData.missingFields = missingFieldNames;
+    data.missingFields = missingFieldNames;
+  }
 
   const cookies = [
     serialize(

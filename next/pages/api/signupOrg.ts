@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { createAjvJTDSchema } from "combined-validator";
-// import { getSession, setSession } from '../../services/auth/auth-cookie';
 import { organisations } from "../../serverAndClient/publicFieldConstants";
 import { signupOrg } from "../../server/auth/session";
 import { HandlerCollection } from "../../server/types";
