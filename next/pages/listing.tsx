@@ -1,29 +1,106 @@
 import Image from "next/image";
-import { Button, capitalize } from "@material-ui/core";
+import { Button, capitalize, CircularProgress } from "@material-ui/core";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import { ReactElement } from "react";
 import Head from "../client/components/Head";
 import { getMongo } from "../server/mongo";
 import { Listing } from "../server/mongo/mongoModels";
 import { toStrippedObject } from "../server/mongo/util";
-import { undoCamelCase } from "../client/utils/misc";
+import {
+  undoCamelCase,
+  updateOverallErrorsForRequests,
+} from "../client/utils/misc";
 import { getAccountInfo } from "../client/utils/userState";
-import { useViewProtection } from "../client/utils/otherHooks";
+import {
+  useIsAfterRehydration,
+  useViewProtection,
+} from "../client/utils/otherHooks";
+import FormFieldCollection from "../client/components/FormFieldCollection";
+import { userFieldNamesToShow } from "../serverAndClient/displayNames";
+import { users } from "../serverAndClient/publicFieldConstants";
+import isMobilePhone from "validator/lib/isMobilePhone";
+import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
+import { flatten, Flattened } from "combined-validator";
+import { csrfFetch } from "../client/utils/csrf";
+import { updateCsrf } from "../server/csrf";
+import { useEffect } from "react";
 
 export default function ListingPage({
   listing,
+  csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
   useViewProtection(["org", "user"]);
-  const [showVolunteerPopup, setShowVolunteerPopup] = useState(false);
 
-  const missingFields = getAccountInfo()?.missingFields ?? [];
-  const requiredMissingFields = listing.requiredData.filter((v) =>
-    missingFields.includes(v)
+  const [showVolunteerPopup, setShowVolunteerPopup] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+
+  // do not update this value after the initial render
+  const [missingFieldStructure, setMissingFieldStructure] = useState(
+    {} as Flattened
   );
 
+  useEffect(() => {
+    const missingFields = getAccountInfo()?.missingFields ?? [];
+    const requiredMissingFields = listing.requiredData.filter((v) =>
+      missingFields.includes(v) // not terribly efficient, but there are not many fields
+    );
+    // get only the required fields, but set them to "required"
+    setMissingFieldStructure(
+      Object.fromEntries(
+        requiredMissingFields.map((k) => {
+          const v = flatten(users)[k];
+          v.required = true; // make them all required
+          return [k, v];
+        })
+      )
+    );
+  }, []);
+
+  const missingFieldsRef = useRef();
+
   // TODO: charity edit menu
-  const [volunteerFormFieldValues, setVolunteerFormFieldValues] = useState({});
+
+  const [overallErrors, setOverallErrors] = useState(
+    {} as { [key: string]: any }
+  );
+
+  async function wantToHelpFormSubmit(evt: React.FormEvent<HTMLFormElement>) {
+    evt.preventDefault();
+
+    if (isLoading) return; // do not submit the form twice in a row
+
+    const dataRef = missingFieldsRef.current as any;
+    const data: { [key: string]: any } | null = dataRef?.getData();
+
+    if (data === null) return;
+
+    setIsLoading(true);
+
+    // if there is data to be updated, do that
+    if (data !== undefined) {
+      const res = await csrfFetch(csrfToken, `/api/updateUserData`, {
+        method: "POST",
+        credentials: "same-origin", // only send cookies for same-origin requests
+        headers: {
+          "content-type": "application/json",
+          accept: "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+      if (
+        !(await updateOverallErrorsForRequests(
+          res,
+          `listingUserUpdateData`,
+          overallErrors,
+          setOverallErrors
+        ))
+      )
+        return setIsLoading(false);
+    }
+
+    setIsLoading(false);
+  }
 
   return (
     <div>
@@ -98,14 +175,18 @@ export default function ListingPage({
         )}
       </p>
 
+      {/* TODO: separate into a different component */}
       {/* The popup shown after the user clicks on "i want to help" button */}
       {showVolunteerPopup ? (
         <div>
-          <form>
+          <form onSubmit={wantToHelpFormSubmit}>
             <h2>
               (Totally a popup) Hey, are you sure you want to sign up for this
               opportunity?
             </h2>
+            <FormFieldCollectionErrorHeader
+              overallErrors={overallErrors}
+            ></FormFieldCollectionErrorHeader>
             {listing.requiredData.length > 0 ? (
               <h3>
                 This organisation will be able to see this information about
@@ -118,7 +199,7 @@ export default function ListingPage({
 
             {/* Get missing fields */}
             {(() => {
-              if (requiredMissingFields.length === 0) return null;
+              if (Object.keys(missingFieldStructure).length === 0) return null;
 
               return (
                 <>
@@ -126,14 +207,16 @@ export default function ListingPage({
                     We do not have some information about you that is required
                     by this charity:
                   </h3>
-                  {requiredMissingFields.map((v, i) => (
-                    <span key={i}>
-                      <label htmlFor={`missing-fields-${v}`}>
-                        {capitalize(undoCamelCase(v))}
-                      </label>
-                      <input id={`missing-fields-${v}`}></input>
-                    </span>
-                  ))}
+                  <FormFieldCollection
+                    ref={missingFieldsRef}
+                    fields={missingFieldStructure}
+                    presentableNames={userFieldNamesToShow}
+                    perElementValidationCallbacks={{
+                      phoneNumber: (v: string) => isMobilePhone(v),
+                    }}
+                    overallErrors={overallErrors}
+                    setOverallErrors={setOverallErrors}
+                  />
                 </>
               );
             })()}
@@ -146,6 +229,8 @@ export default function ListingPage({
       <Button onClick={() => setShowVolunteerPopup(!showVolunteerPopup)}>
         <p>want to help</p>
       </Button>
+
+      {isLoading ? <CircularProgress /> : null}
     </div>
   );
 }
@@ -201,6 +286,7 @@ export const getServerSideProps: GetServerSideProps<{
     minHoursPerWeek: number;
     maxHoursPerWeek: number;
   };
+  csrfToken: string;
 }> = async (context) => {
   const uuid = context.query.uuid;
   if (typeof uuid !== "string")
@@ -224,6 +310,7 @@ export const getServerSideProps: GetServerSideProps<{
   return {
     props: {
       listing,
+      csrfToken: await updateCsrf(context),
     }, // will be passed to the page component as props
   };
 };

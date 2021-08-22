@@ -1,0 +1,42 @@
+// Next.js API route support: https://nextjs.org/docs/api-routes/introduction
+import type { NextApiRequest, NextApiResponse } from "next";
+import { createHandler, ajv } from "../../server/apiRequests";
+import { isUser, signupUser } from "../../server/auth/session";
+import { createAjvJTDSchema } from "combined-validator";
+import { users } from "../../serverAndClient/publicFieldConstants";
+import { HandlerCollection } from "../../server/types";
+import { logger } from "../../server/logger";
+import { getSession } from "../../server/auth/auth-cookie";
+
+export * from "../../server/defaultEndpointConfig";
+
+type Data = {
+  name: string;
+};
+
+const handlers: HandlerCollection = {
+  POST: async function (req, res) {
+    //TODO: check for missing fields here
+    const session = await getSession(req);
+
+    if (!isUser(session))
+      return res.status(400).send("You need to be a user to do this");
+
+    return res.end();
+  },
+};
+
+export default async function signUp(
+  req: NextApiRequest,
+  res: NextApiResponse<Data>
+): Promise<void> {
+  await createHandler(
+    handlers,
+    {
+      useCsrf: true,
+    },
+    {
+      POST: ajv.compileParser(createAjvJTDSchema(users)),
+    }
+  )(req, res);
+}

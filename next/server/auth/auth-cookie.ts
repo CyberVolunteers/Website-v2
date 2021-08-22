@@ -86,7 +86,7 @@ export async function updateSession(
   req.session = newData;
 }
 
-async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
+export async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
   // keep a cookie that tells the client that it is logged in and other data
   const isOrg = data?.isOrg === true;
   const publicData = {

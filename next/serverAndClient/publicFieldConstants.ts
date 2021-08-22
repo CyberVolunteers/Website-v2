@@ -1,10 +1,13 @@
-import { FieldConstraintsCollection, flatten } from "combined-validator";
+import {
+  deepAssign,
+  FieldConstraintsCollection,
+  flatten,
+} from "combined-validator";
 
 //TODO: separate into push and pull fields
 export const users: FieldConstraintsCollection = {
   required: {
     string: {
-      // uuid: {TODO: exactLength},
       firstName: { maxLength: 30 },
       lastName: { maxLength: 30 },
       email: { maxLength: 320 },
@@ -135,7 +138,22 @@ export const searchListingsSpec: FieldConstraintsCollection = {
       },
       minHours: {},
       maxHours: {},
-      isOnline: {enum: ["true", "false"]},
+      isOnline: { enum: ["true", "false"] },
     },
   },
 };
+
+// deep copy
+// I have no clue why deepAssign is not working in this case
+export const userDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
+  JSON.stringify(users)
+);
+// NOTE: deleting some fields
+delete userDataUpdateSpec.required?.string?.email;
+delete userDataUpdateSpec.required?.string?.password;
+// Make all optional
+userDataUpdateSpec.optional = deepAssign(
+  userDataUpdateSpec.optional,
+  userDataUpdateSpec.required
+);
+delete userDataUpdateSpec.required;
