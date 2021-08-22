@@ -5,7 +5,7 @@ import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession } from "../../server/auth/auth-cookie";
-import { isLoggedIn } from "../../server/auth/session";
+import { isLoggedIn } from "../../server/auth/data";
 
 export * from "../../server/defaultEndpointConfig";
 

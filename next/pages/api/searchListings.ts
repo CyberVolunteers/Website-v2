@@ -2,7 +2,6 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler } from "../../server/apiRequests";
 import { Listing } from "../../server/mongo/mongoModels";
-import { toStrippedObject } from "../../server/mongo/util";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { searchListingsSpec } from "../../serverAndClient/publicFieldConstants";

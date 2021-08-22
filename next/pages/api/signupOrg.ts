@@ -3,7 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { createAjvJTDSchema } from "combined-validator";
 import { organisations } from "../../serverAndClient/publicFieldConstants";
-import { signupOrg } from "../../server/auth/session";
+import { signupOrg } from "../../server/auth/data";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 

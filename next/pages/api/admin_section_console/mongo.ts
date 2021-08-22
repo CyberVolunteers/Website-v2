@@ -4,7 +4,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createAjvJTDSchema } from "combined-validator";
 import { ajv, createHandler } from "../../../server/apiRequests";
 import { getSession } from "../../../server/auth/auth-cookie";
-import { isAdminLevel } from "../../../server/auth/session";
+import { isAdminLevel } from "../../../server/auth/data";
 import { HandlerCollection } from "../../../server/types";
 import { Listing, Org, User } from "../../../server/mongo/mongoModels";
 import { logger } from "../../../server/logger";

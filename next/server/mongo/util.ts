@@ -2,6 +2,7 @@
 //@ts-ignore
 import ObjectId from "mongoose/lib/types/objectid";
 
+// NOTE: Removes some unwanted keys, but do double-check them!
 export function toStrippedObject(obj: any){
 	return obj.toJSON({
 		versionKey: false,

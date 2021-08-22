@@ -6,7 +6,7 @@ import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
-import { isLoggedIn, isOrg } from "../server/auth/session";
+import { isLoggedIn, isOrg } from "../server/auth/data";
 import { orgFieldNamesToShow, userFieldNamesToShow } from "../serverAndClient/displayNames";
 
 

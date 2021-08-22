@@ -8,7 +8,7 @@ import {
   verifyJSONShape,
 } from "../../server/apiRequests";
 import { getSession } from "../../server/auth/auth-cookie";
-import { isOrg } from "../../server/auth/session";
+import { isOrg } from "../../server/auth/data";
 import { createListing } from "../../server/listings";
 import { HandlerCollection, MulterReq } from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";

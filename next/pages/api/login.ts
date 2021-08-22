@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isLoggedIn, login } from "../../server/auth/session";
+import { isLoggedIn, login } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { disableSession, getSession, updateSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
