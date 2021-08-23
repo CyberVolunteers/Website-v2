@@ -1,6 +1,5 @@
 set -e
 
-# nextjs
-sudo docker build -f ./next/Dockerfile ../../next/ -t next-prod
+./build.sh
 
 docker-compose up

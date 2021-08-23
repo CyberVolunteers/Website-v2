@@ -10,6 +10,9 @@ RUN chmod +x /wait
 # for sharp
 # RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
 
+# python for bcrypt
+RUN apk add python
+
 RUN npm i
 RUN npx next telemetry disable
 RUN npm run build
