@@ -26,6 +26,7 @@ const FormFieldCollection = forwardRef((
     return <>
         <FormComponent ref={guaranteedRef}
             name="_root"
+            useLabel={false}
             flattenedValue={{ type: fields, required: true }}
             perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
             presentableNames={presentableNames}

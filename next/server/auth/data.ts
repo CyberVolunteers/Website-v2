@@ -101,9 +101,24 @@ export async function updateUserData(
   data: any,
   email: string
 ): Promise<{ [key: string]: any } | null> {
-  let doc = await User.findOneAndUpdate({ email }, data, {
+  return await updateData(data, email, User);
+}
+
+export async function updateOrgData(
+  data: any,
+  email: string
+): Promise<{ [key: string]: any } | null> {
+  return await updateData(data, email, Org);
+}
+
+async function updateData(
+  data: any,
+  email: string,
+  model: typeof User | typeof Org | typeof Listing,
+): Promise<{ [key: string]: any } | null> {
+  let doc = await model.findOneAndUpdate({ email }, data, {
     new: true,
-    upsert: false, // do not create a new user
+    upsert: false, // do not create a new one
   });
   return doc;
 }

@@ -17,9 +17,7 @@ type Data = {
 const handlers: HandlerCollection = {
   POST: async function (req, res) {
     const session = await getSession(req);
-
-	console.log(session)
-
+    
     if (!isUser(session))
       return res.status(400).send("You need to be a user to do this");
 

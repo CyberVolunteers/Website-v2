@@ -50,7 +50,7 @@ const SimpleForm: FC<{
 
     const dataRef = autoFormRef.current as any;
 
-    const data: { [key: string]: any } | null = dataRef?.getData();
+    const data: { [key: string]: any } | null = dataRef?.getData?.();
     if (data === null) return;
 
     setIsLoading(true);

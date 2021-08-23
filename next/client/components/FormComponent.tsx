@@ -22,6 +22,7 @@ const getPresentableName = (
 ) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));
 
 export type PropsType = {
+  useLabel?: boolean;
   name: string;
   flattenedValue: FlattenedValue;
   perElementValidationCallbacks: PerElementValidatorCallbacks;
@@ -31,7 +32,7 @@ export type PropsType = {
 };
 
 const FormComponent = forwardRef((props: PropsType, ref) => {
-  const { name, flattenedValue, presentableNames } = props;
+  const { name, flattenedValue, presentableNames, useLabel } = props;
 
   const [elementError, setElementError] = useState("");
 
@@ -45,7 +46,7 @@ const FormComponent = forwardRef((props: PropsType, ref) => {
   return (
     <span>
       {/* Hide underscored values */}
-      {name[0] === "_" ? null : outLabel}
+      {useLabel === false ? null : outLabel}
       <InputElement
         ref={ref}
         {...props}
@@ -158,15 +159,15 @@ const InputElement = forwardRef(
         Object.entries(inputType).map(([k, v]) => [k, useRef<any>()])
       );
 
-      function doesHaveNoErrors() {
+      function hasNoErrors() {
         return Object.entries(nestedRefs).every(([k, r]) =>
-          (r as any)?.current?.doesHaveNoErrors()
+          (r as any)?.current?.hasNoErrors()
         );
       }
 
       useImperativeHandle(ref, () => ({
         getData: () => {
-          if (!doesHaveNoErrors()) return null;
+          if (!hasNoErrors()) return null;
           const out: { [key: string]: any } = {};
           Object.entries(nestedRefs).forEach(([k, v]) => {
             const state = v?.current?.formState;
@@ -174,7 +175,7 @@ const InputElement = forwardRef(
           });
           return out;
         },
-        doesHaveNoErrors,
+        hasNoErrors,
         getChild: (name: string) => nestedRefs[name]?.current,
         nestedRefs,
         ...baseRefProps,
@@ -208,7 +209,7 @@ const InputElement = forwardRef(
     }
 
     baseRefProps.validate = validate;
-    baseRefProps.doesHaveNoErrors = () => elementError === "";
+    baseRefProps.hasNoErrors = () => elementError === "";
 
     function setValue(v: any) {
       formStateSetter(v); // do it straight away for responsiveness
@@ -330,7 +331,9 @@ const DropdownComponent = forwardRef(
     },
     ref
   ) => {
+    const elementRef = useRef<HTMLSelectElement>();
     useImperativeHandle(ref, () => ({
+      elementRef,
       getData: () => {
         // a check to make sure
         if (!flattenedValue.enum.includes(formState)) return null;
@@ -340,6 +343,7 @@ const DropdownComponent = forwardRef(
     }));
     return (
       <select
+        ref={elementRef as ForwardedRef<HTMLSelectElement>}
         className={name}
         name={name}
         required={flattenedValue.required}
@@ -378,7 +382,10 @@ const PrimitiveFormComponent = forwardRef(
     },
     ref
   ) => {
+    const elementRef = useRef<HTMLInputElement>();
+
     useImperativeHandle(ref, () => ({
+      elementRef,
       getData: () => {
         switch (inputType) {
           case "date":
@@ -438,6 +445,7 @@ const PrimitiveFormComponent = forwardRef(
     return (
       <>
         <input
+          ref={elementRef as ForwardedRef<HTMLInputElement>}
           className={name}
           id={name}
           name={name}

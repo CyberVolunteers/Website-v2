@@ -11,6 +11,7 @@ import { undoCamelCase, updateOverallErrorsForRequests } from "../utils/misc";
 import { getAccountInfo } from "../utils/userState";
 import FormFieldCollection from "./FormFieldCollection";
 import FormFieldCollectionErrorHeader from "./FormFieldCollectionErrorHeader";
+import { getSignupPerElementValidationCallbacks } from "./Signup";
 
 export function ListingJoinPrompt({
   csrfToken,
@@ -116,52 +117,52 @@ export function ListingJoinPrompt({
   }
   return (
     <>
-        <div>
-          <form onSubmit={wantToHelpFormSubmit}>
-            <h2>
-              (Totally a popup) Hey, are you sure you want to sign up for this
-              opportunity?
-            </h2>
-            <FormFieldCollectionErrorHeader
-              overallErrors={overallErrors}
-            ></FormFieldCollectionErrorHeader>
-            {listing.requiredData.length > 0 ? (
-              <h3>
-                This organisation will be able to see this information about
-                you:
-              </h3>
-            ) : null}
-            {listing.requiredData.map((v) => (
-              <p key={v}>{capitalize(undoCamelCase(v))}</p>
-            ))}
+      <div>
+        <form onSubmit={wantToHelpFormSubmit}>
+          <h2>
+            (Totally a popup) Hey, are you sure you want to sign up for this
+            opportunity?
+          </h2>
+          <FormFieldCollectionErrorHeader
+            overallErrors={overallErrors}
+          ></FormFieldCollectionErrorHeader>
+          {listing.requiredData.length > 0 ? (
+            <h3>
+              This organisation will be able to see this information about you:
+            </h3>
+          ) : null}
+          {listing.requiredData.map((v) => (
+            <p key={v}>{capitalize(undoCamelCase(v))}</p>
+          ))}
 
-            {/* Get missing fields */}
-            {(() => {
-              if (Object.keys(missingFieldStructure).length === 0) return null;
+          {/* Get missing fields */}
+          {(() => {
+            if (Object.keys(missingFieldStructure).length === 0) return null;
 
-              return (
-                <>
-                  <h3>
-                    We do not have some information about you that is required
-                    by this charity:
-                  </h3>
-                  <FormFieldCollection
-                    ref={missingFieldsRef}
-                    fields={missingFieldStructure}
-                    presentableNames={userFieldNamesToShow}
-                    perElementValidationCallbacks={{
-                      phoneNumber: (v: string) => isMobilePhone(v),
-                    }}
-                    overallErrors={overallErrors}
-                    setOverallErrors={setOverallErrors}
-                  />
-                </>
-              );
-            })()}
+            return (
+              <>
+                <h3>
+                  We do not have some information about you that is required by
+                  this charity:
+                </h3>
+                <FormFieldCollection
+                  ref={missingFieldsRef}
+                  fields={missingFieldStructure}
+                  presentableNames={userFieldNamesToShow}
+                  perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
+                    overallErrors,
+                    setOverallErrors
+                  )}
+                  overallErrors={overallErrors}
+                  setOverallErrors={setOverallErrors}
+                />
+              </>
+            );
+          })()}
 
-            <button type="submit">Sell my soul to the devil!</button>
-          </form>
-        </div>
+          <button type="submit">Sell my soul to the devil!</button>
+        </form>
+      </div>
 
       {isLoading ? <CircularProgress /> : null}
     </>
