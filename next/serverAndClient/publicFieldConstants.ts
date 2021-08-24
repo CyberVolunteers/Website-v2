@@ -170,3 +170,23 @@ orgDataUpdateSpec.optional = deepAssign(
 	orgDataUpdateSpec.required
 );
 delete orgDataUpdateSpec.required;
+
+// deep copy
+// I have no clue why deepAssign is not working in this case
+export const listingDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
+	JSON.stringify(listings)
+);
+// NOTE: deleting some fields
+delete listingDataUpdateSpec.required?.string?.imagePath;
+delete listingDataUpdateSpec.required?.string?.uuid;
+
+// Make all optional
+listingDataUpdateSpec.optional = deepAssign(
+	listingDataUpdateSpec.optional,
+	listingDataUpdateSpec.required
+);
+listingDataUpdateSpec.required = {
+	string: {
+		uuid: { exactLength: 36 },
+	},
+};

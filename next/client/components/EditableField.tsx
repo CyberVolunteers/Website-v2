@@ -11,6 +11,7 @@ export default function EditableField({
 	editableFields,
 	perElementValidationCallbacks,
 	sendEditRequest,
+	isLocked,
 }: {
 	presentableNames: { [key: string]: string };
 	name: string;
@@ -18,6 +19,7 @@ export default function EditableField({
 	editableFields: Flattened;
 	perElementValidationCallbacks: PerElementValidatorCallbacks;
 	sendEditRequest: (name: string, value: any) => void;
+	isLocked?: boolean;
 }) {
 	const [isCurrentlyEdited, setIsCurrentlyEdited] = useState(false);
 	const formRef = useRef();
@@ -26,14 +28,18 @@ export default function EditableField({
 	if (editableFields[name]?.type === "date")
 		value = new Date(value).toDateString();
 
-	function submit() {
-		// submit
+	function toggleEdit() {
+		// do not allow it to submit if it is locked
+		if (isLocked === true) return;
+		// submit if needed
 		if (isCurrentlyEdited) {
 			const dataRef = formRef?.current as any;
 
 			if (!dataRef?.hasNoErrors()) return sendEditRequest(name, null);
 			sendEditRequest(name, dataRef?.getData?.());
 		}
+
+		// toggle
 		setIsCurrentlyEdited(!isCurrentlyEdited);
 	}
 
@@ -49,7 +55,7 @@ export default function EditableField({
 			if (typeof newRef === "object")
 				newRef.onkeypress = (evt: { keyCode: number }) => {
 					// only submit on enter
-					if (evt.keyCode === 13) submit();
+					if (evt.keyCode === 13) toggleEdit();
 				};
 		}
 	}, [isCurrentlyEdited]);
@@ -76,8 +82,12 @@ export default function EditableField({
 			{(() => {
 				if (name in editableFields)
 					return (
-						<span style={{ cursor: "pointer" }} onClick={submit}>
-							{isCurrentlyEdited ? "<submit icon>" : "<edit icon>"}
+						<span style={{ cursor: "pointer" }} onClick={toggleEdit}>
+							{isLocked === true
+								? null
+								: isCurrentlyEdited
+								? "<submit icon>"
+								: "<edit icon>"}
 						</span>
 					);
 			})()}

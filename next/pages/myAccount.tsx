@@ -92,6 +92,10 @@ export default function MyAccount({
 
 			<p>Hello and welcome to my secure website</p>
 
+			{Object.entries(overallErrors).map(([k, v]) => (
+				<h1 key={k}>{v}</h1>
+			))}
+
 			{/* Render common stuff normally */}
 			{Object.entries(allFields ?? {}).map(([k, fieldDescription]) => {
 				const v = k in fields ? fields[k] : "<not specified>";

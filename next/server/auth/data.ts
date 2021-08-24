@@ -101,22 +101,30 @@ export async function updateUserData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, email, User);
+	return await updateData(data, {email}, User);
 }
 
 export async function updateOrgData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, email, Org);
+	return await updateData(data, {email}, Org);
+}
+
+export async function updateListingData(
+	data: any,
+	orgId: string,
+	uuid: string,
+): Promise<{ [key: string]: any } | null> {
+	return await updateData(data, { organisation: orgId, uuid }, Listing);
 }
 
 async function updateData(
 	data: any,
-	email: string,
+	constraints: {[key: string]: any},
 	model: typeof User | typeof Org | typeof Listing
 ): Promise<{ [key: string]: any } | null> {
-	let doc = await model.findOneAndUpdate({ email }, data, {
+	let doc = await model.findOneAndUpdate(constraints, data, {
 		new: true,
 		upsert: false, // do not create a new one
 	});
