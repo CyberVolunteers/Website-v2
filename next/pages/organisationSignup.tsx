@@ -8,22 +8,23 @@ import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 import React from "react";
 import { Signup } from "../client/components/Signup";
 
+export default function OrganisationSignup(
+	props: InferGetServerSidePropsType<typeof getServerSideProps>
+): ReactElement {
+	return (
+		<div>
+			<Head title="Organisation sign up - cybervolunteers" />
 
-export default function OrganisationSignup(props: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+			<p>Hello and welcome to my secure website</p>
 
-	return <div>
-		<Head title="Organisation sign up - cybervolunteers" />
-
-		<p>Hello and welcome to my secure website</p>
-
-		<Signup presentableNames={orgFieldNamesToShow} target="org"  {...props} />
-
-	</div>;
+			<Signup presentableNames={orgFieldNamesToShow} target="org" {...props} />
+		</div>
+	);
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	csrfToken: string,
-	fields: Flattened
+	csrfToken: string;
+	fields: Flattened;
 }> = async (context) => {
 	return {
 		props: {

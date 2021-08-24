@@ -16,8 +16,10 @@ import { useRouter } from "next/dist/client/router";
 import { isNonNegative } from "../serverAndClient/validation";
 import { addError } from "../client/utils/formUtils";
 
-
-export default function CreateListing({ csrfToken, listingFields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+export default function CreateListing({
+	csrfToken,
+	listingFields,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org"]);
 
 	const fieldsToDisplay = Object.assign({}, listingFields);
@@ -30,9 +32,11 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 	const [isLoading, setIsLoading] = useState(false);
 	const listingImageInputRef = useRef<HTMLInputElement>(null);
 
-	const [overallErrors, setOverallErrors] = useState({} as {
-		[key: string]: string
-	});
+	const [overallErrors, setOverallErrors] = useState(
+		{} as {
+			[key: string]: string;
+		}
+	);
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 		minHoursPerWeek: isNonNegative,
@@ -44,66 +48,102 @@ export default function CreateListing({ csrfToken, listingFields }: InferGetServ
 		evt.preventDefault();
 		if (isLoading) return; // do not submit the form twice in a row
 
-		
-		
 		// the file is a requirement
 		const file = listingImageInputRef.current?.files?.[0];
-		if (!file) return addError(overallErrors, setOverallErrors, "createListingImageFileUpload", "Please select an image for your listing.");
-		
-		const data: { [key: string]: any } | null = (autoFormRef.current as any)?.getData();
+		if (!file)
+			return addError(
+				overallErrors,
+				setOverallErrors,
+				"createListingImageFileUpload",
+				"Please select an image for your listing."
+			);
+
+		const data: { [key: string]: any } | null = (
+			autoFormRef.current as any
+		)?.getData();
 		if (data === null) return;
-		
-		if (data.minHoursPerWeek > data.maxHoursPerWeek) return addError(overallErrors, setOverallErrors, "createListingMaxAndMinHoursComparison", "Please make sure that the minimum number of hours of volunteering is not greater than the maximum.");
-		
+
+		if (data.minHoursPerWeek > data.maxHoursPerWeek)
+			return addError(
+				overallErrors,
+				setOverallErrors,
+				"createListingMaxAndMinHoursComparison",
+				"Please make sure that the minimum number of hours of volunteering is not greater than the maximum."
+			);
+
 		const formData = new FormData();
-		Object.entries(data).forEach(([k, v]) => formData.append(k, JSON.stringify(v)));
+		Object.entries(data).forEach(([k, v]) =>
+			formData.append(k, JSON.stringify(v))
+		);
 		formData.append("listingImage", file);
-		
+
 		setIsLoading(true);
 		const res = await csrfFetch(csrfToken, "/api/createListing", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
-				"accept": "application/json",
+				accept: "application/json",
 			},
-			body: formData
+			body: formData,
 		});
-		
+
 		setIsLoading(false);
-		if (!await updateOverallErrorsForRequests(res, "createListingPost", overallErrors, setOverallErrors)) return;
+		if (
+			!(await updateOverallErrorsForRequests(
+				res,
+				"createListingPost",
+				overallErrors,
+				setOverallErrors
+			))
+		)
+			return;
 		router.push("/manageListings");
 	}
 
-	return <div>
-		<Head title="Create a listing - cybervolunteers" />
+	return (
+		<div>
+			<Head title="Create a listing - cybervolunteers" />
 
-		<form onSubmit={onSubmit}>
-			<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
-			<FormFieldCollection ref={autoFormRef} fields={fieldsToDisplay} presentableNames={listingFieldNamesToShow} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors} />
+			<form onSubmit={onSubmit}>
+				<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
+				<FormFieldCollection
+					ref={autoFormRef}
+					fields={fieldsToDisplay}
+					presentableNames={listingFieldNamesToShow}
+					perElementValidationCallbacks={perElementValidationCallbacks}
+					overallErrors={overallErrors}
+					setOverallErrors={setOverallErrors}
+				/>
 
-			<p>
-				<label htmlFor="listing-img-upload">Can i haz image please? (required)</label>
-				<input type="file" name="listing-img-upload" ref={listingImageInputRef}></input>
-			</p>
-			<p><button className="submit" type="submit">Create a listing!</button></p>
-			{
-				isLoading ?
-					<CircularProgress /> :
-					null
-			}
-		</form>
-
-	</div>;
+				<p>
+					<label htmlFor="listing-img-upload">
+						Can i haz image please? (required)
+					</label>
+					<input
+						type="file"
+						name="listing-img-upload"
+						ref={listingImageInputRef}
+					></input>
+				</p>
+				<p>
+					<button className="submit" type="submit">
+						Create a listing!
+					</button>
+				</p>
+				{isLoading ? <CircularProgress /> : null}
+			</form>
+		</div>
+	);
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	csrfToken: string,
-	listingFields: Flattened
+	csrfToken: string;
+	listingFields: Flattened;
 }> = async (context) => {
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			listingFields: flatten(listings)
+			listingFields: flatten(listings),
 		}, // will be passed to the page component as props
 	};
 };

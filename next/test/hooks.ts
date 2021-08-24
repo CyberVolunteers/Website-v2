@@ -3,13 +3,13 @@ import * as dotenv from "dotenv";
 
 // Restores the default sandbox after every test
 export const mochaHooks = {
-    beforeAll() {
-        dotenv.config({
-            path: "./.env.local"
-        })
-    },
+	beforeAll() {
+		dotenv.config({
+			path: "./.env.local",
+		});
+	},
 
-    afterEach() {
-        sinon.restore();
-    },
+	afterEach() {
+		sinon.restore();
+	},
 };

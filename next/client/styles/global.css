@@ -1,67 +1,66 @@
 html,
 body {
-  padding: 0;
-  margin: 0;
-  background-color: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+	padding: 0;
+	margin: 0;
+	background-color: #ffffff;
+	font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
+		Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
 }
 
 .w-1000 {
-  width: 1000px;
-  margin: 0rem auto;
+	width: 1000px;
+	margin: 0rem auto;
 }
 
 @media screen and (max-width: 1000px) {
-  .w-1000 {
-    width: 95%;
-  }
+	.w-1000 {
+		width: 95%;
+	}
 }
 
-
 a {
-  text-decoration: none;
+	text-decoration: none;
 }
 
 ul,
 nav {
-  list-style: none;
+	list-style: none;
 }
 .dflex,
 .dflex-align-center,
 .dflex-justify-center {
-  display: flex;
+	display: flex;
 }
 .dflex-align-center {
-  align-items: center;
+	align-items: center;
 }
 
 .dflex-justify-center {
-  justify-content: center;
+	justify-content: center;
 }
 
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
 }
 
-.pointer{
-  cursor: pointer;
+.pointer {
+	cursor: pointer;
 }
 
-.m-auto{
-  margin:auto;
+.m-auto {
+	margin: auto;
 }
 
 .w-100 {
-  width: 100%;
+	width: 100%;
 }
 
-.d-block{
-  display: block;
+.d-block {
+	display: block;
 }
 
 .img-container {
-  position: relative;
+	position: relative;
 }

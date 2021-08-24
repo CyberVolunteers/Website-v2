@@ -10,8 +10,8 @@ import { logger } from "../../server/logger";
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-	name: string
-}
+	name: string;
+};
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
@@ -19,22 +19,28 @@ const handlers: HandlerCollection = {
 
 		if (!signupResult) {
 			logger.info("server.signupUser:Signup failed");
-			return res.status(400).send("This did not seem to work. Can you please double-check that this email is not used?");
+			return res
+				.status(400)
+				.send(
+					"This did not seem to work. Can you please double-check that this email is not used?"
+				);
 		}
 
 		return res.end();
-	}
+	},
 };
 
 export default async function signUp(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
-	await createHandler(handlers,
+	await createHandler(
+		handlers,
 		{
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(users))
-		})(req, res);
+			POST: ajv.compileParser(createAjvJTDSchema(users)),
+		}
+	)(req, res);
 }

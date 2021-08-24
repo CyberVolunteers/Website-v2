@@ -15,11 +15,16 @@ import SimpleForm from "../client/components/SimpleForm";
 import Link from "next/link";
 import { csrfFetch } from "../client/utils/csrf";
 
-export default function Login({ csrfToken, fields }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+export default function Login({
+	csrfToken,
+	fields,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
-	const [overallErrors, setOverallErrors] = useState({} as {
-		[key: string]: string
-	});
+	const [overallErrors, setOverallErrors] = useState(
+		{} as {
+			[key: string]: string;
+		}
+	);
 
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
 		email: [isEmail],
@@ -27,52 +32,71 @@ export default function Login({ csrfToken, fields }: InferGetServerSidePropsType
 
 	fields.password.isPassword = true;
 
-	async function onSubmit(evt: FormEvent<HTMLFormElement>, data: FormFieldCollectionData) {
+	async function onSubmit(
+		evt: FormEvent<HTMLFormElement>,
+		data: FormFieldCollectionData
+	) {
 		const res = await csrfFetch(csrfToken, "/api/login", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
-
 				"content-type": "application/json",
-				"accept": "application/json",
+				accept: "application/json",
 			},
-			body: JSON.stringify(data)
+			body: JSON.stringify(data),
 		});
 
-		if (!await updateOverallErrorsForRequests(res, "loginPost", overallErrors, setOverallErrors)) return;
+		if (
+			!(await updateOverallErrorsForRequests(
+				res,
+				"loginPost",
+				overallErrors,
+				setOverallErrors
+			))
+		)
+			return;
 
 		updateLoginState();
-		router.push(typeof router.query.redirect === "string" ? router.query.redirect : "/searchListings"); // redirect
+		router.push(
+			typeof router.query.redirect === "string"
+				? router.query.redirect
+				: "/searchListings"
+		); // redirect
 	}
 
-	return <div>
-		<Head title="Sign in - cybervolunteers" />
-
-		Hello and welcome to my secure website
-		<br />
-
-		<SimpleForm fields={fields} onSubmit={onSubmit} perElementValidationCallbacks={perElementValidationCallbacks} overallErrors={overallErrors} setOverallErrors={setOverallErrors}>Log in!</SimpleForm>
-
-		<Link href="/signupSelect" passHref>
-			<a>
-				<li>
-					<p>
-						Or sign up
-					</p>
-				</li>
-			</a>
-		</Link>
-	</div>;
+	return (
+		<div>
+			<Head title="Sign in - cybervolunteers" />
+			Hello and welcome to my secure website
+			<br />
+			<SimpleForm
+				fields={fields}
+				onSubmit={onSubmit}
+				perElementValidationCallbacks={perElementValidationCallbacks}
+				overallErrors={overallErrors}
+				setOverallErrors={setOverallErrors}
+			>
+				Log in!
+			</SimpleForm>
+			<Link href="/signupSelect" passHref>
+				<a>
+					<li>
+						<p>Or sign up</p>
+					</li>
+				</a>
+			</Link>
+		</div>
+	);
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	csrfToken: string,
-	fields: Flattened
+	csrfToken: string;
+	fields: Flattened;
 }> = async (context) => {
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			fields: flatten(loginSpec)
+			fields: flatten(loginSpec),
 		}, // will be passed to the page component as props
 	};
 };

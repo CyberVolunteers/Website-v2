@@ -9,7 +9,7 @@ export const orgFieldNamesToShow = {
 	phoneNumber: "Your phone number",
 	websiteUrl: "The web address of your website",
 	password2: "Repeat your password",
-}
+};
 
 export const userFieldNamesToShow = {
 	firstName: "First name",
@@ -23,10 +23,9 @@ export const userFieldNamesToShow = {
 	nationality: "Your nationality",
 	phoneNumber: "Your phone number",
 	password2: "Repeat your password",
-}
+};
 
 export const listingFieldNamesToShow = {
-
 	duration: "How long will your opportunity last?",
 	place: "What is the name of the place?",
 	time: "When will it take place?",
@@ -41,5 +40,4 @@ export const listingFieldNamesToShow = {
 	requestedNumVolunteers: "How many volunteers do you need",
 	minHoursPerWeek: "Minimal hours of volunteering (per week)",
 	maxHoursPerWeek: "Maximum hours of volunteering (per week)",
-
-}
+};

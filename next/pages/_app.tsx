@@ -13,14 +13,16 @@ const { publicRuntimeConfig } = getConfig();
 function MyApp({ Component, pageProps }: AppProps): ReactElement {
 	const router = useRouter();
 
-	const out = <>
-		<Header />
-		<Component {...pageProps} />
-		<Footer />
-	</>;
+	const out = (
+		<>
+			<Header />
+			<Component {...pageProps} />
+			<Footer />
+		</>
+	);
 
 	// don't bother with that if it is not a development server
-	if(!publicRuntimeConfig.IS_DEV) return out;
+	if (!publicRuntimeConfig.IS_DEV) return out;
 
 	if (typeof window !== "undefined") window.wasHeadIncluded = false;
 
@@ -28,7 +30,8 @@ function MyApp({ Component, pageProps }: AppProps): ReactElement {
 	// eslint will say that we are using a hook conditionally, but that only happens depending on whether it is in production or not
 	// eslint-disable-next-line
 	useEffect(() => {
-		if (!window.wasHeadIncluded) throw new Error("Please don't forget about the <Head> tag");
+		if (!window.wasHeadIncluded)
+			throw new Error("Please don't forget about the <Head> tag");
 	}, [router]);
 
 	return out;

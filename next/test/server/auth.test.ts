@@ -1,274 +1,303 @@
-import { hash, verifyHash } from "../../server/auth/password"
-import bcrypt from "bcrypt"
-import { minBcryptRounds } from "../../server/auth/config"
-import { expect } from "chai"
-import { mock, SinonSpy, spy, stub } from "sinon"
-import { seal, unseal } from "../../server/auth/iron"
-import { getSession, updateSession, removeSession } from "../../server/auth/auth-cookie"
-import { NextApiRequest, NextApiResponse } from "next"
-import { parse } from "cookie"
+import { hash, verifyHash } from "../../server/auth/password";
+import bcrypt from "bcrypt";
+import { minBcryptRounds } from "../../server/auth/config";
+import { expect } from "chai";
+import { mock, SinonSpy, spy, stub } from "sinon";
+import { seal, unseal } from "../../server/auth/iron";
+import {
+	getSession,
+	updateSession,
+	removeSession,
+} from "../../server/auth/auth-cookie";
+import { NextApiRequest, NextApiResponse } from "next";
+import { parse } from "cookie";
 import * as dotenv from "dotenv";
-import { cookieMaxAge } from "../../serverAndClient/cookiesConfig"
+import { cookieMaxAge } from "../../serverAndClient/cookiesConfig";
 
-const cookie = require("cookie")
+const cookie = require("cookie");
 
-async function asyncThrows(promise: Promise<any>, promisedError?: string | Error) {
-    let error: any;
-    try {
-        await promise;
-    } catch (e) {
-        error = e;
-    }
-    expect(error, "It must throw").to.not.be.undefined;
-    if (promisedError !== undefined) expect(error, `Expected the error to be '${promisedError}'`).to.equal(promisedError);
+async function asyncThrows(
+	promise: Promise<any>,
+	promisedError?: string | Error
+) {
+	let error: any;
+	try {
+		await promise;
+	} catch (e) {
+		error = e;
+	}
+	expect(error, "It must throw").to.not.be.undefined;
+	if (promisedError !== undefined)
+		expect(error, `Expected the error to be '${promisedError}'`).to.equal(
+			promisedError
+		);
 }
 
 describe("password.ts", function () {
-    describe("#hash()", function () {
-        it("Should return a hash string of length 60", async function () {
-            expect(await hash("test")).to.be.a("string").and.to.have.lengthOf(60)
-        })
+	describe("#hash()", function () {
+		it("Should return a hash string of length 60", async function () {
+			expect(await hash("test"))
+				.to.be.a("string")
+				.and.to.have.lengthOf(60);
+		});
 
-        it("Should have the right rounds value", async function () {
-            const h = await hash("test");
-            const detectedRounds = await bcrypt.getRounds(h);
-            expect(detectedRounds).to.equal(minBcryptRounds);
-        })
-    })
+		it("Should have the right rounds value", async function () {
+			const h = await hash("test");
+			const detectedRounds = await bcrypt.getRounds(h);
+			expect(detectedRounds).to.equal(minBcryptRounds);
+		});
+	});
 
-    describe("#verifyHash()", async function () {
+	describe("#verifyHash()", async function () {
+		it("Should return true when the password is correct and skip calling the updateHash function", async function () {
+			const h = await hash("test");
+			const writeSpy = spy(() => {});
 
-        it("Should return true when the password is correct and skip calling the updateHash function", async function () {
-            const h = await hash("test");
-            const writeSpy = spy(() => { });
+			const comparisonResult = await verifyHash(h, "test", writeSpy);
 
-            const comparisonResult = await verifyHash(h, "test", writeSpy)
+			expect(comparisonResult, "The hash should be classified as correct").to.be
+				.true;
+			expect(writeSpy.notCalled, "The callback should not be called").to.be
+				.true;
+		});
 
-            expect(comparisonResult, "The hash should be classified as correct").to.be.true;
-            expect(writeSpy.notCalled, "The callback should not be called").to.be.true;
-        })
+		it("Should return false when the password is incorrect and skip calling the updateHash function", async function () {
+			const h = await hash("test");
+			const writeSpy = spy(() => {});
 
-        it("Should return false when the password is incorrect and skip calling the updateHash function", async function () {
-            const h = await hash("test");
-            const writeSpy = spy(() => { });
+			const comparisonResult = await verifyHash(h, "not test", writeSpy);
 
-            const comparisonResult = await verifyHash(h, "not test", writeSpy);
+			expect(comparisonResult, "The hash should be classified as incorrect").to
+				.be.false;
+			expect(writeSpy.notCalled, "The callback should not be called").to.be
+				.true;
+		});
 
-            expect(comparisonResult, "The hash should be classified as incorrect").to.be.false;
-            expect(writeSpy.notCalled, "The callback should not be called").to.be.true;
-        })
+		it("Should rehash the password, only if it is correct and has too few rounds", async function () {
+			const writeSpy = spy((value) => {});
 
-        it("Should rehash the password, only if it is correct and has too few rounds", async function () {
+			const h = await bcrypt.hash("test", 4);
+			await verifyHash(h, "test", writeSpy);
 
-            const writeSpy = spy((value) => { });
+			expect(writeSpy.calledOnce, "The value needs to be rehashed").to.be.true;
+			expect(
+				writeSpy.firstCall.firstArg,
+				"The hash needs to still be a hash of the same password"
+			).to.satisfy(async function (newHash: string) {
+				return await bcrypt.compare("test", newHash);
+			});
+			expect(
+				writeSpy.firstCall.firstArg,
+				"The hash needs to have the required rounds value"
+			).to.satisfy(async function (newHash: string) {
+				return (await bcrypt.getRounds(newHash)) === minBcryptRounds;
+			});
 
-            const h = await bcrypt.hash("test", 4);
-            await verifyHash(h, "test", writeSpy);
+			writeSpy.resetHistory();
 
-            expect(writeSpy.calledOnce, "The value needs to be rehashed").to.be.true;
-            expect(writeSpy.firstCall.firstArg, "The hash needs to still be a hash of the same password").to.satisfy(async function (newHash: string) {
-                return await bcrypt.compare("test", newHash)
-            })
-            expect(writeSpy.firstCall.firstArg, "The hash needs to have the required rounds value").to.satisfy(async function (newHash: string) {
-                return await bcrypt.getRounds(newHash) === minBcryptRounds;
-            })
+			await verifyHash(h, "not test", writeSpy);
 
-            writeSpy.resetHistory()
-
-            await verifyHash(h, "not test", writeSpy);
-
-            expect(writeSpy.notCalled, "The value can not be rehashed if the password is wrong").to.be.true;
-        })
-    })
-})
+			expect(
+				writeSpy.notCalled,
+				"The value can not be rehashed if the password is wrong"
+			).to.be.true;
+		});
+	});
+});
 
 describe("iron.ts", function () {
-    describe("#seal(), #unseal()", function () {
-        it("should recover data JSON data as it was", async function () {
-            const input = {
-                test: 4,
-                nested: {
-                    eight: 8
-                },
-                str: "string here"
-            }
-            const result = await seal(input)
-            expect(await unseal(result)).to.be.deep.equal(input);
-        })
+	describe("#seal(), #unseal()", function () {
+		it("should recover data JSON data as it was", async function () {
+			const input = {
+				test: 4,
+				nested: {
+					eight: 8,
+				},
+				str: "string here",
+			};
+			const result = await seal(input);
+			expect(await unseal(result)).to.be.deep.equal(input);
+		});
 
-        it("should recover data string data as it was", async function () {
-            const input = "test test";
-            const result = await seal(input)
-            expect(await unseal(result)).to.equal(input);
-        })
+		it("should recover data string data as it was", async function () {
+			const input = "test test";
+			const result = await seal(input);
+			expect(await unseal(result)).to.equal(input);
+		});
 
-        describe("without a proper key: ", function () {
+		describe("without a proper key: ", function () {
+			// reset the variables
+			this.afterAll(() =>
+				dotenv.config({
+					path: "./.env.local",
+				})
+			);
 
-            // reset the variables
-            this.afterAll(() => dotenv.config({
-                path: "./.env.local"
-            }))
-
-            it("should throw if the key is not defined or is invalid", async function () {
-                delete process.env.IRON_KEY;
-                const input = "test test";
-                asyncThrows(seal(input), "Iron key is undefined")
-                asyncThrows(unseal(input), "Iron key is undefined");
-            })
-        })
-    })
-})
+			it("should throw if the key is not defined or is invalid", async function () {
+				delete process.env.IRON_KEY;
+				const input = "test test";
+				asyncThrows(seal(input), "Iron key is undefined");
+				asyncThrows(unseal(input), "Iron key is undefined");
+			});
+		});
+	});
+});
 
 describe("auth-cookies.ts", function () {
-    describe("#getSession()", function () {
+	describe("#getSession()", function () {
+		it("should return null when there are no cookies available", async function () {
+			expect(await getSession({} as NextApiRequest)).to.equal(null);
+		});
 
-        it("should return null when there are no cookies available", async function () {
+		it("should return null when the data can not be unsealed", async function () {
+			expect(
+				await getSession({
+					cookies: {
+						session: "can not be parsed",
+					},
+				} as unknown as NextApiRequest)
+			).to.equal(null);
+		});
 
-            expect(await getSession({} as NextApiRequest)).to.equal(null);
-        })
+		it("should return the unsealed data when it can be unsealed", async function () {
+			const dataToSeal = "this data can be parsed";
 
-        it("should return null when the data can not be unsealed", async function () {
+			expect(
+				await getSession({
+					cookies: {
+						session: await seal(dataToSeal),
+					},
+				} as unknown as NextApiRequest)
+			).to.equal(dataToSeal);
+		});
+	});
 
-            expect(await getSession({
-                cookies: {
-                    session: "can not be parsed"
-                }
-            } as unknown as NextApiRequest)).to.equal(null);
-        })
+	describe("#refreshSession(), #createSession()", function () {
+		const resStub = {
+			setHeader: (name: string, data: any) => {},
+		} as NextApiResponse;
+		let resSpy: SinonSpy;
 
-        it("should return the unsealed data when it can be unsealed", async function () {
-            const dataToSeal = "this data can be parsed";
+		this.beforeEach(function () {
+			resSpy = spy(resStub, "setHeader");
+		});
 
-            expect(await getSession({
-                cookies: {
-                    session: await seal(dataToSeal)
-                }
-            } as unknown as NextApiRequest)).to.equal(dataToSeal);
-        })
-    })
+		this.afterEach(function () {
+			resSpy.restore();
+		});
 
-    describe("#refreshSession(), #createSession()", function () {
+		it("should set two cookies", async function () {
+			await setSession(resStub, "data");
 
-        const resStub = {
-            setHeader: (name: string, data: any) => { }
-        } as NextApiResponse;
-        let resSpy: SinonSpy;
+			expect(resSpy.called, "the callback must have been called").to.be.true;
+			expect(resSpy.args[0].length, "it needs to set two cookies").to.equal(2);
+			const args = resSpy.args;
+		});
 
-        this.beforeEach(function () {
-            resSpy = spy(resStub, "setHeader");
-        })
+		it("should have correct cookie data", async function () {
+			const dataToSeal = "some data";
+			await setSession(resStub, dataToSeal);
 
-        this.afterEach(function () {
-            resSpy.restore()
-        })
+			const cookieData = resSpy.args[0][1];
+			const cookie1 = parse(cookieData[0]);
+			const cookie2 = parse(cookieData[1]);
 
-        it("should set two cookies", async function () {
+			expect(
+				await unseal(cookie1.session),
+				"the data should be preserved"
+			).to.be.equal(dataToSeal);
+			expect(
+				cookie2.isSessionActive,
+				"the session should be set to active"
+			).to.be.equal("true");
+		});
 
-            await setSession(resStub, "data");
+		it("should set correct cookie options", async function () {
+			const serialiseSpy = spy(cookie, "serialize");
 
+			await setSession(resStub, "some data");
 
-            expect(resSpy.called, "the callback must have been called").to.be.true;
-            expect(resSpy.args[0].length, "it needs to set two cookies").to.equal(2);
-            const args = resSpy.args
-        })
+			expect(serialiseSpy.calledTwice, "the cookie needs to be set twice").to.be
+				.true;
 
-        it("should have correct cookie data", async function () {
-            const dataToSeal = "some data"
-            await setSession(resStub, dataToSeal);
+			const cookie1 = serialiseSpy.args[0][2];
+			const cookie2 = serialiseSpy.args[1][2];
 
-            const cookieData = resSpy.args[0][1];
-            const cookie1 = parse(cookieData[0]);
-            const cookie2 = parse(cookieData[1]);
+			expect(cookie1).to.deep.equal({
+				maxAge: cookieMaxAge,
+				httpOnly: true,
+				sameSite: "strict",
+				secure: true,
+				path: "/",
+			});
 
-            expect(await unseal(cookie1.session), "the data should be preserved").to.be.equal(dataToSeal);
-            expect(cookie2.isSessionActive, "the session should be set to active").to.be.equal("true");
-        })
+			expect(cookie2).to.deep.equal({
+				maxAge: cookieMaxAge,
+				sameSite: "strict",
+				secure: true,
+				path: "/",
+			});
 
-        it("should set correct cookie options", async function () {
-            const serialiseSpy = spy(cookie, "serialize");
+			serialiseSpy.restore();
+		});
+	});
 
-            await setSession(resStub, "some data");
+	describe("#removeSession()", function () {
+		const resStub = {
+			setHeader: (name: string, data: any) => {},
+		} as NextApiResponse;
+		let resSpy: SinonSpy;
 
-            expect(serialiseSpy.calledTwice, "the cookie needs to be set twice").to.be.true;
+		this.beforeEach(function () {
+			resSpy = spy(resStub, "setHeader");
+		});
 
-            const cookie1 = serialiseSpy.args[0][2];
-            const cookie2 = serialiseSpy.args[1][2];
+		this.afterEach(function () {
+			resSpy.restore();
+		});
 
-            expect(cookie1).to.deep.equal({
-                maxAge: cookieMaxAge,
-                httpOnly: true,
-                sameSite: "strict",
-                secure: true,
-                path: "/"
-            })
+		it("should set two cookies", async function () {
+			await removeSession(resStub);
 
-            expect(cookie2).to.deep.equal({
-                maxAge: cookieMaxAge,
-                sameSite: "strict",
-                secure: true,
-                path: "/"
-            })
+			expect(resSpy.called, "the callback must have been called").to.be.true;
+			expect(resSpy.args[0].length, "it needs to set two cookies").to.equal(2);
+			const args = resSpy.args;
+		});
 
-            serialiseSpy.restore()
-        })
-    })
+		it("should have empty cookie data", async function () {
+			await removeSession(resStub);
 
-    describe("#removeSession()", function () {
+			const cookieData = resSpy.args[0][1];
+			const cookie1 = parse(cookieData[0]);
+			const cookie2 = parse(cookieData[1]);
 
-        const resStub = {
-            setHeader: (name: string, data: any) => { }
-        } as NextApiResponse;
-        let resSpy: SinonSpy;
+			expect(cookie1.session, "the data should be empty").to.be.equal("");
+			expect(cookie2.isSessionActive, "the data should be empty").to.be.equal(
+				""
+			);
+		});
 
-        this.beforeEach(function () {
-            resSpy = spy(resStub, "setHeader");
-        })
+		it("should set correct cookie options", async function () {
+			const serialiseSpy = spy(cookie, "serialize");
 
-        this.afterEach(function () {
-            resSpy.restore()
-        })
+			await removeSession(resStub);
 
-        it("should set two cookies", async function () {
+			expect(serialiseSpy.calledTwice, "the cookie needs to be set twice").to.be
+				.true;
 
-            await removeSession(resStub);
+			const cookie1 = serialiseSpy.args[0][2];
+			const cookie2 = serialiseSpy.args[1][2];
 
+			const targetValues = {
+				maxAge: -1,
+				path: "/",
+			};
 
-            expect(resSpy.called, "the callback must have been called").to.be.true;
-            expect(resSpy.args[0].length, "it needs to set two cookies").to.equal(2);
-            const args = resSpy.args
-        })
+			expect(cookie1).to.deep.equal(targetValues);
 
-        it("should have empty cookie data", async function () {
-            await removeSession(resStub);
+			expect(cookie2).to.deep.equal(targetValues);
 
-            const cookieData = resSpy.args[0][1];
-            const cookie1 = parse(cookieData[0]);
-            const cookie2 = parse(cookieData[1]);
-
-            expect(cookie1.session, "the data should be empty").to.be.equal("");
-            expect(cookie2.isSessionActive, "the data should be empty").to.be.equal("");
-        })
-
-        it("should set correct cookie options", async function () {
-            const serialiseSpy = spy(cookie, "serialize");
-
-            await removeSession(resStub);
-
-            expect(serialiseSpy.calledTwice, "the cookie needs to be set twice").to.be.true;
-
-            const cookie1 = serialiseSpy.args[0][2];
-            const cookie2 = serialiseSpy.args[1][2];
-
-            const targetValues = {
-                maxAge: -1,
-                path: "/"
-            }
-
-            expect(cookie1).to.deep.equal(targetValues)
-
-            expect(cookie2).to.deep.equal(targetValues)
-
-            serialiseSpy.restore()
-        })
-    })
-})
+			serialiseSpy.restore();
+		});
+	});
+});

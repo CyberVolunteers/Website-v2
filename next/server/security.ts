@@ -7,7 +7,7 @@ function trimDollarSigns(val: string): string {
 
 export function sanitizeForMongo<T>(val: T): T {
 	if (typeof val !== "object" || val === null) return val;
-	const out: any = (val instanceof Array) ? [] : {};
+	const out: any = val instanceof Array ? [] : {};
 	Object.entries(val).forEach(([k, entry]) => {
 		out[trimDollarSigns(k)] = sanitizeForMongo(entry);
 	});

@@ -10,49 +10,53 @@ import { isLoggedIn } from "../../server/auth/data";
 export * from "../../server/defaultEndpointConfig";
 
 type Data = {
-	name: string
-}
+	name: string;
+};
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		const {level, path, message} = req.body
+		const { level, path, message } = req.body;
 		const userInfo = isLoggedIn(session) ? session._id : "Logged out user";
 
 		logger.log(level, `client.${path}:${message}; User: ${userInfo}`);
 
 		return res.end();
-	}
+	},
 };
 
 export default async function loggerRequest(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
-	await createHandler(handlers,
+	await createHandler(
+		handlers,
 		{
 			useCsrf: false,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema({
-				required: {
-					string: {
-						level: {
-							enum: [
-								"error",
-								"warn",
-								"info",
-								"http",
-								"verbose",
-								"debug",
-								"silly"
-							]
+			POST: ajv.compileParser(
+				createAjvJTDSchema({
+					required: {
+						string: {
+							level: {
+								enum: [
+									"error",
+									"warn",
+									"info",
+									"http",
+									"verbose",
+									"debug",
+									"silly",
+								],
+							},
+							path: {},
+							message: {},
 						},
-						path: {},
-						message: {}
-					}
-				}
-			}))
-		})(req, res);
+					},
+				})
+			),
+		}
+	)(req, res);
 }
