@@ -18,6 +18,8 @@ import { flatten, Flattened } from "combined-validator";
 import {
 	orgDataUpdateSpec,
 	userDataUpdateSpec,
+	users,
+	organisations,
 } from "../serverAndClient/publicFieldConstants";
 import React from "react";
 import EditableField from "../client/components/EditableField";
@@ -32,6 +34,7 @@ export default function MyAccount({
 	editableFields,
 	fieldNames,
 	csrfToken,
+	allFields,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org", "user"]);
 
@@ -90,7 +93,8 @@ export default function MyAccount({
 			<p>Hello and welcome to my secure website</p>
 
 			{/* Render common stuff normally */}
-			{Object.entries(fields ?? {}).map(([k, v]) => {
+			{Object.entries(allFields ?? {}).map(([k, fieldDescription]) => {
+				const v = k in fields ? fields[k] : "<not specified>";
 				return (
 					<EditableField
 						key={k}
@@ -148,21 +152,25 @@ export default function MyAccount({
 			</Link>
 		</div>
 	);
+
+	// TODO: a button to change the password
 }
 
-type AccountDataType = null | {
+type AccountDataType = {
 	[key: string]: any;
 };
 
 export const getServerSideProps: GetServerSideProps<{
 	accountData: AccountDataType;
 	editableFields: Flattened;
+	allFields: Flattened;
 	fieldNames: { [key: string]: string };
 	csrfToken: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	let fields: AccountDataType = null;
+	let fields: AccountDataType = {};
 	let editableFields: Flattened = {};
+	let allFields: Flattened = {};
 	let fieldNames: { [key: string]: string } = {};
 	if (isLoggedIn(session)) {
 		const isRequestByAnOrg = isOrg(session);
@@ -171,6 +179,10 @@ export const getServerSideProps: GetServerSideProps<{
 		editableFields = isRequestByAnOrg
 			? flatten(orgDataUpdateSpec)
 			: flatten(userDataUpdateSpec);
+
+		allFields = isRequestByAnOrg ? flatten(organisations) : flatten(users);
+
+		delete allFields.password;
 
 		const fieldKeys = Object.keys(fieldNames).filter((k) => k in session); // only show the keys that have been specified
 		fields = Object.fromEntries(fieldKeys.map((k) => [k, session[k]])); // translate them
@@ -181,6 +193,7 @@ export const getServerSideProps: GetServerSideProps<{
 			accountData: fields,
 			editableFields,
 			fieldNames,
+			allFields,
 			csrfToken: await updateCsrf(context),
 		}, // will be passed to the page component as props
 	};

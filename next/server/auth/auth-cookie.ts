@@ -11,6 +11,7 @@ import { deepAssign, flatten } from "combined-validator";
 import { ExtendedNextApiRequest, ExtendedNextApiResponse } from "../types";
 import { logger } from "../logger";
 import { users } from "../../serverAndClient/publicFieldConstants";
+import { isLoggedIn } from "./data";
 
 const sessionCookieOptions: CookieSerializeOptions = {
 	maxAge: cookieMaxAge,
@@ -82,6 +83,8 @@ export async function updateSession(
 	const newData = data === undefined ? session : deepAssign(session, data);
 	const newCsrf = csrf === undefined ? oldCsrf : deepAssign(oldCsrf, csrf);
 
+	if(newData._doc !== undefined) logger.error("server.auth-cookie:There is an error with _doc being sent to the cookie wrapper")
+
 	await setSession(res, newData, newCsrf);
 	req.session = newData;
 }
@@ -102,7 +105,7 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
 		(v) => !Object.keys(data).includes(v) && !["password"].includes(v)
 	);
 
-	if (!isOrg) {
+	if (!isOrg && isLoggedIn(data)) {
 		publicData.missingFields = missingFieldNames;
 		data.missingFields = missingFieldNames;
 	}
