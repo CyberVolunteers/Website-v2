@@ -1,2 +1,2 @@
 # nextjs
-sudo docker build -f ./next/Dockerfile ../../next/ -t next-prod
+docker build -f ./next/Dockerfile ../../next/ -t next-prod
