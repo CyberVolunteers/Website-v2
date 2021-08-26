@@ -42,6 +42,7 @@ export default function EmailConfirmationEmailSent({
 			: <>
 			<h1>Something went wrong when verifying your email.</h1>
 			<h3>It is possible that this is because the link you used is too old. Please try again</h3>
+			<h3>For your security, only the last sent email is valid</h3>
 			</>
 			} 
 

@@ -4,7 +4,11 @@ import {
 	useIsAfterRehydration,
 	useViewProtection,
 } from "../client/utils/otherHooks";
-import { getAccountInfo, useViewerType } from "../client/utils/userState";
+import {
+	getAccountInfo,
+	updateLoginState,
+	useViewerType,
+} from "../client/utils/userState";
 import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
@@ -29,6 +33,49 @@ import { csrfFetch } from "../client/utils/csrf";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { CircularProgress } from "@material-ui/core";
 
+export function createEmailChangingFunction(
+	overallErrors: { [key: string]: any },
+	setOverallErrors: React.Dispatch<
+		React.SetStateAction<{
+			[key: string]: any;
+		}>
+	>,
+	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+	csrfToken: string
+) {
+	return async function (name: string, value: any) {
+		setIsLoading(true);
+
+		const res = await csrfFetch(csrfToken, "/api/changeEmail", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({ email: value }),
+		});
+
+		if (
+			!(await updateOverallErrorsForRequests(
+				res,
+				"changeEmail",
+				overallErrors,
+				setOverallErrors
+			))
+		)
+			return setIsLoading(false);
+
+		setIsLoading(false);
+
+		// refresh login status
+		updateLoginState();
+
+		// refresh the page
+		history.go(0);
+	};
+}
+
 export default function MyAccount({
 	accountData: initAccountData,
 	editableFields,
@@ -43,6 +90,13 @@ export default function MyAccount({
 
 	const [overallErrors, setOverallErrors] = useState(
 		{} as { [key: string]: any }
+	);
+
+	const changeEmail = createEmailChangingFunction(
+		overallErrors,
+		setOverallErrors,
+		setIsLoading,
+		csrfToken
 	);
 
 	const isOrg = getAccountInfo()?.isOrg;
@@ -106,7 +160,7 @@ export default function MyAccount({
 						value={v}
 						presentableNames={fieldNames}
 						editableFields={editableFields}
-						sendEditRequest={sendEditRequest}
+						sendEditRequest={k === "email" ? changeEmail : sendEditRequest} //TODO: a popup saying that it will force you to re-confirm the email
 						perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
 							overallErrors,
 							setOverallErrors

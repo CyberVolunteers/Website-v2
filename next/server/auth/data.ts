@@ -131,6 +131,34 @@ async function updateData(
 	return doc;
 }
 
+export async function changeEmail(oldEmail: string, newEmail: string) {
+	//TODO: maybe extract this into a function?
+	// find instead of findOne to keep the time roughly constant relative to when there are no results
+	const [users, organisations] = await Promise.all([
+		User.find({ email: oldEmail }),
+		Org.find({ email: oldEmail }),
+	]);
+
+	// no such email
+	if (users.length === 0 && organisations.length === 0) return null;
+
+	const doesEmailBelongToUser = users.length !== 0;
+
+	const model = doesEmailBelongToUser ? User : Org;
+
+	return await model.findOneAndUpdate(
+		{ email: oldEmail },
+		{
+			email: newEmail,
+			isEmailVerified: false,
+		},
+		{
+			new: true,
+			upsert: false, // do not create a new one
+		}
+	);
+}
+
 export async function addUserToListing(userId: string, listingUuid: string) {
 	const out = await Listing.findOneAndUpdate(
 		{

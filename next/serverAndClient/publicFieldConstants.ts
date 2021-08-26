@@ -147,7 +147,6 @@ export const userDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
 	JSON.stringify(users)
 );
 // NOTE: deleting some fields
-delete userDataUpdateSpec.required?.string?.email;
 delete userDataUpdateSpec.required?.string?.password;
 // Make all optional
 userDataUpdateSpec.optional = deepAssign(
@@ -162,7 +161,6 @@ export const orgDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
 	JSON.stringify(organisations)
 );
 // NOTE: deleting some fields
-delete orgDataUpdateSpec.required?.string?.email;
 delete orgDataUpdateSpec.required?.string?.password;
 // Make all optional
 orgDataUpdateSpec.optional = deepAssign(
