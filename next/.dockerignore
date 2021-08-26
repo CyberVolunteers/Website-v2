@@ -5,6 +5,9 @@
 /.pnp
 .pnp.js
 
+/.next
+/cache
+/.nyc_output
 
 # production
 /build

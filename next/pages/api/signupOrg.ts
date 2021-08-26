@@ -6,6 +6,8 @@ import { organisations } from "../../serverAndClient/publicFieldConstants";
 import { signupOrg } from "../../server/auth/data";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
+import { sendEmail } from "../../server/email/nodemailer";
+import { notificationsEmail } from "../../serverAndClient/staticDetails";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -25,6 +27,14 @@ const handlers: HandlerCollection = {
 					"This did not seem to work. Can you please double-check that this email is not used?"
 				);
 		}
+
+		// send a notification
+		// can be done out-of-sync, so no await here
+		sendEmail({
+			to: notificationsEmail,
+			subject: "<Notification> A charity just signed up",
+			text: `The charity is called "${req.body.orgName}", its email is "${req.body.email}" and it needs to be verified`,
+		});
 
 		return res.end();
 	},
