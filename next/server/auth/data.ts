@@ -29,7 +29,7 @@ export async function login({
 		  };
 
 	logger.info(
-		"server.auth.session:Login db retrieval success: %s",
+		"server.auth.session:Login credentials found in the db: %s",
 		emailWasFound
 	);
 
@@ -101,27 +101,27 @@ export async function updateUserData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, {email}, User);
+	return await updateData(data, { email }, User);
 }
 
 export async function updateOrgData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, {email}, Org);
+	return await updateData(data, { email }, Org);
 }
 
 export async function updateListingData(
 	data: any,
 	orgId: string,
-	uuid: string,
+	uuid: string
 ): Promise<{ [key: string]: any } | null> {
 	return await updateData(data, { organisation: orgId, uuid }, Listing);
 }
 
 async function updateData(
 	data: any,
-	constraints: {[key: string]: any},
+	constraints: { [key: string]: any },
 	model: typeof User | typeof Org | typeof Listing
 ): Promise<{ [key: string]: any } | null> {
 	let doc = await model.findOneAndUpdate(constraints, data, {
@@ -153,8 +153,40 @@ export async function addUserToListing(userId: string, listingUuid: string) {
 	return out;
 }
 
+export async function setEmailAsVerified(email: string) {
+	// find instead of findOne to keep the time roughly constant relative to when there are no results
+	const [users, organisations] = await Promise.all([
+		User.find({ email }),
+		Org.find({ email }),
+	]);
+
+	// no such email
+	if (users.length === 0 && organisations.length === 0) return null;
+
+	const doesEmailBelongToUser = users.length !== 0;
+
+	const model = doesEmailBelongToUser ? User : Org;
+
+	return await model.findOneAndUpdate(
+		{ email },
+		{ isEmailVerified: true },
+		{
+			new: true,
+			upsert: false, // do not create a new one
+		}
+	);
+}
+
 export function isLoggedIn(session: any) {
 	return typeof session?.email === "string";
+}
+
+export function isVerified(session: any) {
+	return (
+		isLoggedIn(session) &&
+		session?.isEmailVerified === true &&
+		(session?.isOrg === false || session?.isOrganisationVerified == true)
+	);
 }
 
 export function isOrg(session: any) {

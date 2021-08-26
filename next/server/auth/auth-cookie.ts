@@ -128,7 +128,6 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
 		);
 
 	logger.info("server.auth.auth-cookie:Setting session");
-
 	res.setHeader("Set-Cookie", cookies);
 }
 

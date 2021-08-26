@@ -32,7 +32,6 @@ const handlers: HandlerCollection = {
 			return res.status(400).send("You need to be a charity to do this");
 
 		const orgId = session._id;
-		console.log(orgId)
 
 		const newDoc = await updateListingData(req.body, orgId, req.body.uuid);
 
