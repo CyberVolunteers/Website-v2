@@ -60,10 +60,10 @@ export function createHandler(
 				bodyParsers as { [key: string]: JTDParser | undefined }
 			)?.[method];
 			const queryFieldRules = (
-				queryRequiredFields as {
+				(queryRequiredFields ?? {}) as {
 					[key: string]: FieldConstraintsCollection | undefined;
 				}
-			)?.[method];
+			)[method];
 			await sanitize(req, res, bodyParser, queryFieldRules, options);
 			// if sanitizing already sent a response
 			if (res.headersSent) return;
