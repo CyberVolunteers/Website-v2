@@ -95,14 +95,14 @@ export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	const email = session?.email; //TODO: replace the email
+	const email = session?.email;
 	if (typeof email === "string" && isLoggedIn(session) && !isVerified(session))
 		sendEmailConfirmationEmail(email);
 
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			email,
+			email: email ?? null, // so that it can be serialized
 		}, // will be passed to the page component as props
 	};
 };

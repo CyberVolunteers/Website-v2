@@ -11,6 +11,7 @@ export async function sendEmailConfirmationEmail(email: string) {
 				html: `<h1>Please register:</h1> <p><a href="${link}">go</a> </p> <p> or if that does not work, visit this link: ${link}`,
 			};
 		},
+		"emailConfirmUUID",
 		{
 			subject: "Please verify your email.",
 		}

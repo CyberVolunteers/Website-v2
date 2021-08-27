@@ -131,12 +131,11 @@ async function updateData(
 	return doc;
 }
 
-export async function changeEmail(oldEmail: string, newEmail: string) {
-	//TODO: maybe extract this into a function?
+async function changeByEmail(email: string, newData: { [key: string]: any }) {
 	// find instead of findOne to keep the time roughly constant relative to when there are no results
 	const [users, organisations] = await Promise.all([
-		User.find({ email: oldEmail }),
-		Org.find({ email: oldEmail }),
+		User.find({ email }),
+		Org.find({ email }),
 	]);
 
 	// no such email
@@ -146,17 +145,30 @@ export async function changeEmail(oldEmail: string, newEmail: string) {
 
 	const model = doesEmailBelongToUser ? User : Org;
 
-	return await model.findOneAndUpdate(
-		{ email: oldEmail },
-		{
-			email: newEmail,
-			isEmailVerified: false,
-		},
-		{
-			new: true,
-			upsert: false, // do not create a new one
-		}
-	);
+	return await model.findOneAndUpdate({ email }, newData, {
+		new: true,
+		upsert: false, // do not create a new one
+	});
+}
+
+export async function changeEmail(oldEmail: string, newEmail: string) {
+	return await changeByEmail(oldEmail, {
+		email: newEmail,
+		isEmailVerified: false,
+	});
+}
+
+export async function setEmailAsVerified(email: string) {
+	return await changeByEmail(email, {
+		isEmailVerified: true,
+	});
+}
+
+export async function setPassword(email: string, password: string){
+	const passwordHash = await hash(password);
+	return await changeByEmail(email, {
+		passwordHash,
+	});
 }
 
 export async function addUserToListing(userId: string, listingUuid: string) {
@@ -179,30 +191,6 @@ export async function addUserToListing(userId: string, listingUuid: string) {
 	);
 
 	return out;
-}
-
-export async function setEmailAsVerified(email: string) {
-	// find instead of findOne to keep the time roughly constant relative to when there are no results
-	const [users, organisations] = await Promise.all([
-		User.find({ email }),
-		Org.find({ email }),
-	]);
-
-	// no such email
-	if (users.length === 0 && organisations.length === 0) return null;
-
-	const doesEmailBelongToUser = users.length !== 0;
-
-	const model = doesEmailBelongToUser ? User : Org;
-
-	return await model.findOneAndUpdate(
-		{ email },
-		{ isEmailVerified: true },
-		{
-			new: true,
-			upsert: false, // do not create a new one
-		}
-	);
 }
 
 export function isLoggedIn(session: any) {

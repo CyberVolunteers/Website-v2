@@ -203,6 +203,11 @@ export default function MyAccount({
 
 			{/* Etc */}
 
+			<Link href="/changePassword" passHref>
+				<a>
+					<p>Change my password</p>
+				</a>
+			</Link>
 			<Link href="/logout" passHref>
 				<a>
 					<p>Log out</p>

@@ -1,4 +1,8 @@
-import { flatten, Flattened } from "combined-validator";
+import {
+	FieldConstraintsCollection,
+	flatten,
+	Flattened,
+} from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { FormEvent, ReactElement } from "react";
@@ -14,11 +18,15 @@ import { PerElementValidatorCallbacks } from "../client/components/FormComponent
 import SimpleForm from "../client/components/SimpleForm";
 import Link from "next/link";
 import { csrfFetch } from "../client/utils/csrf";
+import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
+import { userFieldNamesToShow } from "../serverAndClient/displayNames";
+import { useViewProtection } from "../client/utils/otherHooks";
 
-export default function Login({
+export default function ChangePassword({
 	csrfToken,
-	fields,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
+	
 	const router = useRouter();
 	const [overallErrors, setOverallErrors] = useState(
 		{} as {
@@ -26,17 +34,26 @@ export default function Login({
 		}
 	);
 
-	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
-		email: [isEmail],
-	};
+	const perElementValidationCallbacks: PerElementValidatorCallbacks =
+		getSignupPerElementValidationCallbacks(overallErrors, setOverallErrors);
 
-	fields.password.isPassword = true;
+	const fields = flatten({
+		required: {
+			string: {
+				oldPassword: { isPassword: true },
+				password: { isPassword: true },
+				password2: { isPassword: true },
+			},
+		},
+	} as FieldConstraintsCollection);
 
 	async function onSubmit(
 		evt: FormEvent<HTMLFormElement>,
 		data: FormFieldCollectionData
 	) {
-		const res = await csrfFetch(csrfToken, "/api/login", {
+		delete data.password2;
+
+		const res = await csrfFetch(csrfToken, "/api/passResetOldPassKnown", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
@@ -49,42 +66,36 @@ export default function Login({
 		if (
 			!(await updateOverallErrorsForRequests(
 				res,
-				"loginPost",
+				"changePasswordPost",
 				overallErrors,
 				setOverallErrors
 			))
 		)
 			return;
 
+		// log them out
 		updateLoginState();
-		router.push(
-			typeof router.query.redirect === "string"
-				? router.query.redirect
-				: "/searchListings"
-		); // redirect
+		router.push("login"); // redirect
 	}
 
 	return (
 		<div>
-			<Head title="Sign in - cybervolunteers" />
+			<Head title="Forgot password - cybervolunteers" />
 			Hello and welcome to my secure website
 			<br />
 			<SimpleForm
 				fields={fields}
 				onSubmit={onSubmit}
+				presentableNames={userFieldNamesToShow}
 				perElementValidationCallbacks={perElementValidationCallbacks}
 				overallErrors={overallErrors}
 				setOverallErrors={setOverallErrors}
+				onChange={(name: string, newVal: any, root: any) => {
+					if (name === "password") root?.getChild("password2")?.validate?.();
+				}}
 			>
-				Log in!
+				Change my password!
 			</SimpleForm>
-			<Link href="/signupSelect" passHref>
-				<a>
-					<li>
-						<p>Or sign up</p>
-					</li>
-				</a>
-			</Link>
 			<Link href="/forgotPassword" passHref>
 				<a>
 					<li>
@@ -98,12 +109,10 @@ export default function Login({
 
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
-	fields: Flattened;
 }> = async (context) => {
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			fields: flatten(loginSpec),
 		}, // will be passed to the page component as props
 	};
 };

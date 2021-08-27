@@ -1,11 +1,12 @@
 import Mail from "nodemailer/lib/mailer";
 import { v4 as uuidv4 } from "uuid";
 import { sendEmail } from "./nodemailer";
-import { addTempKey } from "./redis";
+import { addTempKey, RedisStores } from "./redis";
 
 export async function sendEmailWithUUID(
 	email: string,
 	getProps: (uuid: string) => {html: string, text: string},
+	store: RedisStores,
 	data?: Mail.Options
 ) {
 	const uuid = uuidv4();
@@ -17,6 +18,5 @@ export async function sendEmailWithUUID(
 		html: html,
 		...(data ?? {}),
 	});
-	//TODO: uncomment the thing above
-	await addTempKey(email, uuid, "emailConfirmUUID");
+	await addTempKey(email, uuid, store);
 }

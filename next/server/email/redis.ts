@@ -7,7 +7,7 @@ const client = redis.createClient(6379, "redis");
 export type RedisStores = "emailConfirmUUID" | "passwordResetUUID";
 
 export async function addTempKey(k: string, v: string, store: RedisStores) {
-	await hset(k, v, store);
+	await hset(k, v, store,);
 	await expire(k, store);
 }
 

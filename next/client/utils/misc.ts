@@ -11,7 +11,7 @@ export function undoCamelCase(s: string) {
 
 async function createErrorMessage(resStatus: number, resContents: string) {
 	// it is a separate function to account for a possible improvement
-	return capitalize(`${resStatus >= 500 ? "server" : ""}error: ${resContents}`);
+	return capitalize(`${resStatus >= 500 ? "server " : ""}error: ${resContents}`);
 }
 
 export async function updateOverallErrorsForRequests(

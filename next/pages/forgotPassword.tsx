@@ -1,4 +1,8 @@
-import { flatten, Flattened } from "combined-validator";
+import {
+	FieldConstraintsCollection,
+	flatten,
+	Flattened,
+} from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { FormEvent, ReactElement } from "react";
@@ -14,10 +18,11 @@ import { PerElementValidatorCallbacks } from "../client/components/FormComponent
 import SimpleForm from "../client/components/SimpleForm";
 import Link from "next/link";
 import { csrfFetch } from "../client/utils/csrf";
+import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
+import { userFieldNamesToShow } from "../serverAndClient/displayNames";
 
-export default function Login({
+export default function forgotPassword({
 	csrfToken,
-	fields,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
 	const [overallErrors, setOverallErrors] = useState(
@@ -26,17 +31,26 @@ export default function Login({
 		}
 	);
 
+	const [showEmailSentMessage, setShowEmailSentMessage] = useState(false);
+
 	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
-		email: [isEmail],
+		email: (v: string) => isEmail(v),
 	};
 
-	fields.password.isPassword = true;
+	const fields = flatten({
+		required: {
+			string: {
+				email: { isEmail: true },
+			},
+		},
+	} as FieldConstraintsCollection);
 
 	async function onSubmit(
 		evt: FormEvent<HTMLFormElement>,
 		data: FormFieldCollectionData
 	) {
-		const res = await csrfFetch(csrfToken, "/api/login", {
+		setShowEmailSentMessage(false);
+		const res = await csrfFetch(csrfToken, "/api/forgotPassword", {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
 			headers: {
@@ -49,61 +63,45 @@ export default function Login({
 		if (
 			!(await updateOverallErrorsForRequests(
 				res,
-				"loginPost",
+				"forgotPasswordPost",
 				overallErrors,
 				setOverallErrors
 			))
 		)
 			return;
 
-		updateLoginState();
-		router.push(
-			typeof router.query.redirect === "string"
-				? router.query.redirect
-				: "/searchListings"
-		); // redirect
+		setShowEmailSentMessage(true);
 	}
 
 	return (
 		<div>
-			<Head title="Sign in - cybervolunteers" />
+			<Head title="Forgot my password - cybervolunteers" />
 			Hello and welcome to my secure website
 			<br />
 			<SimpleForm
 				fields={fields}
 				onSubmit={onSubmit}
+				presentableNames={userFieldNamesToShow}
 				perElementValidationCallbacks={perElementValidationCallbacks}
 				overallErrors={overallErrors}
 				setOverallErrors={setOverallErrors}
+				onChange={() => setShowEmailSentMessage(false)}
 			>
-				Log in!
+				Send an email to reset the password to this email address
 			</SimpleForm>
-			<Link href="/signupSelect" passHref>
-				<a>
-					<li>
-						<p>Or sign up</p>
-					</li>
-				</a>
-			</Link>
-			<Link href="/forgotPassword" passHref>
-				<a>
-					<li>
-						<p>I forgot my password</p>
-					</li>
-				</a>
-			</Link>
+			{showEmailSentMessage ? (
+				<p>An email has been sent to that address</p>
+			) : null}
 		</div>
 	);
 }
 
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
-	fields: Flattened;
 }> = async (context) => {
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			fields: flatten(loginSpec),
 		}, // will be passed to the page component as props
 	};
 };
