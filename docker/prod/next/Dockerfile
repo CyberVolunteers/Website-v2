@@ -14,16 +14,10 @@ RUN chmod +x /wait
 # for sharp
 RUN apk add python build-base
 # RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
-<<<<<<< HEAD
-run apk add python
-run apk add build-base
-RUN npm i --unsafe-perm
-=======
 
 USER node:node
 
 RUN npm i
->>>>>>> f3179f45699f2f5dc62df44fff4bba48bede177f
 RUN npx next telemetry disable
 RUN npm run build
 

@@ -33,11 +33,12 @@ services:
       - mongo_root_user
       - mongo_root_pass
 
-  redis-dev:
+  redis-prod:
     image: "redis:6.2.5-alpine"
 
   nginx-prod: 
     image: nginx:latest
+    restart: always
     volumes:
       - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt/:/etc/letsencrypt/
