@@ -16,7 +16,7 @@ services:
 
     links:
       - "mongo-prod:db"
-      - "redis-dev:redis"
+      - "redis-prod:redis"
 
   mongo-prod:
     image: mongo
