@@ -4,9 +4,6 @@ services:
     image: "next-prod"
     restart: always
 
-    ports:
-      - "3000:3000"
-
     depends_on:
       - mongo-prod
 
@@ -38,14 +35,19 @@ services:
 
   redis-dev:
     image: "redis:6.2.5-alpine"
-    ports:
-      - "6379:6379"
 
   nginx-prod: 
     image: nginx:latest
     volumes:
       - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
       - /etc/letsencrypt/:/etc/letsencrypt/
+
+    links:
+      - "web-next-prod:localhost"
+
+    ports:
+      - 80:80
+      - 443:443
 
 secrets:
   mongo_root_user:
