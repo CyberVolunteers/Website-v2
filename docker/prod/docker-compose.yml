@@ -46,8 +46,8 @@ services:
       - "web-next-prod:localhost"
 
     ports:
-      - 80:80
-      - 443:443
+      - 80:3000
+      - 443:3001
 
 secrets:
   mongo_root_user:
