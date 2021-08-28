@@ -4,7 +4,11 @@ import {
 	useIsAfterRehydration,
 	useViewProtection,
 } from "../client/utils/otherHooks";
-import { getAccountInfo, useViewerType } from "../client/utils/userState";
+import {
+	getAccountInfo,
+	updateLoginState,
+	useViewerType,
+} from "../client/utils/userState";
 import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
@@ -18,6 +22,8 @@ import { flatten, Flattened } from "combined-validator";
 import {
 	orgDataUpdateSpec,
 	userDataUpdateSpec,
+	users,
+	organisations,
 } from "../serverAndClient/publicFieldConstants";
 import React from "react";
 import EditableField from "../client/components/EditableField";
@@ -27,11 +33,55 @@ import { csrfFetch } from "../client/utils/csrf";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { CircularProgress } from "@material-ui/core";
 
+export function createEmailChangingFunction(
+	overallErrors: { [key: string]: any },
+	setOverallErrors: React.Dispatch<
+		React.SetStateAction<{
+			[key: string]: any;
+		}>
+	>,
+	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+	csrfToken: string
+) {
+	return async function (name: string, value: any) {
+		setIsLoading(true);
+
+		const res = await csrfFetch(csrfToken, "/api/changeEmail", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({ email: value }),
+		});
+
+		if (
+			!(await updateOverallErrorsForRequests(
+				res,
+				"changeEmail",
+				overallErrors,
+				setOverallErrors
+			))
+		)
+			return setIsLoading(false);
+
+		setIsLoading(false);
+
+		// refresh login status
+		updateLoginState();
+
+		// refresh the page
+		history.go(0);
+	};
+}
+
 export default function MyAccount({
 	accountData: initAccountData,
 	editableFields,
 	fieldNames,
 	csrfToken,
+	allFields,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org", "user"]);
 
@@ -40,6 +90,13 @@ export default function MyAccount({
 
 	const [overallErrors, setOverallErrors] = useState(
 		{} as { [key: string]: any }
+	);
+
+	const changeEmail = createEmailChangingFunction(
+		overallErrors,
+		setOverallErrors,
+		setIsLoading,
+		csrfToken
 	);
 
 	const isOrg = getAccountInfo()?.isOrg;
@@ -89,8 +146,13 @@ export default function MyAccount({
 
 			<p>Hello and welcome to my secure website</p>
 
+			{Object.entries(overallErrors).map(([k, v]) => (
+				<h1 key={k}>{v}</h1>
+			))}
+
 			{/* Render common stuff normally */}
-			{Object.entries(fields ?? {}).map(([k, v]) => {
+			{Object.entries(allFields ?? {}).map(([k, fieldDescription]) => {
+				const v = k in fields ? fields[k] : "<not specified>";
 				return (
 					<EditableField
 						key={k}
@@ -98,7 +160,7 @@ export default function MyAccount({
 						value={v}
 						presentableNames={fieldNames}
 						editableFields={editableFields}
-						sendEditRequest={sendEditRequest}
+						sendEditRequest={k === "email" ? changeEmail : sendEditRequest} //TODO: a popup saying that it will force you to re-confirm the email
 						perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
 							overallErrors,
 							setOverallErrors
@@ -141,6 +203,11 @@ export default function MyAccount({
 
 			{/* Etc */}
 
+			<Link href="/changePassword" passHref>
+				<a>
+					<p>Change my password</p>
+				</a>
+			</Link>
 			<Link href="/logout" passHref>
 				<a>
 					<p>Log out</p>
@@ -148,21 +215,25 @@ export default function MyAccount({
 			</Link>
 		</div>
 	);
+
+	// TODO: a button to change the password
 }
 
-type AccountDataType = null | {
+type AccountDataType = {
 	[key: string]: any;
 };
 
 export const getServerSideProps: GetServerSideProps<{
 	accountData: AccountDataType;
 	editableFields: Flattened;
+	allFields: Flattened;
 	fieldNames: { [key: string]: string };
 	csrfToken: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	let fields: AccountDataType = null;
+	let fields: AccountDataType = {};
 	let editableFields: Flattened = {};
+	let allFields: Flattened = {};
 	let fieldNames: { [key: string]: string } = {};
 	if (isLoggedIn(session)) {
 		const isRequestByAnOrg = isOrg(session);
@@ -171,6 +242,10 @@ export const getServerSideProps: GetServerSideProps<{
 		editableFields = isRequestByAnOrg
 			? flatten(orgDataUpdateSpec)
 			: flatten(userDataUpdateSpec);
+
+		allFields = isRequestByAnOrg ? flatten(organisations) : flatten(users);
+
+		delete allFields.password;
 
 		const fieldKeys = Object.keys(fieldNames).filter((k) => k in session); // only show the keys that have been specified
 		fields = Object.fromEntries(fieldKeys.map((k) => [k, session[k]])); // translate them
@@ -181,6 +256,7 @@ export const getServerSideProps: GetServerSideProps<{
 			accountData: fields,
 			editableFields,
 			fieldNames,
+			allFields,
 			csrfToken: await updateCsrf(context),
 		}, // will be passed to the page component as props
 	};

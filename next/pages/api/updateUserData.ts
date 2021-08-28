@@ -34,7 +34,7 @@ const handlers: HandlerCollection = {
 				.status(500)
 				.send("We could not update your data. Sorry for the inconvenience.");
 
-		await updateSession(req, res, newDoc);
+		await updateSession(req, res, newDoc._doc);
 
 		return res.end();
 	},

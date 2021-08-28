@@ -1,9 +1,8 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isOrg, updateOrgData } from "../../server/auth/data";
+import { changeEmail, isLoggedIn } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
-import { orgDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
@@ -18,12 +17,14 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
+		logger.info("server.changeEmail: updating %s with %s", session, req.body);
 
-		if (!isOrg(session))
-			return res.status(400).send("You need to be an organisation to do this");
+		if (!isLoggedIn(session))
+			return res.status(400).send("You need to be logged in to do this");
 
-		const newDoc = await updateOrgData(req.body, session.email);
+		const oldEmail = session.email;
+
+		const newDoc = await changeEmail(oldEmail, req.body.email);
 
 		if (newDoc === null)
 			return res
@@ -36,7 +37,7 @@ const handlers: HandlerCollection = {
 	},
 };
 
-export default async function updateData(
+export default async function changeEmailRequest(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
@@ -46,7 +47,15 @@ export default async function updateData(
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(orgDataUpdateSpec)),
+			POST: ajv.compileParser(
+				createAjvJTDSchema({
+					required: {
+						string: {
+							email: { maxLength: 320 },
+						},
+					},
+				})
+			),
 		}
 	)(req, res);
 }

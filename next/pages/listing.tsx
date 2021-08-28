@@ -1,5 +1,5 @@
 import Image from "next/image";
-import { Button, capitalize } from "@material-ui/core";
+import { Button, capitalize, CircularProgress } from "@material-ui/core";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import React, { useState } from "react";
 import { ReactElement } from "react";
@@ -7,7 +7,10 @@ import Head from "../client/components/Head";
 import { getMongo } from "../server/mongo";
 import { Listing } from "../server/mongo/mongoModels";
 import { toStrippedObject } from "../server/mongo/util";
-import { undoCamelCase } from "../client/utils/misc";
+import {
+	undoCamelCase,
+	updateOverallErrorsForRequests,
+} from "../client/utils/misc";
 import {
 	useIsAfterRehydration,
 	useViewProtection,
@@ -17,6 +20,13 @@ import { getSession } from "../server/auth/auth-cookie";
 import { isOrg, isUser } from "../server/auth/data";
 import { ListingJoinPrompt } from "../client/components/listingJoinPrompt";
 import { getAccountInfo } from "../client/utils/userState";
+import EditableField from "../client/components/EditableField";
+import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
+import { listings } from "../serverAndClient/publicFieldConstants";
+import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
+import { flatten } from "combined-validator";
+import { getPresentableName } from "../client/components/FormComponent";
+import { csrfFetch } from "../client/utils/csrf";
 
 export default function ListingPage({
 	listing,
@@ -26,17 +36,58 @@ export default function ListingPage({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	useViewProtection(["org", "user"]);
 
+	const fieldsToShowOverall = isOwnerOrg
+		? fieldsToShowCommon.concat(fieldsToShowOwnerOnly)
+		: fieldsToShowCommon;
+
 	const isAfterHydration = useIsAfterRehydration();
 
 	const isOrg = getAccountInfo()?.isOrg;
 
+	const [fields, setFields] = useState(listing as { [key: string]: any });
+
 	const [showVolunteerPopup, setShowVolunteerPopup] = useState(false);
 
-	// TODO: charity edit menu
+	const [isLoading, setIsLoading] = useState(false);
 
 	const [overallErrors, setOverallErrors] = useState(
 		{} as { [key: string]: any }
 	);
+
+	async function sendEditRequest(k: string, v: any) {
+		const data = { uuid: listing.uuid } as { [key: string]: any };
+		data[k] = v;
+		if (v === null) return; // do not submit data with errors
+
+		setIsLoading(true);
+
+		const res = await csrfFetch(csrfToken, "/api/updateListingData", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify(data),
+		});
+
+		if (
+			!(await updateOverallErrorsForRequests(
+				res,
+				"listingUpdateData",
+				overallErrors,
+				setOverallErrors
+			))
+		)
+			return setIsLoading(false);
+
+		setIsLoading(false);
+
+		// set the new value through a copy
+		const fieldsCopy = Object.assign({}, fields);
+		fieldsCopy[k] = v;
+		setFields(fieldsCopy);
+	}
 
 	return (
 		<div>
@@ -62,66 +113,35 @@ export default function ListingPage({
 				/>
 			</div>
 
-			<p>
-				<span>Description: {listing.desc}</span>
-			</p>
+			{Object.entries(overallErrors).map(([k, v]) => (
+				<h1 key={k}>{v}</h1>
+			))}
 
-			<p>
-				volunteers: {listing.currentNumVolunteers}/
-				{listing.requestedNumVolunteers}
-			</p>
-
-			<p>orgName: {listing.orgName}</p>
-			<p>duration: {listing.duration}</p>
-			<p>time: {listing.time}</p>
-			<p>skills: {listing.skills}</p>
-			<p>requirements: {listing.requirements}</p>
-			<p>
-				targetAudience:{" "}
-				{(() => {
-					const targetAudience = listing.targetAudience;
-					const targetAudienceNameArray = Object.keys(targetAudience).filter(
-						(k) => (targetAudience as any)[k] === true
-					);
-					if (
-						targetAudienceNameArray.length === 0 ||
-						targetAudienceNameArray.length ===
-							Object.keys(targetAudience).length
-					)
-						// if anyone or no-one, select everyone
-						return "Anyone";
-					if (targetAudienceNameArray.length === 1)
-						return undoCamelCase(targetAudienceNameArray[0]);
-					// get all but the last one
-					const lastVal = targetAudienceNameArray.pop() as string;
-					return `${targetAudienceNameArray
-						.map(undoCamelCase)
-						.join(", ")} and ${undoCamelCase(lastVal)}`;
-				})()}
-			</p>
-			<p>location: {JSON.stringify(listing.location)}</p>
-			<p>
-				{listing.isFlexible ? (
-					"The hours are flexible"
-				) : (
-					<span>
-						The expected hours are between {listing.minHoursPerWeek} and{" "}
-						{listing.maxHoursPerWeek}
-					</span>
-				)}
-			</p>
+			{fieldsToShowOverall.map((k) => {
+				const v = fields[k];
+				return (
+					<EditableField
+						key={k}
+						name={k}
+						value={translateToString(k, v)}
+						presentableNames={listingFieldNamesToShow}
+						editableFields={flatten(listings)}
+						sendEditRequest={sendEditRequest}
+						perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
+							overallErrors,
+							setOverallErrors
+						)} //TODO: change this
+						isLocked={!isOwnerOrg}
+					></EditableField>
+				);
+			})}
 
 			{/* display on the client */}
 			{!isAfterHydration ? null : (
 				<>
 					{isOrg ? (
 						<>
-							{isOwnerOrg ? (
-								<>
-									{/* TODO: allow to edit */}
-									<h2>Edit</h2>
-								</>
-							) : (
+							{isOwnerOrg ? null : (
 								<p>
 									We are sorry, but this listing does not belong to your
 									organisation and you can not edit it.
@@ -158,8 +178,66 @@ export default function ListingPage({
 					)}
 				</>
 			)}
+
+			{isLoading ? <CircularProgress /> : null}
 		</div>
 	);
+}
+
+function getTargetAudienceString(targetAudience: { [key: string]: boolean }) {
+	const targetAudienceNameArray = Object.keys(targetAudience).filter(
+		(k) => (targetAudience as any)[k] === true
+	);
+	if (
+		targetAudienceNameArray.length === 0 ||
+		targetAudienceNameArray.length === Object.keys(targetAudience).length
+	)
+		// if anyone or no-one, select everyone
+		return "Anyone";
+	if (targetAudienceNameArray.length === 1)
+		return undoCamelCase(targetAudienceNameArray[0]);
+	// get all but the last one
+	const lastVal = targetAudienceNameArray.pop() as string;
+	return `${targetAudienceNameArray
+		.map(undoCamelCase)
+		.join(", ")} and ${undoCamelCase(lastVal)}`;
+}
+
+function getLocationString(location: {
+	place: string;
+	street: string;
+	city: string;
+	county: string;
+	isOnline: boolean;
+}) {
+	if (location.isOnline === true) return "online";
+	const { place, street, city, county } = location;
+	return [place, street, city, county].join(", ");
+}
+
+//TODO: capitalize?
+function translateToString(k: string, input: any) {
+	switch (typeof input) {
+		case "string":
+			return input;
+		case "number":
+			return "" + input;
+		case "boolean":
+			return input ? "yes" : "no";
+	}
+
+	switch (k) {
+		case "targetAudience":
+			return getTargetAudienceString(input);
+		case "location":
+			return getLocationString(input);
+		case "requiredData":
+			return input
+				.map((value: any) => getPresentableName(value, listingFieldNamesToShow))
+				.join(", ");
+	}
+
+	return "" + input;
 }
 
 const allowedFields = [
@@ -169,6 +247,7 @@ const allowedFields = [
 	"requestedNumVolunteers",
 	"requiredData",
 	"orgName",
+	"category",
 	"title",
 	"desc",
 	"duration",
@@ -181,6 +260,25 @@ const allowedFields = [
 	"minHoursPerWeek",
 	"maxHoursPerWeek",
 ];
+
+const fieldsToShowCommon = [
+	"currentNumVolunteers",
+	"requestedNumVolunteers",
+	"category",
+	"title",
+	"desc",
+	"duration",
+	"time",
+	"skills",
+	"requirements",
+	"targetAudience",
+	"location",
+	"isFlexible",
+	"minHoursPerWeek",
+	"maxHoursPerWeek",
+];
+
+const fieldsToShowOwnerOnly = ["requiredData"];
 
 export type ListingPageListingData = {
 	imagePath: string;

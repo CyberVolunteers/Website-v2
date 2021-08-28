@@ -50,13 +50,18 @@ export default function NotAllowed(): ReactElement {
 			})()}
 			{currentUser === "unverified_user" || currentUser === "unverified_org" ? (
 				//TODO: change this page url
-				<Link href={`/login?redirect=${router.query.redirect ?? ""}`} passHref>
+				<Link
+					href={`/emailConfirmationEmailSent?redirect=${
+						router.query.redirect ?? ""
+					}`}
+					passHref
+				>
 					<a>
 						<p>Verify my email!</p>
 					</a>
 				</Link>
 			) : (
-				<Link href={`/login?redirect=${router.query.redirect ?? ""}`} passHref>
+				<Link href={`/emailConfirmationEmailSent?redirect=${router.query.redirect ?? ""}`} passHref>
 					<a>
 						<p>Log in!</p>
 					</a>

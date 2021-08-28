@@ -1,12 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isOrg, updateOrgData } from "../../server/auth/data";
+import { changeEmail, isLoggedIn, setPassword } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
-import { orgDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
+import { verifyUUID } from "../../server/email/redis";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -16,14 +16,19 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const session = await getSession(req);
+		const { email, uuid, password } = req.body;
 
-		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
+		logger.info(
+			"server.passwordResetWithToken: updating %s with %s",
+			email,
+			uuid
+		);
 
-		if (!isOrg(session))
-			return res.status(400).send("You need to be an organisation to do this");
+		const isCorrectUUID = await verifyUUID(email, uuid, "passwordResetUUID");
 
-		const newDoc = await updateOrgData(req.body, session.email);
+		if(!isCorrectUUID) return res.status(400).send("We are sorry, but this link has expired");
+
+		const newDoc = await setPassword(email, password);
 
 		if (newDoc === null)
 			return res
@@ -36,7 +41,7 @@ const handlers: HandlerCollection = {
 	},
 };
 
-export default async function updateData(
+export default async function changeEmailRequest(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
@@ -46,7 +51,17 @@ export default async function updateData(
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(orgDataUpdateSpec)),
+			POST: ajv.compileParser(
+				createAjvJTDSchema({
+					required: {
+						string: {
+							email: { maxLength: 320 },
+							uuid: { exactLength: 36 },
+							password: {},
+						},
+					},
+				})
+			),
 		}
 	)(req, res);
 }

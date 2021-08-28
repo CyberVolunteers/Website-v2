@@ -15,8 +15,7 @@ export type PerElementValidatorCallback = (
 export type PerElementValidatorCallbacks = {
 	[k: string]: PerElementValidatorCallback | PerElementValidatorCallback[];
 };
-
-const getPresentableName = (
+export const getPresentableName = (
 	v: string,
 	presentableNames?: { [key: string]: string }
 ) => presentableNames?.[v] ?? capitalize(undoCamelCase(v));

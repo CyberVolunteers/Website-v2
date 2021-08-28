@@ -1,10 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isOrg, updateOrgData } from "../../server/auth/data";
+import { isOrg, isUser, updateListingData, updateUserData } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
-import { orgDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
-import { HandlerCollection } from "../../server/types";
+import {
+	listingDataUpdateSpec,
+	userDataUpdateSpec,
+} from "../../serverAndClient/publicFieldConstants";
+import { ExtendedNextApiRequest, HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 
@@ -18,19 +21,24 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
+		logger.info(
+			"server.updateListingData: updating listing %s by %s with %s",
+			req.body.uuid,
+			session,
+			req.body
+		);
 
 		if (!isOrg(session))
-			return res.status(400).send("You need to be an organisation to do this");
+			return res.status(400).send("You need to be a charity to do this");
 
-		const newDoc = await updateOrgData(req.body, session.email);
+		const orgId = session._id;
+
+		const newDoc = await updateListingData(req.body, orgId, req.body.uuid);
 
 		if (newDoc === null)
 			return res
 				.status(500)
 				.send("We could not update your data. Sorry for the inconvenience.");
-
-		await updateSession(req, res, newDoc._doc);
 
 		return res.end();
 	},
@@ -46,7 +54,7 @@ export default async function updateData(
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(orgDataUpdateSpec)),
+			POST: ajv.compileParser(createAjvJTDSchema(listingDataUpdateSpec)),
 		}
 	)(req, res);
 }

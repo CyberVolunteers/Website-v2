@@ -8,7 +8,9 @@ RUN chmod +x /wait
 
 # for sharp
 # RUN apk add vips
-RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
+RUN apk add python build-base
+# RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
+# NOTE: you need to install sharp from the container so that it downloads the correct version
 
 USER node:node
 

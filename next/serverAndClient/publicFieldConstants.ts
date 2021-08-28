@@ -147,7 +147,6 @@ export const userDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
 	JSON.stringify(users)
 );
 // NOTE: deleting some fields
-delete userDataUpdateSpec.required?.string?.email;
 delete userDataUpdateSpec.required?.string?.password;
 // Make all optional
 userDataUpdateSpec.optional = deepAssign(
@@ -162,7 +161,6 @@ export const orgDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
 	JSON.stringify(organisations)
 );
 // NOTE: deleting some fields
-delete orgDataUpdateSpec.required?.string?.email;
 delete orgDataUpdateSpec.required?.string?.password;
 // Make all optional
 orgDataUpdateSpec.optional = deepAssign(
@@ -170,3 +168,23 @@ orgDataUpdateSpec.optional = deepAssign(
 	orgDataUpdateSpec.required
 );
 delete orgDataUpdateSpec.required;
+
+// deep copy
+// I have no clue why deepAssign is not working in this case
+export const listingDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
+	JSON.stringify(listings)
+);
+// NOTE: deleting some fields
+delete listingDataUpdateSpec.required?.string?.imagePath;
+delete listingDataUpdateSpec.required?.string?.uuid;
+
+// Make all optional
+listingDataUpdateSpec.optional = deepAssign(
+	listingDataUpdateSpec.optional,
+	listingDataUpdateSpec.required
+);
+listingDataUpdateSpec.required = {
+	string: {
+		uuid: { exactLength: 36 },
+	},
+};

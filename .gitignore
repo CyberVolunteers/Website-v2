@@ -9,3 +9,5 @@ initMongo.js
 .vscode
 
 **/logs
+
+letsencrypt

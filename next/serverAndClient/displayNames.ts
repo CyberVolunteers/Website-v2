@@ -25,6 +25,13 @@ export const userFieldNamesToShow = {
 	password2: "Repeat your password",
 };
 
+export const userFieldNamesToShowPublic = {
+	firstName: "First name",
+	lastName: "Last name",
+	email: "Email",
+	gender: "Specified gender",
+};
+
 export const listingFieldNamesToShow = {
 	duration: "How long will your opportunity last?",
 	place: "What is the name of the place?",
