@@ -19,6 +19,7 @@ services:
 
     links:
       - "mongo-prod:db"
+      - "redis-dev:redis"
 
   mongo-prod:
     image: mongo
@@ -39,6 +40,12 @@ services:
     image: "redis:6.2.5-alpine"
     ports:
       - "6379:6379"
+
+  nginx-prod: 
+    image: nginx:latest
+    volumes:
+      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
+      - /etc/letsencrypt/:/etc/letsencrypt/
 
 secrets:
   mongo_root_user:
