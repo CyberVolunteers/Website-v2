@@ -44,7 +44,7 @@ services:
       - /etc/letsencrypt/:/etc/letsencrypt/
 
     links:
-      - "web-next-prod:localhost"
+      - "web-next-prod:next"
 
     ports:
       - 3000:80
