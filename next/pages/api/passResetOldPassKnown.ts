@@ -36,6 +36,8 @@ const handlers: HandlerCollection = {
 		const verificationResult = await verifyHash(
 			oldPassword,
 			session.passwordHash,
+			// empty function
+			// eslint-disable-next-line
 			() => {}
 		);
 

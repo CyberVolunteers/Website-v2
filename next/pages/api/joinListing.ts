@@ -37,7 +37,7 @@ const handlers: HandlerCollection = {
 
 		// send a notification
 		// can be done out-of-sync, so no await here
-		(async function(){
+		(async function () {
 			const orgId = newListingValue.organisation;
 			const org = await Org.findById(orgId);
 
@@ -45,17 +45,20 @@ const handlers: HandlerCollection = {
 
 			const requiredFields = newListingValue.requiredData;
 
-			const fields = requiredFields.map((fieldName: string) => `${getPresentableName(fieldName, userFieldNamesToShowPublic)}: ${session[fieldName]}`);
+			const fields = requiredFields.map(
+				(fieldName: string) =>
+					`${getPresentableName(fieldName, userFieldNamesToShowPublic)}: ${
+						session[fieldName]
+					}`
+			);
 
-			console.log(fields);
-
-			if(email)
-			await sendEmail({
-				to: email,
-				subject: `<Notification> Someone has signed up for the listing "${newListingValue.title}"`,
-				text: `User data: ${fields.join(", ")}`,
-			});
-		})()
+			if (email)
+				await sendEmail({
+					to: email,
+					subject: `<Notification> Someone has signed up for the listing "${newListingValue.title}"`,
+					text: `User data: ${fields.join(", ")}`,
+				});
+		})();
 
 		return res.end();
 	},

@@ -21,21 +21,26 @@ const handlers: HandlerCollection = {
 
 		logger.info("server.forgotPassword: request for %s", email);
 
-		
-		await sendEmailWithUUID(email, (uuid: string) =>{
-			const link = `${protocolAndHost}/passwordResetWithToken?${new URLSearchParams({
-				uuid,
-				email,
-			})}`;
+		await sendEmailWithUUID(
+			email,
+			(uuid: string) => {
+				const link = `${protocolAndHost}/passwordResetWithToken?${new URLSearchParams(
+					{
+						uuid,
+						email,
+					}
+				)}`;
 
-			return {
-				html: `<a href="${link}">Reset the password!</a>`,
-				text: `Please go to this webpage: ${link}`
+				return {
+					html: `<a href="${link}">Reset the password!</a>`,
+					text: `Please go to this webpage: ${link}`,
+				};
+			},
+			"passwordResetUUID",
+			{
+				subject: "Password reset",
 			}
-		}, "passwordResetUUID",
-		{
-			subject: "Password reset"
-		});
+		);
 
 		return res.end();
 	},

@@ -21,7 +21,7 @@ import { csrfFetch } from "../client/utils/csrf";
 import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
 import { userFieldNamesToShow } from "../serverAndClient/displayNames";
 
-export default function forgotPassword({
+export default function ForgotPassword({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
