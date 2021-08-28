@@ -28,7 +28,7 @@ export async function updateCsrf(context: GetServerSidePropsContext<any>) {
 	const csrfTokens = {} as { [key: string]: any };
 	csrfTokens[simpleUrl] = newToken;
 
-	logger.info("server.csrf:Setting csrf cookie");
+	logger.info("server.csrf:Adding csrf path, %s", csrfTokens);
 	await updateSession(
 		context.req as any,
 		context.res as any,
@@ -43,16 +43,20 @@ export async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
 	if (typeof receivedPageName !== "string") {
 		logger.info("server.csrf:Incorrect or undefined current page header");
 
-		return res.status(400).send("Incorrect or undefined current page header");
+		return res.status(400).send("Something we received was incorrect. Please refresh the page");
 	}
 
+	
 	const expectedCsrfToken = (await getCsrf(req))?.[receivedPageName]; // from the sealed csrf cookie
 	const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()]; // from the headers
+	logger.info("Stored tokens: %s, received tokens: %s", await getCsrf(req), receivedCsrfToken);
 
 	if (typeof receivedCsrfToken !== "string") {
 		logger.info("server.csrf:Incorrect or undefined csrf header");
 
-		return res.status(400).send("Incorrect or undefined csrf header");
+		return res
+			.status(400)
+			.send("Something we received was incorrect. Please refresh the page");
 	}
 
 	if (!fixedTimeComparison(expectedCsrfToken, receivedCsrfToken)) {

@@ -4,9 +4,9 @@ services:
     image: "next-prod"
     restart: always
 
-    ports: 
+    ports:
       - "3000:3000"
-    
+
     depends_on:
       - mongo-prod
 
@@ -35,12 +35,13 @@ services:
       - mongo_root_user
       - mongo_root_pass
 
-  
+  redis-dev:
+    image: "redis:6.2.5-alpine"
+    ports:
+      - "6379:6379"
 
 secrets:
   mongo_root_user:
     file: ../../mongo/auth/root/user
   mongo_root_pass:
     file: ../../mongo/auth/root/pass
-
-
