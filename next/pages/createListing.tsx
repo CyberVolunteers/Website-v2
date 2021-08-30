@@ -1,6 +1,6 @@
 import { flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import React, { ReactElement, useRef, useState } from "react";
+import React, { Dispatch, ReactElement, SetStateAction, useRef, useState } from "react";
 import FormFieldCollection from "../client/components/FormFieldCollection";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { useViewProtection } from "../client/utils/otherHooks";
@@ -9,7 +9,7 @@ import { csrfFetch } from "../client/utils/csrf";
 import { listings } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
-import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
+import { FormState, PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import FormFieldCollectionErrorHeader from "../client/components/FormFieldCollectionErrorHeader";
 import CircularProgress from "@material-ui/core/CircularProgress";
 import { useRouter } from "next/dist/client/router";
@@ -27,9 +27,10 @@ export default function CreateListing({
 	delete fieldsToDisplay.uuid;
 
 	const router = useRouter();
-
-	const autoFormRef = useRef();
 	const [isLoading, setIsLoading] = useState(false);
+	const [formState, setFormState] = useState({} as {[key: string]: FormState});
+	const [areThereFormErrors, setAreThereFormErrors] = useState(false);
+
 	const listingImageInputRef = useRef<HTMLInputElement>(null);
 
 	const [overallErrors, setOverallErrors] = useState(
@@ -58,12 +59,9 @@ export default function CreateListing({
 				"Please select an image for your listing."
 			);
 
-		const data: { [key: string]: any } | null = (
-			autoFormRef.current as any
-		)?.getData();
-		if (data === null) return;
+		if (areThereFormErrors) return;
 
-		if (data.minHoursPerWeek > data.maxHoursPerWeek)
+		if (formState.minHoursPerWeek > formState.maxHoursPerWeek)
 			return addError(
 				overallErrors,
 				setOverallErrors,
@@ -72,7 +70,7 @@ export default function CreateListing({
 			);
 
 		const formData = new FormData();
-		Object.entries(data).forEach(([k, v]) =>
+		Object.entries(formState).forEach(([k, v]) =>
 			formData.append(k, JSON.stringify(v))
 		);
 		formData.append("listingImage", file);
@@ -107,12 +105,12 @@ export default function CreateListing({
 			<form onSubmit={onSubmit}>
 				<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
 				<FormFieldCollection
-					ref={autoFormRef}
 					fields={fieldsToDisplay}
 					presentableNames={listingFieldNamesToShow}
 					perElementValidationCallbacks={perElementValidationCallbacks}
-					overallErrors={overallErrors}
-					setOverallErrors={setOverallErrors}
+					formState={formState}
+					setFormState={setFormState as Dispatch<SetStateAction<FormState>>}
+					setHasErrors={setAreThereFormErrors}
 				/>
 
 				<p>

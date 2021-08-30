@@ -58,6 +58,6 @@ export const passwordEquality: PerElementValidatorCallback = (
 	password2,
 	root
 ) => {
-	const password1 = root.getChild("password").formState;
+	const password1 = root.password;
 	return password1 === password2 ? true : "The two passwords do not match";
 };

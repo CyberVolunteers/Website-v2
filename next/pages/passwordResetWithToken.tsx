@@ -99,10 +99,6 @@ export default function PasswordResetWithToken({
 						perElementValidationCallbacks={perElementValidationCallbacks}
 						overallErrors={overallErrors}
 						setOverallErrors={setOverallErrors}
-						onChange={(name: string, newVal: any, root: any) => {
-							if (name === "password")
-								root?.getChild("password2")?.validate?.();
-						}}
 					>
 						Change my password!
 					</SimpleForm>

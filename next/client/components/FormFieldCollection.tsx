@@ -1,56 +1,53 @@
 import { Flattened } from "combined-validator";
-import { MutableRefObject, useEffect } from "react";
-import { useRef } from "react";
-import { useImperativeHandle } from "react";
-import { forwardRef } from "react";
+import { useEffect } from "react";
+import { useState } from "react";
 import { Dispatch, SetStateAction } from "react";
-import FormComponent, { PerElementValidatorCallbacks } from "./FormComponent";
+import FormComponent, { FormState, PerElementValidatorCallbacks } from "./FormComponent";
 
-const FormFieldCollection = forwardRef(
-	(
-		{
-			fields,
-			perElementValidationCallbacks,
-			overallErrors,
-			setOverallErrors,
-			presentableNames,
-			onChange,
-		}: {
-			fields: Flattened;
-			perElementValidationCallbacks?: PerElementValidatorCallbacks;
-			presentableNames?: { [key: string]: string };
-			overallErrors: {
-				[key: string]: string;
-			};
-			setOverallErrors: Dispatch<
-				SetStateAction<{
-					[key: string]: string;
-				}>
-			>;
-			onChange?: (name: string, newVal: any, root: any) => void;
-		},
-		ref
-	) => {
-		const guaranteedRef = ref ?? useRef<typeof FormComponent>();
+function FormFieldCollection({
+	fields,
+	perElementValidationCallbacks,
+	presentableNames,
+	setHasErrors,
+	formState,
+	setFormState,
+	freezeValidation,
+	onChange,
+}: {
+	fields: Flattened;
+	perElementValidationCallbacks?: PerElementValidatorCallbacks;
+	presentableNames?: { [key: string]: string };
+	setHasErrors: Dispatch<SetStateAction<boolean>>;
+	formState: FormState;
+	setFormState: Dispatch<SetStateAction<FormState>>;
+	freezeValidation?: boolean;
+	onChange?: () => void;
+}) {
+	const [areThereLocalErrors, setAreThereLocalErrors] = useState(false);
 
-		return (
-			<>
-				<FormComponent
-					ref={guaranteedRef}
-					name="_root"
-					useLabel={false}
-					flattenedValue={{ type: fields, required: true }}
-					perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
-					presentableNames={presentableNames}
-					root={guaranteedRef}
-					onChange={(name, newVal, root) => {
-						if (overallErrors !== {}) setOverallErrors({}); // do not always trigger a rerender
-						onChange?.(name, newVal, root);
-					}}
-				/>
-			</>
-		);
-	}
-);
+	useEffect(() => {
+		setHasErrors(areThereLocalErrors);
+	}, [areThereLocalErrors]);
+
+	useEffect(() => {
+		onChange?.();
+	}, [formState]);
+
+	return (
+		<>
+			<FormComponent
+				name="_root"
+				useLabel={false}
+				flattenedValue={{ type: fields, required: true }}
+				perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
+				presentableNames={presentableNames}
+				formState={formState}
+				setFormState={setFormState}
+				setAreThereLocalErrors={setAreThereLocalErrors}
+				freezeValidation={freezeValidation}
+			/>
+		</>
+	);
+}
 
 export default FormFieldCollection;

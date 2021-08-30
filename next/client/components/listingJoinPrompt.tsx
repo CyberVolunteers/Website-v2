@@ -1,14 +1,14 @@
-import { Button, capitalize, CircularProgress } from "@material-ui/core";
+import { capitalize, CircularProgress } from "@material-ui/core";
 import { Flattened, flatten } from "combined-validator";
 import { useRouter } from "next/dist/client/router";
-import React, { ReactElement, useEffect, useRef, useState } from "react";
-import isMobilePhone from "validator/lib/isMobilePhone";
+import React, { ReactElement, useEffect, useState } from "react";
 import { ListingPageListingData } from "../../pages/listing";
 import { userFieldNamesToShow } from "../../serverAndClient/displayNames";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { csrfFetch } from "../utils/csrf";
 import { undoCamelCase, updateOverallErrorsForRequests } from "../utils/misc";
 import { getAccountInfo } from "../utils/userState";
+import { FormState } from "./FormComponent";
 import FormFieldCollection from "./FormFieldCollection";
 import FormFieldCollectionErrorHeader from "./FormFieldCollectionErrorHeader";
 import { getSignupPerElementValidationCallbacks } from "./Signup";
@@ -31,7 +31,9 @@ export function ListingJoinPrompt({
 	>;
 }): ReactElement {
 	const router = useRouter();
-	const missingFieldsRef = useRef();
+
+	const [formState, setFormState] = useState({} as FormState);
+	const [areThereFormErrors, setAreThereFormErrors] = useState(false);
 
 	const [isLoading, setIsLoading] = useState(false);
 
@@ -62,15 +64,12 @@ export function ListingJoinPrompt({
 
 		if (isLoading) return; // do not submit the form twice in a row
 
-		const dataRef = missingFieldsRef.current as any;
-		const data: { [key: string]: any } | null = dataRef?.getData();
-
-		if (data === null) return;
+		if (areThereFormErrors) return;
 
 		setIsLoading(true);
 
 		// if there is data to be updated, do that
-		if (data !== undefined) {
+		if (Object.keys(formState).length !== 0) {
 			const res = await csrfFetch(csrfToken, `/api/updateUserData`, {
 				method: "POST",
 				credentials: "same-origin", // only send cookies for same-origin requests
@@ -78,7 +77,7 @@ export function ListingJoinPrompt({
 					"content-type": "application/json",
 					accept: "application/json",
 				},
-				body: JSON.stringify(data),
+				body: JSON.stringify(formState),
 			});
 			if (
 				!(await updateOverallErrorsForRequests(
@@ -146,15 +145,15 @@ export function ListingJoinPrompt({
 									this charity:
 								</h3>
 								<FormFieldCollection
-									ref={missingFieldsRef}
 									fields={missingFieldStructure}
 									presentableNames={userFieldNamesToShow}
 									perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
 										overallErrors,
 										setOverallErrors
 									)}
-									overallErrors={overallErrors}
-									setOverallErrors={setOverallErrors}
+									formState={formState}
+									setFormState={setFormState}
+									setHasErrors={setAreThereFormErrors}
 								/>
 							</>
 						);

@@ -1,12 +1,6 @@
 import { Flattened } from "combined-validator";
-import React, {
-	FormEvent,
-	Dispatch,
-	SetStateAction,
-	useRef,
-	useState,
-} from "react";
-import { PerElementValidatorCallbacks } from "./FormComponent";
+import React, { FormEvent, useState } from "react";
+import { FormState, PerElementValidatorCallbacks } from "./FormComponent";
 import FormFieldCollection from "./FormFieldCollection";
 import FormFieldCollectionErrorHeader from "./FormFieldCollectionErrorHeader";
 import { FC } from "react";
@@ -25,12 +19,11 @@ const SimpleForm: FC<{
 	overallErrors: {
 		[key: string]: string;
 	};
-	setOverallErrors: Dispatch<
-		SetStateAction<{
+	setOverallErrors: React.Dispatch<
+		React.SetStateAction<{
 			[key: string]: string;
 		}>
 	>;
-	onChange?: (name: string, newVal: any, root: any) => void;
 }> = ({
 	fields,
 	perElementValidationCallbacks,
@@ -39,35 +32,41 @@ const SimpleForm: FC<{
 	presentableNames,
 	onSubmit,
 	children,
-	onChange,
 }) => {
-	const autoFormRef = useRef();
+	const [formState, setFormState] = useState({} as FormState);
+	const [areThereFormErrors, setAreThereFormErrors] = useState(false);
+
 	const [isLoading, setIsLoading] = useState(false);
 
 	function preSubmit(evt: React.FormEvent<HTMLFormElement>) {
 		evt.preventDefault();
 		if (isLoading) return; // do not submit the form twice in a row
 
-		const dataRef = autoFormRef.current as any;
+		if (areThereFormErrors) return;
 
-		const data: { [key: string]: any } | null = dataRef?.getData?.();
-		if (data === null) return;
+		console.log(formState);
 
 		setIsLoading(true);
-		onSubmit(evt, data).then(() => setIsLoading(false));
+		onSubmit(
+			evt,
+			formState as {
+				[k: string]: FormState;
+			}
+		).then(() => setIsLoading(false));
 	}
 
 	return (
 		<form onSubmit={preSubmit}>
 			<FormFieldCollectionErrorHeader overallErrors={overallErrors} />
 			<FormFieldCollection
-				ref={autoFormRef}
 				fields={fields}
 				presentableNames={presentableNames}
 				perElementValidationCallbacks={perElementValidationCallbacks}
-				overallErrors={overallErrors}
-				setOverallErrors={setOverallErrors}
-				onChange={onChange}
+				formState={formState}
+				setFormState={setFormState}
+				setHasErrors={setAreThereFormErrors}
+				freezeValidation={isLoading}
+				onChange={() => setOverallErrors({})} // remove errors
 			/>
 			<p>
 				<button className="submit" type="submit">

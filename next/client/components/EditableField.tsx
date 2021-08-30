@@ -1,8 +1,6 @@
 import { Flattened } from "combined-validator";
 import React, { useState } from "react";
-import { useEffect } from "react";
-import { useRef } from "react";
-import FormComponent, { PerElementValidatorCallbacks } from "./FormComponent";
+import FormComponent, { FormState, PerElementValidatorCallbacks } from "./FormComponent";
 
 export default function EditableField({
 	name,
@@ -21,8 +19,10 @@ export default function EditableField({
 	sendEditRequest: (name: string, value: any) => void;
 	isLocked?: boolean;
 }) {
+	const [formState, setFormState] = useState({} as FormState);
+	const [areThereFormErrors, setAreThereFormErrors] = useState(false);
+
 	const [isCurrentlyEdited, setIsCurrentlyEdited] = useState(false);
-	const formRef = useRef();
 
 	// check if it is a date
 	if (editableFields[name]?.type === "date")
@@ -33,32 +33,31 @@ export default function EditableField({
 		if (isLocked === true) return;
 		// submit if needed
 		if (isCurrentlyEdited) {
-			const dataRef = formRef?.current as any;
 
-			if (!dataRef?.hasNoErrors()) return sendEditRequest(name, null);
-			sendEditRequest(name, dataRef?.getData?.());
+			if (areThereFormErrors) return sendEditRequest(name, null);
+			sendEditRequest(name, formState);
 		}
 
 		// toggle
 		setIsCurrentlyEdited(!isCurrentlyEdited);
 	}
 
+	// TODO: do this
 	// focus on edit
-	useEffect(() => {
-		let currentRef: any = formRef?.current;
-		if (isCurrentlyEdited && currentRef !== undefined) {
-			// find the first element ref to be displayed
-			const newRef = currentRef?.elementRef?.current;
-			newRef?.focus?.(); //TODO: test this with nested
+	// useEffect(() => {
+	// 	if (isCurrentlyEdited && currentRef !== undefined) {
+	// 		// find the first element ref to be displayed
+	// 		const newRef = currentRef?.elementRef?.current;
+	// 		newRef?.focus?.(); //TODO: test this with nested
 
-			// try to set it to submit on enter
-			if (typeof newRef === "object")
-				newRef.onkeypress = (evt: { keyCode: number }) => {
-					// only submit on enter
-					if (evt.keyCode === 13) toggleEdit();
-				};
-		}
-	}, [isCurrentlyEdited]);
+	// 		// try to set it to submit on enter
+	// 		if (typeof newRef === "object")
+	// 			newRef.onkeypress = (evt: { keyCode: number }) => {
+	// 				// only submit on enter
+	// 				if (evt.keyCode === 13) toggleEdit();
+	// 			};
+	// 	}
+	// }, [isCurrentlyEdited]);
 
 	return (
 		<p key={name}>
@@ -66,13 +65,14 @@ export default function EditableField({
 				{(presentableNames as any)[name] ?? name}:
 				{isCurrentlyEdited ? (
 					<FormComponent
-						root={formRef}
-						ref={formRef}
 						presentableNames={presentableNames}
 						perElementValidationCallbacks={perElementValidationCallbacks}
 						flattenedValue={editableFields[name]}
 						name={name}
 						useLabel={false}
+						formState={formState}
+						setFormState={setFormState}
+						setAreThereLocalErrors={setAreThereFormErrors}
 					></FormComponent>
 				) : (
 					value

@@ -7,7 +7,6 @@ import React, {
 	ReactElement,
 	SetStateAction,
 } from "react";
-import { Ref } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
 import isMobilePhone from "validator/lib/isMobilePhone";
@@ -19,7 +18,7 @@ import {
 } from "../../serverAndClient/validation";
 import { FormFieldCollectionData } from "../types";
 import { csrfFetch } from "../utils/csrf";
-import { addError, setFieldOrder } from "../utils/formUtils";
+import { setFieldOrder } from "../utils/formUtils";
 import { updateOverallErrorsForRequests } from "../utils/misc";
 import { PerElementValidatorCallbacks } from "./FormComponent";
 import SimpleForm from "./SimpleForm";
@@ -119,9 +118,6 @@ export function Signup({
 				perElementValidationCallbacks={perElementValidationCallbacks}
 				overallErrors={overallErrors}
 				setOverallErrors={setOverallErrors}
-				onChange={(name: string, newVal: any, root: any) => {
-					if (name === "password") root?.getChild("password2")?.validate?.();
-				}}
 			>
 				Sign up!
 			</SimpleForm>

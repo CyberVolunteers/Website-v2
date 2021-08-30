@@ -33,9 +33,7 @@ export default function ForgotPassword({
 
 	const [showEmailSentMessage, setShowEmailSentMessage] = useState(false);
 
-	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
-		email: (v: string) => isEmail(v),
-	};
+	const perElementValidationCallbacks: PerElementValidatorCallbacks = getSignupPerElementValidationCallbacks(overallErrors, setOverallErrors);
 
 	const fields = flatten({
 		required: {
@@ -85,7 +83,6 @@ export default function ForgotPassword({
 				perElementValidationCallbacks={perElementValidationCallbacks}
 				overallErrors={overallErrors}
 				setOverallErrors={setOverallErrors}
-				onChange={() => setShowEmailSentMessage(false)}
 			>
 				Send an email to reset the password to this email address
 			</SimpleForm>
