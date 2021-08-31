@@ -32,6 +32,7 @@ import { updateCsrf } from "../server/csrf";
 import { csrfFetch } from "../client/utils/csrf";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { CircularProgress } from "@material-ui/core";
+import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 
 export function createEmailChangingFunction(
 	overallErrors: { [key: string]: any },
@@ -71,8 +72,7 @@ export function createEmailChangingFunction(
 		// refresh login status
 		updateLoginState();
 
-		// refresh the page
-		history.go(0);
+		// the component will update and hit the viewer type protection screen
 	};
 }
 
@@ -108,7 +108,6 @@ export default function MyAccount({
 		const url = `/api/update${isOrg ? "Org" : "User"}Data`;
 		const data = {} as { [key: string]: any };
 		data[k] = v;
-		if (v === null) return; // do not submit data with errors
 
 		setIsLoading(true);
 
@@ -140,6 +139,11 @@ export default function MyAccount({
 		setFields(fieldsCopy);
 	}
 
+	const perElementValidationCallbacks: PerElementValidatorCallbacks =
+		getSignupPerElementValidationCallbacks(overallErrors, setOverallErrors, {
+			allowedEmailAddresses: [fields.email],
+		});
+
 	return (
 		<div>
 			<Head title="My account - cybervolunteers" />
@@ -152,7 +156,7 @@ export default function MyAccount({
 
 			{/* Render common stuff normally */}
 			{Object.entries(allFields ?? {}).map(([k, fieldDescription]) => {
-				const v = k in fields ? fields[k] : "<not specified>";
+				const v = k in fields ? fields[k] : null;
 				return (
 					<EditableField
 						key={k}
@@ -161,10 +165,7 @@ export default function MyAccount({
 						presentableNames={fieldNames}
 						editableFields={editableFields}
 						sendEditRequest={k === "email" ? changeEmail : sendEditRequest} //TODO: a popup saying that it will force you to re-confirm the email
-						perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
-							overallErrors,
-							setOverallErrors
-						)}
+						perElementValidationCallbacks={perElementValidationCallbacks}
 					></EditableField>
 				);
 			})}

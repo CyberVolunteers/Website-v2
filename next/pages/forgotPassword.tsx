@@ -33,7 +33,9 @@ export default function ForgotPassword({
 
 	const [showEmailSentMessage, setShowEmailSentMessage] = useState(false);
 
-	const perElementValidationCallbacks: PerElementValidatorCallbacks = getSignupPerElementValidationCallbacks(overallErrors, setOverallErrors);
+	const perElementValidationCallbacks: PerElementValidatorCallbacks = {
+		email: (v: string) => isEmail(v),
+	};
 
 	const fields = flatten({
 		required: {

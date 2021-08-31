@@ -44,8 +44,6 @@ const SimpleForm: FC<{
 
 		if (areThereFormErrors) return;
 
-		console.log(formState);
-
 		setIsLoading(true);
 		onSubmit(
 			evt,

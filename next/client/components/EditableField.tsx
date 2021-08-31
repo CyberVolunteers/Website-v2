@@ -1,6 +1,9 @@
 import { Flattened } from "combined-validator";
 import React, { useState } from "react";
-import FormComponent, { FormState, PerElementValidatorCallbacks } from "./FormComponent";
+import FormComponent, {
+	FormState,
+	PerElementValidatorCallbacks,
+} from "./FormComponent";
 
 export default function EditableField({
 	name,
@@ -13,29 +16,34 @@ export default function EditableField({
 }: {
 	presentableNames: { [key: string]: string };
 	name: string;
-	value: string;
+	value: string | null;
 	editableFields: Flattened;
 	perElementValidationCallbacks: PerElementValidatorCallbacks;
 	sendEditRequest: (name: string, value: any) => void;
 	isLocked?: boolean;
 }) {
-	const [formState, setFormState] = useState({} as FormState);
+	const [formState, setFormState] = useState((value ?? "") as FormState);
 	const [areThereFormErrors, setAreThereFormErrors] = useState(false);
 
 	const [isCurrentlyEdited, setIsCurrentlyEdited] = useState(false);
 
 	// check if it is a date
 	if (editableFields[name]?.type === "date")
-		value = new Date(value).toDateString();
+		value = new Date(value ?? "").toDateString();
 
 	function toggleEdit() {
 		// do not allow it to submit if it is locked
 		if (isLocked === true) return;
 		// submit if needed
 		if (isCurrentlyEdited) {
-
-			if (areThereFormErrors) return sendEditRequest(name, null);
-			sendEditRequest(name, formState);
+			// cancel if it is the same or empty
+			if (value !== formState && formState !== "") {
+				if (areThereFormErrors) return;
+				sendEditRequest(name, formState);
+			}else {
+				// reset
+				setFormState(value ?? "")
+			}
 		}
 
 		// toggle
@@ -75,7 +83,7 @@ export default function EditableField({
 						setAreThereLocalErrors={setAreThereFormErrors}
 					></FormComponent>
 				) : (
-					value
+					value ?? "<not specified>"
 				)}
 			</span>
 			{/* check that it can be edited */}

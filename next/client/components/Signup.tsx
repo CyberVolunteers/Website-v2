@@ -31,12 +31,15 @@ export function getSignupPerElementValidationCallbacks(
 		React.SetStateAction<{
 			[key: string]: string;
 		}>
-	>
+	>,
+	additionalData?: {
+		allowedEmailAddresses?: string[]
+	}
 ): PerElementValidatorCallbacks {
 	return {
 		email: [
 			(v: string) => isEmail(v),
-			createIsEmailIsAvailableValidator(overallErrors, setOverallErrors),
+			createIsEmailIsAvailableValidator(overallErrors, setOverallErrors, additionalData?.allowedEmailAddresses),
 		],
 		password: passwordStrengthSuggestions,
 		password2: passwordEquality,
@@ -133,9 +136,11 @@ function createIsEmailIsAvailableValidator(
 		SetStateAction<{
 			[key: string]: string;
 		}>
-	>
+	>,
+	allowedEmailAddresses?: string[]
 ) {
 	return async function (email: string) {
+		if(allowedEmailAddresses?.includes?.(email)) return true;
 		const res = await fetch(
 			`/api/isEmailFree?${new URLSearchParams({ email })}`,
 			{

@@ -487,7 +487,11 @@ function connectPerElementValidator(props: {
 		if (isFirstUpdate === false) setErrorMessage(newMsg);
 
 		// now check that the errors object is up to date
-		const errorsCopy = Object.assign({}, errors);
+		const errorsCopy: FormErrorsDescription = {
+			localErrorComponentsList: Object.assign({}, errors.localErrorComponentsList),
+			globalErrors: Object.assign({}, errors.globalErrors)
+		};
+
 
 		if (newMsg === null) delete errorsCopy.localErrorComponentsList[uniqueName];
 		else errorsCopy.localErrorComponentsList[uniqueName] = newMsg;

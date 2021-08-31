@@ -6,6 +6,8 @@ import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
+import { stringify } from "ajv";
+import { isValid, signupValidation } from "../../server/validation";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -16,6 +18,12 @@ type Data = {
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const signupResult = await signupUser(req.body);
+
+		if(!isValid(req.body, signupValidation)) return res
+			.status(400)
+			.send(
+				"This data does not seem correct. Could you please double-check it?"
+			);
 
 		if (!signupResult) {
 			logger.info("server.signupUser:Signup failed");

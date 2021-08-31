@@ -6,6 +6,7 @@ import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
+import { isValid, signupValidation } from "../../server/validation";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -16,6 +17,13 @@ type Data = {
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
+
+		if (!isValid(req.body, signupValidation))
+			return res
+				.status(400)
+				.send(
+					"This data does not seem correct. Could you please double-check it?"
+				);
 
 		logger.info("server.changeEmail: updating %s with %s", session, req.body);
 
