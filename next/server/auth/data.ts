@@ -59,8 +59,8 @@ export async function signupUser(params: any) {
 		return false;
 	}
 
-	await newUser.save();
-	return true;
+	const user = await newUser.save();
+	return user;
 }
 
 export async function signupOrg(params: any) {
@@ -73,8 +73,8 @@ export async function signupOrg(params: any) {
 		logger.info("server.auth.session:Email used for user");
 		return false;
 	}
-	await newUser.save();
-	return true;
+	const user = await newUser.save();
+	return user;
 }
 
 export async function isEmailFree(email: string) {

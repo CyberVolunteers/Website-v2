@@ -33,13 +33,17 @@ export function getSignupPerElementValidationCallbacks(
 		}>
 	>,
 	additionalData?: {
-		allowedEmailAddresses?: string[]
+		allowedEmailAddresses?: string[];
 	}
 ): PerElementValidatorCallbacks {
 	return {
 		email: [
 			(v: string) => isEmail(v),
-			createIsEmailIsAvailableValidator(overallErrors, setOverallErrors, additionalData?.allowedEmailAddresses),
+			createIsEmailIsAvailableValidator(
+				overallErrors,
+				setOverallErrors,
+				additionalData?.allowedEmailAddresses
+			),
 		],
 		password: passwordStrengthSuggestions,
 		password2: passwordEquality,
@@ -91,6 +95,7 @@ export function Signup({
 		data: FormFieldCollectionData
 	) {
 		delete data.password2;
+		console.log(data);
 		const res = await csrfFetch(csrfToken, `/api/signup${capitalize(target)}`, {
 			method: "POST",
 			credentials: "same-origin", // only send cookies for same-origin requests
@@ -110,7 +115,7 @@ export function Signup({
 			))
 		)
 			return;
-		router.push("/login");
+		router.push("/emailConfirmationEmailSent?redirect=/myAccount");
 	}
 	return (
 		<div>
@@ -140,7 +145,7 @@ function createIsEmailIsAvailableValidator(
 	allowedEmailAddresses?: string[]
 ) {
 	return async function (email: string) {
-		if(allowedEmailAddresses?.includes?.(email)) return true;
+		if (allowedEmailAddresses?.includes?.(email)) return true;
 		const res = await fetch(
 			`/api/isEmailFree?${new URLSearchParams({ email })}`,
 			{

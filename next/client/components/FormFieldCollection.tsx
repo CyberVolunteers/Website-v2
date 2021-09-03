@@ -2,6 +2,7 @@ import { Flattened } from "combined-validator";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Dispatch, SetStateAction } from "react";
+import { prepareFormState } from "../../serverAndClient/utils";
 import FormComponent, { FormState, PerElementValidatorCallbacks } from "./FormComponent";
 
 function FormFieldCollection({
@@ -33,6 +34,12 @@ function FormFieldCollection({
 		onChange?.();
 	}, [formState]);
 
+	const [internalFormState, setInternalFormState] = useState(formState);
+
+	useEffect(() => {
+		setFormState(prepareFormState(internalFormState as {[key: string]: any}, fields));
+	}, [internalFormState])
+
 	return (
 		<>
 			<FormComponent
@@ -41,8 +48,8 @@ function FormFieldCollection({
 				flattenedValue={{ type: fields, required: true }}
 				perElementValidationCallbacks={perElementValidationCallbacks ?? {}}
 				presentableNames={presentableNames}
-				formState={formState}
-				setFormState={setFormState}
+				formState={internalFormState}
+				setFormState={setInternalFormState}
 				setAreThereLocalErrors={setAreThereLocalErrors}
 				freezeValidation={freezeValidation}
 			/>

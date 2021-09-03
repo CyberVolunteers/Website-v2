@@ -9,6 +9,7 @@ import { logger } from "../../server/logger";
 import { sendEmail } from "../../server/email/nodemailer";
 import { notificationsEmail } from "../../serverAndClient/staticDetails";
 import { isValid, signupValidation } from "../../server/validation";
+import { updateSession } from "../../server/auth/auth-cookie";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -27,7 +28,7 @@ const handlers: HandlerCollection = {
 					"This data does not seem correct. Could you please double-check it?"
 				);
 
-		if (!signupResult) {
+		if (signupResult === false) {
 			logger.info("server.signupOrg:Signup failed");
 			return res
 				.status(400)
@@ -43,6 +44,9 @@ const handlers: HandlerCollection = {
 			subject: "<Notification> A charity just signed up",
 			text: `The charity is called "${req.body.orgName}", its email is "${req.body.email}" and it needs to be verified`,
 		});
+
+		// log in the poor soul
+		await updateSession(req, res, signupResult._doc);
 
 		return res.end();
 	},

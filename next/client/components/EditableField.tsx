@@ -1,5 +1,6 @@
 import { Flattened } from "combined-validator";
 import React, { useState } from "react";
+import { prepareFormState } from "../../serverAndClient/utils";
 import FormComponent, {
 	FormState,
 	PerElementValidatorCallbacks,
@@ -27,22 +28,25 @@ export default function EditableField({
 
 	const [isCurrentlyEdited, setIsCurrentlyEdited] = useState(false);
 
-	// check if it is a date
-	if (editableFields[name]?.type === "date")
-		value = new Date(value ?? "").toDateString();
-
 	function toggleEdit() {
 		// do not allow it to submit if it is locked
 		if (isLocked === true) return;
 		// submit if needed
 		if (isCurrentlyEdited) {
+
+			// a silly workaround
+			const processedFormState = prepareFormState(
+				{ _root: formState },
+				{ _root: editableFields[name] }
+			)._root;
+			
 			// cancel if it is the same or empty
-			if (value !== formState && formState !== "") {
+			if (value !== processedFormState && processedFormState !== "") {
 				if (areThereFormErrors) return;
-				sendEditRequest(name, formState);
-			}else {
+				sendEditRequest(name, processedFormState);
+			} else {
 				// reset
-				setFormState(value ?? "")
+				setFormState(value ?? "");
 			}
 		}
 
