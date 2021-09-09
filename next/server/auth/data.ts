@@ -86,7 +86,7 @@ export async function signupUser(params: any) {
 	}
 
 	const user = await newUser.save();
-	return user;
+	return user._doc;
 }
 
 export async function signupOrg(params: any) {

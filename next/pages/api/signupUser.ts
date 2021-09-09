@@ -8,7 +8,7 @@ import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { stringify } from "ajv";
 import { isValid, signupValidation } from "../../server/validation";
-import { updateSession } from "../../server/auth/auth-cookie";
+import { disableSession, updateSession } from "../../server/auth/auth-cookie";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -37,7 +37,10 @@ const handlers: HandlerCollection = {
 		}
 
 		// log in the poor soul
-		await updateSession(req, res, signupResult._doc);
+		console.log(signupResult);
+		// Delete the session cache so that the data does not persist
+		disableSession(req);
+		await updateSession(req, res, signupResult);
 
 		return res.end();
 	},

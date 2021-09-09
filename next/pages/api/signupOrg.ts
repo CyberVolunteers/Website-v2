@@ -9,7 +9,7 @@ import { logger } from "../../server/logger";
 import { sendEmail } from "../../server/email/nodemailer";
 import { notificationsEmail } from "../../serverAndClient/staticDetails";
 import { isValid, signupValidation } from "../../server/validation";
-import { updateSession } from "../../server/auth/auth-cookie";
+import { disableSession, updateSession } from "../../server/auth/auth-cookie";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -46,6 +46,8 @@ const handlers: HandlerCollection = {
 		});
 
 		// log in the poor soul
+		// Delete the session cache so that the data does not persist
+		disableSession(req);
 		await updateSession(req, res, signupResult);
 
 		return res.end();
