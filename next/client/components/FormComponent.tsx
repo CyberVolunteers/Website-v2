@@ -248,10 +248,10 @@ function InputElement(
 		setFormState(v); // do it straight away for responsiveness
 	}
 
-	// validate it on any update
+	// validate it on update
 	useEffect(() => {
 		validate(rawFormState);
-	});
+	}, [rawFormState]);
 
 	if (flattenedValue.enum !== undefined) {
 		if (flattenedValue.array === true)

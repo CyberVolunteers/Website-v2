@@ -46,7 +46,7 @@ const handlers: HandlerCollection = {
 		});
 
 		// log in the poor soul
-		await updateSession(req, res, signupResult._doc);
+		await updateSession(req, res, signupResult);
 
 		return res.end();
 	},
@@ -56,13 +56,15 @@ export default async function signupOrgRequest(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
+	const fields = Object.assign({}, organisations);
+	delete fields.required?.string?.contactEmails;
 	await createHandler(
 		handlers,
 		{
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(organisations)),
+			POST: ajv.compileParser(createAjvJTDSchema(fields)),
 		}
 	)(req, res);
 }

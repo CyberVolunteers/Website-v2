@@ -24,14 +24,28 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { unique: true },
+			// @ts-ignore
+			email: undefined,
 			// @ts-ignore
 			password: undefined, // delete the password field from server-side usage
-			passwordHash: { exactLength: 60 },
 		},
 		boolean: {
-			isEmailVerified: { default: false },
 			isOrganisationVerified: { default: false },
+		},
+		object: {
+			creds: {
+				array: true,
+				required: {
+					string: {
+						// @ts-ignore
+						email: { maxLength: 320, index: true },
+						passwordHash: { exactLength: 60 },
+					},
+					boolean: {
+						isEmailVerified: { default: false },
+					},
+				},
+			},
 		},
 	},
 };

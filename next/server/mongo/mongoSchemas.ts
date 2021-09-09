@@ -11,17 +11,15 @@ import {
 	listings as listingPrivate,
 } from "../privateFieldConstants";
 
-export const UserSchema = constructSchema(
-	deepAssign(usersPublic, usersPrivate)
-);
+export const UserSchema = constructUserSchema();
 export const OrgSchema = constructOrgSchema();
 export const ListingSchema = constructListingSchema();
 
 function constructUserSchema() {
 	const schema = constructSchema(deepAssign(usersPublic, usersPrivate));
-	schema.add({
-		listings: [{ type: Schema.Types.ObjectId, ref: "Listings" }],
-	});
+	// schema.add({
+	// 	listings: [{ type: Schema.Types.ObjectId, ref: "Listings" }],
+	// });
 
 	return schema;
 }

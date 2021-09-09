@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { addUserToListing, isUser } from "../../server/auth/data";
+import { addUserToListing, extractOrgData, isUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
@@ -41,7 +41,7 @@ const handlers: HandlerCollection = {
 			const orgId = newListingValue.organisation;
 			const org = await Org.findById(orgId);
 
-			const email = org?.email;
+			const email = session?.email;
 
 			const requiredFields = newListingValue.requiredData;
 
@@ -52,9 +52,9 @@ const handlers: HandlerCollection = {
 					}`
 			);
 
-			if (email)
+			if (Array.isArray(org.contactEmails))
 				await sendEmail({
-					to: email,
+					to: org.contactEmails,
 					subject: `<Notification> Someone has signed up for the listing "${newListingValue.title}"`,
 					text: `User data: ${fields.join(", ")}`,
 				});

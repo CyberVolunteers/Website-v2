@@ -15,12 +15,12 @@ export async function login({
 	// find instead of findOne to keep the time roughly constant relative to when there are no results
 	const [users, organisations] = await Promise.all([
 		User.find({ email }),
-		Org.find({ email }),
+		Org.find({ "creds.email": email }),
 	]);
 
 	const emailWasFound = users.length !== 0 || organisations.length !== 0;
 	const doesEmailBelongToUser = emailWasFound && users.length !== 0;
-	const storedInfo = emailWasFound
+	let storedInfo = emailWasFound
 		? doesEmailBelongToUser
 			? users[0]._doc
 			: organisations[0]._doc
@@ -41,10 +41,36 @@ export async function login({
 			schema.updateOne({ email }, { passwordHash: newHash });
 		}
 	);
+	// the rest can assume it is the only account
+	if (!doesEmailBelongToUser && emailWasFound)
+		storedInfo = extractOrgData(storedInfo, email);
 
 	storedInfo.isOrg = !doesEmailBelongToUser;
 
 	return isCorrectHash && emailWasFound ? storedInfo : false;
+}
+
+declare type Creds = {
+	email: string;
+	passwordHash: string;
+	isEmailVerified: boolean;
+};
+
+export function extractOrgData(user: any, targetEmail: string) {
+	const creds = (user.creds as (Creds & { _doc: Creds })[]).filter(
+		({ email }) => email === targetEmail
+	);
+	if (creds.length !== 1)
+		throw new Error(`server.data:Expected one email, found ${creds.length}`);
+
+	const out = {
+		...user._doc,
+		...creds[0]._doc,
+	};
+
+	delete out.creds;
+
+	return out;
 }
 
 export async function signupUser(params: any) {
@@ -64,17 +90,25 @@ export async function signupUser(params: any) {
 }
 
 export async function signupOrg(params: any) {
+	const email = params.email;
+
 	const passwordHash = await hash(params.password);
+
+	params.creds = [{ passwordHash, email }];
+	params.contactEmails = [email];
+
 	delete params.password;
-	params.passwordHash = passwordHash;
+	delete params.email;
+
 	const newUser = new Org(params);
 
-	if ((await isEmailFree(params.email)) === false) {
+	if ((await isEmailFree(email)) === false) {
 		logger.info("server.auth.session:Email used for user");
 		return false;
 	}
 	const user = await newUser.save();
-	return user;
+
+	return extractOrgData(user, email);
 }
 
 export async function isEmailFree(email: string) {
@@ -89,7 +123,7 @@ export async function isEmailFree(email: string) {
 	try {
 		await Promise.any([
 			failOnNoElements(User.findOne({ email })),
-			failOnNoElements(Org.findOne({ email })),
+			failOnNoElements(Org.findOne({ "creds.email": email })),
 		]);
 		return false;
 	} catch {
@@ -135,7 +169,7 @@ async function changeByEmail(email: string, newData: { [key: string]: any }) {
 	// find instead of findOne to keep the time roughly constant relative to when there are no results
 	const [users, organisations] = await Promise.all([
 		User.find({ email }),
-		Org.find({ email }),
+		Org.find({ "creds.email": email }),
 	]);
 
 	// no such email
@@ -164,7 +198,7 @@ export async function setEmailAsVerified(email: string) {
 	});
 }
 
-export async function setPassword(email: string, password: string){
+export async function setPassword(email: string, password: string) {
 	const passwordHash = await hash(password);
 	return await changeByEmail(email, {
 		passwordHash,

@@ -11,6 +11,7 @@ import { Signup } from "../client/components/Signup";
 export default function OrganisationSignup(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
 ): ReactElement {
+	delete props.fields.contactEmails;
 	return (
 		<div>
 			<Head title="Organisation sign up - cybervolunteers" />

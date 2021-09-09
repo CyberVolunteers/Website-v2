@@ -33,7 +33,8 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { maxLength: 320 },
+			email: { maxLength: 320, },
+			contactEmails: { maxLength: 320, array: true },
 			password: {},
 			orgType: { maxLength: 60 },
 			orgName: { maxLength: 150 },
