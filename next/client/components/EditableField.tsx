@@ -33,13 +33,12 @@ export default function EditableField({
 		if (isLocked === true) return;
 		// submit if needed
 		if (isCurrentlyEdited) {
-
 			// a silly workaround
 			const processedFormState = prepareFormState(
 				{ _root: formState },
 				{ _root: editableFields[name] }
 			)._root;
-			
+
 			// cancel if it is the same or empty
 			if (value !== processedFormState && processedFormState !== "") {
 				if (areThereFormErrors) return;
@@ -105,4 +104,9 @@ export default function EditableField({
 			})()}
 		</p>
 	);
+}
+
+function displayValue(value: any) {
+	if (Array.isArray(value)) return value.join(", ");
+	return value;
 }

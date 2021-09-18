@@ -12,10 +12,8 @@ export const users: FieldConstraintsCollection = {
 			lastName: { maxLength: 30 },
 			email: { maxLength: 320 },
 			password: {},
-			gender: { enum: ["male", "female", "other"] },
 			city: { maxLength: 85 },
 			country: { maxLength: 56 },
-			skillsAndInterests: { maxLength: 1000 },
 		},
 		date: {
 			birthDate: {},
@@ -23,6 +21,10 @@ export const users: FieldConstraintsCollection = {
 	},
 	optional: {
 		string: {
+			gender: { enum: ["male", "female", "other"] },
+			occupation: { maxLength: 200 },
+			languages: { maxLength: 200 },
+			skillsAndInterests: { maxLength: 1000 },
 			nationality: { maxLength: 60 },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
@@ -33,7 +35,7 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { maxLength: 320, },
+			email: { maxLength: 320 },
 			contactEmails: { maxLength: 320, array: true },
 			password: {},
 			orgType: { maxLength: 60 },
@@ -47,6 +49,9 @@ export const organisations: FieldConstraintsCollection = {
 	optional: {
 		string: {
 			websiteUrl: { maxLength: 100 },
+		},
+		boolean: {
+			// hasSafeguarding: {default: true }
 		},
 	},
 };

@@ -18,6 +18,9 @@ export default function NotAllowed(): ReactElement {
 			router.push(typeof redirect === "string" ? redirect : "/");
 	}, [currentUser, router]);
 
+	let doesEmailHaveToBeVerified = false;
+	let hasToLogIn = false;
+
 	return (
 		<div>
 			<Head title="Access not allowed - cybervolunteers" />
@@ -26,16 +29,21 @@ export default function NotAllowed(): ReactElement {
 				if (!isAfterHydration) return null;
 				switch (currentUser) {
 					case "org":
+						hasToLogIn = true;
 						return <p>Please log in as a volunteer to view that page</p>;
 					case "user":
+						hasToLogIn = true;
 						return <p>Please log in as an organisation to view that page</p>;
 					case "unverified_user":
+						doesEmailHaveToBeVerified = true;
 						return <p>Please verify your email to view this page.</p>;
 					case "unverified_org": {
 						const phrases = [];
 						const accountInfo = getAccountInfo();
-						if (accountInfo?.isEmailVerified !== true)
+						if (accountInfo?.isEmailVerified !== true) {
+							doesEmailHaveToBeVerified = true;
 							phrases.push("Please verify your email to view that page. ");
+						}
 						if (accountInfo?.isOrganisationVerified !== true)
 							phrases.push(
 								`We ${
@@ -48,7 +56,7 @@ export default function NotAllowed(): ReactElement {
 						return <p>Please log in to view that page</p>;
 				}
 			})()}
-			{currentUser === "unverified_user" || currentUser === "unverified_org" ? (
+			{doesEmailHaveToBeVerified ? (
 				//TODO: change this page url
 				<Link
 					href={`/emailConfirmationEmailSent?redirect=${
@@ -61,11 +69,18 @@ export default function NotAllowed(): ReactElement {
 					</a>
 				</Link>
 			) : (
-				<Link href={`/emailConfirmationEmailSent?redirect=${router.query.redirect ?? ""}`} passHref>
-					<a>
-						<p>Log in!</p>
-					</a>
-				</Link>
+				hasToLogIn ? (
+					<Link
+						href={`/emailConfirmationEmailSent?redirect=${
+							router.query.redirect ?? ""
+						}`}
+						passHref
+					>
+						<a>
+							<p>Log in!</p>
+						</a>
+					</Link>
+				) : null
 			)}
 		</div>
 	);

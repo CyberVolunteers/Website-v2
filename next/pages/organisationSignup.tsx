@@ -12,6 +12,7 @@ export default function OrganisationSignup(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
 ): ReactElement {
 	delete props.fields.contactEmails;
+	delete props.fields.hasSafeguarding;
 	return (
 		<div>
 			<Head title="Organisation sign up - cybervolunteers" />

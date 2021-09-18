@@ -33,6 +33,7 @@ import { csrfFetch } from "../client/utils/csrf";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { CircularProgress } from "@material-ui/core";
 import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
+import isEmail from "validator/lib/isEmail";
 
 export function createEmailChangingFunction(
 	overallErrors: { [key: string]: any },
@@ -144,6 +145,8 @@ export default function MyAccount({
 			allowedEmailAddresses: [fields.email],
 		});
 
+	perElementValidationCallbacks.contactEmails = (v: string) => isEmail(v);
+
 	return (
 		<div>
 			<Head title="My account - cybervolunteers" />
@@ -248,8 +251,9 @@ export const getServerSideProps: GetServerSideProps<{
 
 		delete allFields.password;
 
-		const fieldKeys = Object.keys(fieldNames).filter((k) => k in session); // only show the keys that have been specified
-		fields = Object.fromEntries(fieldKeys.map((k) => [k, session[k]])); // translate them
+		fields = Object.fromEntries(
+			Object.entries(session).filter(([k, v]) => k in allFields)
+		); // only show the ones which were selected
 	}
 
 	return {

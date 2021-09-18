@@ -26,6 +26,8 @@ const handlers: HandlerCollection = {
 					"This data does not seem correct. Could you please double-check it?"
 				);
 
+				console.log(req.body.contactEmails);
+
 		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
 
 		if (!isOrg(session))

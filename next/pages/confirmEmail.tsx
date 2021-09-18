@@ -88,6 +88,7 @@ export const getServerSideProps: GetServerSideProps<{
 			resultDoc._doc
 		);
 	else isSuccessful = false; // the user was not found
+
 	return {
 		props: {
 			isSuccessful,

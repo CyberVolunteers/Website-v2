@@ -238,8 +238,15 @@ function InputElement(
 	}
 
 	function validate(v: any) {
-		if (freezeValidation !== true && validationCallback !== null)
-			validationCallback(name, v, isFirstUpdate);
+		if (freezeValidation !== true && validationCallback !== null) {
+			if (flattenedValue.array === true) {
+				v.forEach((subVal: any) => {
+					validationCallback(name, subVal, isFirstUpdate);
+				});
+			} else {
+				validationCallback(name, v, isFirstUpdate);
+			}
+		}
 	}
 
 	function setValue(v: any) {
@@ -253,6 +260,10 @@ function InputElement(
 		validate(rawFormState);
 	}, [rawFormState]);
 
+	console.log(flattenedValue);
+
+	if (inputType === "string" && flattenedValue.array === true)
+		return <MultiText {...props} setValue={setValue} />;
 	if (flattenedValue.enum !== undefined) {
 		if (flattenedValue.array === true)
 			return <MultiSelect {...props} setValue={setValue} />;
@@ -265,6 +276,80 @@ function InputElement(
 			inputType={inputType}
 			setValue={setValue}
 		/>
+	);
+}
+
+function MultiText({
+	flattenedValue,
+	formState,
+	setValue,
+	presentableNames,
+}: {
+	flattenedValue: FlattenedValue;
+	formState: FormState;
+	setValue: (v: any) => void;
+	presentableNames?: { [key: string]: string };
+}) {
+	if (!Array.isArray(formState)) throw Error("Invalid form state type");
+	return (
+		<span>
+			{formState.map((v: string, i: number) => {
+				return (
+					<span key={i}>
+						<br />
+
+						<input
+							value={v}
+							onChange={(e) => {
+								const newVal = e.target.value;
+								const arrayCopy = [...formState];
+								arrayCopy[i] = newVal;
+								setValue(arrayCopy);
+							}}
+						></input>
+						{formState.length === 1 ? null : (
+							<span
+								onClick={() => {
+									const arrayCopy = [...formState];
+									arrayCopy.splice(i, 1); // delete the current element
+									setValue(arrayCopy);
+								}}
+							>
+								{"<minus sign>"}
+							</span>
+						)}
+
+						{/* <span
+							style={{
+								textDecoration: formState.includes(v) ? "underline" : "none",
+								cursor: "pointer",
+							}}
+							onClick={() => {
+								const newState = [...formState]; // clone
+								const index = newState.indexOf(v);
+								// delete or add
+								if (index !== -1) newState.splice(index, 1);
+								else newState.push(v);
+								setValue(newState);
+							}}
+						>
+							{getPresentableName(v, presentableNames)}
+						</span>
+						<br /> */}
+					</span>
+				);
+			})}
+			<br />
+			<span
+				onClick={() => {
+					const arrayCopy = [...formState];
+					arrayCopy.push(""); // add a new element
+					setValue(arrayCopy);
+				}}
+			>
+				{"<plus sign>"}
+			</span>
+		</span>
 	);
 }
 
@@ -332,7 +417,9 @@ function DropdownComponent({
 			onChange={(e) => setValue(e.target.value)}
 		>
 			{
-				formState === "" ? <option value="notSelected">Select:</option> : null // only show this if nothing else is selected
+				formState === "" || !flattenedValue.required ? (
+					<option value="notSelected">Select:</option>
+				) : null // only show this if nothing else is selected
 			}
 			{Object.entries(flattenedValue.enum).map(([k, v]: [string, any]) => (
 				<option key={k} value={v}>
@@ -476,8 +563,8 @@ function connectPerElementValidator(props: {
 						break;
 					}
 				}
-			}
-		} catch (e) {
+			} else hasPassed = false;
+		} catch (e: any) {
 			hasPassed = false;
 			reason = e.message;
 		}
@@ -488,10 +575,12 @@ function connectPerElementValidator(props: {
 
 		// now check that the errors object is up to date
 		const errorsCopy: FormErrorsDescription = {
-			localErrorComponentsList: Object.assign({}, errors.localErrorComponentsList),
-			globalErrors: Object.assign({}, errors.globalErrors)
+			localErrorComponentsList: Object.assign(
+				{},
+				errors.localErrorComponentsList
+			),
+			globalErrors: Object.assign({}, errors.globalErrors),
 		};
-
 
 		if (newMsg === null) delete errorsCopy.localErrorComponentsList[uniqueName];
 		else errorsCopy.localErrorComponentsList[uniqueName] = newMsg;

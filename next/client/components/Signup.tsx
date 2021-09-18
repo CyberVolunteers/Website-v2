@@ -144,6 +144,7 @@ function createIsEmailIsAvailableValidator(
 	allowedEmailAddresses?: string[]
 ) {
 	return async function (email: string) {
+		// allow reusing old emails
 		if (allowedEmailAddresses?.includes?.(email)) return true;
 		const res = await fetch(
 			`/api/isEmailFree?${new URLSearchParams({ email })}`,

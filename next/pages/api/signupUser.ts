@@ -37,7 +37,6 @@ const handlers: HandlerCollection = {
 		}
 
 		// log in the poor soul
-		console.log(signupResult);
 		// Delete the session cache so that the data does not persist
 		disableSession(req);
 		await updateSession(req, res, signupResult);

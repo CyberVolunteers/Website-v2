@@ -19,7 +19,8 @@ export async function login({
 	]);
 
 	const emailWasFound = users.length !== 0 || organisations.length !== 0;
-	const doesEmailBelongToUser = emailWasFound && users.length !== 0;
+	const doesEmailBelongToUser = organisations.length === 0;
+
 	let storedInfo = emailWasFound
 		? doesEmailBelongToUser
 			? users[0]._doc
@@ -27,6 +28,10 @@ export async function login({
 		: {
 				passwordHash: "this should never match", // a dummy "hash" against timing attacks
 		  };
+
+	// the rest can assume it is the only account
+	if (!doesEmailBelongToUser && emailWasFound)
+		storedInfo = extractOrgData(storedInfo, email);
 
 	logger.info(
 		"server.auth.session:Login credentials found in the db: %s",
@@ -41,9 +46,6 @@ export async function login({
 			schema.updateOne({ email }, { passwordHash: newHash });
 		}
 	);
-	// the rest can assume it is the only account
-	if (!doesEmailBelongToUser && emailWasFound)
-		storedInfo = extractOrgData(storedInfo, email);
 
 	storedInfo.isOrg = !doesEmailBelongToUser;
 
@@ -57,6 +59,9 @@ declare type Creds = {
 };
 
 export function extractOrgData(user: any, targetEmail: string) {
+	user = user._doc ?? user;
+	logger.info("server.auth.data: Extracting org data from %s", user);
+	// must be only one set of credentials
 	const creds = (user.creds as (Creds & { _doc: Creds })[]).filter(
 		({ email }) => email === targetEmail
 	);
@@ -64,11 +69,13 @@ export function extractOrgData(user: any, targetEmail: string) {
 		throw new Error(`server.data:Expected one email, found ${creds.length}`);
 
 	const out = {
-		...user._doc,
+		...user,
 		...creds[0]._doc,
 	};
 
 	delete out.creds;
+
+	logger.info("server.auth.data: Extraction result: %s", out);
 
 	return out;
 }
@@ -103,7 +110,7 @@ export async function signupOrg(params: any) {
 	const newUser = new Org(params);
 
 	if ((await isEmailFree(email)) === false) {
-		logger.info("server.auth.session:Email used for user");
+		logger.info("server.auth.session:Email used for org");
 		return false;
 	}
 	const user = await newUser.save();
@@ -142,7 +149,7 @@ export async function updateOrgData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, { email }, Org);
+	return await updateData(data, { "creds.email": email }, Org);
 }
 
 export async function updateListingData(
@@ -177,9 +184,25 @@ async function changeByEmail(email: string, newData: { [key: string]: any }) {
 
 	const doesEmailBelongToUser = users.length !== 0;
 
+	const searchParams = doesEmailBelongToUser
+		? { email }
+		: { "creds.email": email };
+
 	const model = doesEmailBelongToUser ? User : Org;
 
-	return await model.findOneAndUpdate({ email }, newData, {
+	// make sure to put the modified data into the array if a charity
+	if (!doesEmailBelongToUser) {
+		const perUserFields = ["email", "isEmailVerified", "passwordHash"];
+		Object.entries(newData).forEach(([k, v]) => {
+			if (perUserFields.includes(k)) {
+				newData["$set"] = newData["$set"] ?? {};
+				newData["$set"][`creds.$.${k}`] = v;
+				delete newData[k];
+			}
+		});
+	}
+
+	return await model.findOneAndUpdate(searchParams, newData, {
 		new: true,
 		upsert: false, // do not create a new one
 	});

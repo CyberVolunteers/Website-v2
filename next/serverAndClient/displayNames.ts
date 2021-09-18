@@ -2,6 +2,7 @@
 
 export const orgFieldNamesToShow = {
 	email: "Email",
+	contactEmails: "Contact emails",
 	orgType: "The type of your organisation",
 	orgName: "The name of your organisation",
 	orgDesc: "The description of your organisation",
@@ -9,6 +10,7 @@ export const orgFieldNamesToShow = {
 	phoneNumber: "Your phone number",
 	websiteUrl: "The web address of your website",
 	password2: "Repeat your password",
+	hasSafeguarding: "Does this charity have valid safeguarding policies?",
 };
 
 export const userFieldNamesToShow = {
