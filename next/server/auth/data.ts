@@ -209,6 +209,12 @@ async function changeByEmail(email: string, newData: { [key: string]: any }) {
 }
 
 export async function changeEmail(oldEmail: string, newEmail: string) {
+	if ((await isEmailFree(newEmail)) === false) {
+		logger.info("server.auth.session:Email used for user");
+
+		return null;
+	}
+
 	return await changeByEmail(oldEmail, {
 		email: newEmail,
 		isEmailVerified: false,

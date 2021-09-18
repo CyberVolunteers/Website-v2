@@ -24,11 +24,6 @@ function FormFieldCollection({
 	freezeValidation?: boolean;
 	onChange?: () => void;
 }) {
-	const [areThereLocalErrors, setAreThereLocalErrors] = useState(false);
-
-	useEffect(() => {
-		setHasErrors(areThereLocalErrors);
-	}, [areThereLocalErrors]);
 
 	useEffect(() => {
 		onChange?.();
@@ -50,7 +45,7 @@ function FormFieldCollection({
 				presentableNames={presentableNames}
 				formState={internalFormState}
 				setFormState={setInternalFormState}
-				setAreThereLocalErrors={setAreThereLocalErrors}
+				setAreThereLocalErrors={setHasErrors}
 				freezeValidation={freezeValidation}
 			/>
 		</>

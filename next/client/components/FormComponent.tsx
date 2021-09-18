@@ -82,9 +82,9 @@ function FormComponent(
 
 	// make sure to keep this up-to-date
 	useEffect(() => {
-		setAreThereLocalErrors(
-			Object.keys(errors.localErrorComponentsList).length !== 0
-		);
+		const areThereLocalErrors =
+			Object.keys(errors.localErrorComponentsList).length !== 0;
+		setAreThereLocalErrors(areThereLocalErrors);
 	}, [errors]);
 
 	const guaranteedRootFormState =
@@ -259,8 +259,6 @@ function InputElement(
 	useEffect(() => {
 		validate(rawFormState);
 	}, [rawFormState]);
-
-	console.log(flattenedValue);
 
 	if (inputType === "string" && flattenedValue.array === true)
 		return <MultiText {...props} setValue={setValue} />;
@@ -563,7 +561,7 @@ function connectPerElementValidator(props: {
 						break;
 					}
 				}
-			} else hasPassed = false;
+			} else if (flattenedValue.required && v === "") hasPassed = false;
 		} catch (e: any) {
 			hasPassed = false;
 			reason = e.message;
