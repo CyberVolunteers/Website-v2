@@ -1,11 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import {
-	changeEmail,
-	extractOrgData,
-	isLoggedIn,
-} from "../../server/auth/data";
+import { changeEmail, isLoggedIn } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
@@ -36,10 +32,7 @@ const handlers: HandlerCollection = {
 
 		const oldEmail = session.email;
 
-		const newDoc = extractOrgData(
-			await changeEmail(oldEmail, req.body.email),
-			req.body.email
-		);
+		const newDoc = await changeEmail(oldEmail, req.body.email);
 
 		if (newDoc === null)
 			return res

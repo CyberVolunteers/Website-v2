@@ -23,18 +23,17 @@ export async function login({
 
 	let storedInfo = emailWasFound
 		? doesEmailBelongToUser
-			? users[0]._doc
-			: organisations[0]._doc
+			? users[0]
+			: organisations[0]
 		: {
 				passwordHash: "this should never match", // a dummy "hash" against timing attacks
 		  };
 
-	// the rest can assume it is the only account
-	if (!doesEmailBelongToUser && emailWasFound)
-		storedInfo = extractOrgData(storedInfo, email);
+	// prepare it for the future access
+	storedInfo = extractData(storedInfo, email);
 
 	logger.info(
-		"server.auth.session:Login credentials found in the db: %s",
+		"server.auth.session:Were login credentials found in the db?: %s",
 		emailWasFound
 	);
 
@@ -58,8 +57,7 @@ declare type Creds = {
 	isEmailVerified: boolean;
 };
 
-export function extractOrgData(user: any, targetEmail: string) {
-	user = user._doc ?? user;
+function extractOrgData(user: any, targetEmail: string) {
 	logger.info("server.auth.data: Extracting org data from %s", user);
 	// must be only one set of credentials
 	const creds = (user.creds as (Creds & { _doc: Creds })[]).filter(
@@ -80,6 +78,24 @@ export function extractOrgData(user: any, targetEmail: string) {
 	return out;
 }
 
+export function extractData(data: any, email: string | null) {
+	if (data === null) return;
+	data = data._doc ?? data;
+	// see if it is a user and not a random piece of data
+	// const isUser = data.lastName !== undefined;
+	const isOrg = data.orgType !== undefined;
+
+	if (isOrg) {
+		if (email === null)
+			throw new Error(
+				"server.auth.data: The email was null while extracting org data"
+			);
+		return extractOrgData(data, email);
+	}
+
+	return data;
+}
+
 export async function signupUser(params: any) {
 	const passwordHash = await hash(params.password);
 	delete params.password;
@@ -93,7 +109,7 @@ export async function signupUser(params: any) {
 	}
 
 	const user = await newUser.save();
-	return user._doc;
+	return extractData(user, null);
 }
 
 export async function signupOrg(params: any) {
@@ -149,7 +165,7 @@ export async function updateOrgData(
 	data: any,
 	email: string
 ): Promise<{ [key: string]: any } | null> {
-	return await updateData(data, { "creds.email": email }, Org);
+	return await updateData(data, { "creds.email": email }, Org, email);
 }
 
 export async function updateListingData(
@@ -163,16 +179,18 @@ export async function updateListingData(
 async function updateData(
 	data: any,
 	constraints: { [key: string]: any },
-	model: typeof User | typeof Org | typeof Listing
+	model: typeof User | typeof Org | typeof Listing,
+	email?: string
 ): Promise<{ [key: string]: any } | null> {
 	let doc = await model.findOneAndUpdate(constraints, data, {
 		new: true,
 		upsert: false, // do not create a new one
 	});
-	return doc;
+	return extractData(doc, email ?? null);
 }
 
 async function changeByEmail(email: string, newData: { [key: string]: any }) {
+	const latestEmail = newData.email ?? email; // make sure to get the latest email data
 	// find instead of findOne to keep the time roughly constant relative to when there are no results
 	const [users, organisations] = await Promise.all([
 		User.find({ email }),
@@ -202,10 +220,13 @@ async function changeByEmail(email: string, newData: { [key: string]: any }) {
 		});
 	}
 
-	return await model.findOneAndUpdate(searchParams, newData, {
-		new: true,
-		upsert: false, // do not create a new one
-	});
+	return extractData(
+		await model.findOneAndUpdate(searchParams, newData, {
+			new: true,
+			upsert: false, // do not create a new one
+		}),
+		latestEmail
+	);
 }
 
 export async function changeEmail(oldEmail: string, newEmail: string) {
@@ -253,7 +274,7 @@ export async function addUserToListing(userId: string, listingUuid: string) {
 		}
 	);
 
-	return out;
+	return extractData(out, null);
 }
 
 export function isLoggedIn(session: any) {

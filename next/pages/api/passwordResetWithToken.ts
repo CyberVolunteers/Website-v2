@@ -26,7 +26,8 @@ const handlers: HandlerCollection = {
 
 		const isCorrectUUID = await verifyUUID(email, uuid, "passwordResetUUID");
 
-		if(!isCorrectUUID) return res.status(400).send("We are sorry, but this link has expired");
+		if (!isCorrectUUID)
+			return res.status(400).send("We are sorry, but this link has expired");
 
 		const newDoc = await setPassword(email, password);
 
@@ -35,7 +36,7 @@ const handlers: HandlerCollection = {
 				.status(500)
 				.send("We could not update your data. Sorry for the inconvenience.");
 
-		await updateSession(req, res, newDoc._doc);
+		await updateSession(req, res, newDoc);
 
 		return res.end();
 	},

@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { addUserToListing, extractOrgData, isUser } from "../../server/auth/data";
+import { addUserToListing, isUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
@@ -39,7 +39,7 @@ const handlers: HandlerCollection = {
 		// can be done out-of-sync, so no await here
 		(async function () {
 			const orgId = newListingValue.organisation;
-			const org = await Org.findById(orgId);
+			const org = await Org.findById(orgId)._doc;
 
 			const email = session?.email;
 

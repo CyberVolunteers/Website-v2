@@ -85,7 +85,7 @@ export const getServerSideProps: GetServerSideProps<{
 		await updateSession(
 			context.req as ExtendedNextApiRequest,
 			context.res as NextApiResponse,
-			resultDoc._doc
+			resultDoc
 		);
 	else isSuccessful = false; // the user was not found
 

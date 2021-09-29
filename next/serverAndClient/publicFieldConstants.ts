@@ -1,8 +1,11 @@
 import {
 	deepAssign,
 	FieldConstraintsCollection,
+	filterRules,
 	flatten,
 } from "combined-validator";
+
+// client_ prefix means that the option is for the client
 
 //TODO: separate into push and pull fields
 export const users: FieldConstraintsCollection = {
@@ -10,8 +13,8 @@ export const users: FieldConstraintsCollection = {
 		string: {
 			firstName: { maxLength: 30 },
 			lastName: { maxLength: 30 },
-			email: { maxLength: 320 },
-			password: {},
+			email: { maxLength: 320, client_specialEdit: true },
+			password: { client_specialEdit: true },
 			city: { maxLength: 85 },
 			country: { maxLength: 56 },
 		},
@@ -35,13 +38,13 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { maxLength: 320 },
+			email: { maxLength: 320, client_specialEdit: true },
 			contactEmails: { maxLength: 320, array: true },
-			password: {},
+			password: { client_specialEdit: true },
 			orgType: { maxLength: 60 },
 			orgName: { maxLength: 150 },
 			orgDesc: { maxLength: 5000 },
-			orgLocation: { maxLength: 150 },
+			orgLocation: { maxLength: 150, client_specialEdit: true },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
 		},
@@ -51,7 +54,7 @@ export const organisations: FieldConstraintsCollection = {
 			websiteUrl: { maxLength: 100 },
 		},
 		boolean: {
-			// hasSafeguarding: {default: true }
+			hasSafeguarding: { default: false },
 		},
 	},
 };
@@ -80,8 +83,8 @@ export const listings: FieldConstraintsCollection = {
 				enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
 				array: true,
 			},
-			imagePath: {},
-			uuid: { exactLength: 36 },
+			imagePath: { client_readonly: true },
+			uuid: { exactLength: 36, client_readonly: true },
 		},
 		object: {
 			targetAudience: {
@@ -106,6 +109,7 @@ export const listings: FieldConstraintsCollection = {
 						isOnline: {},
 					},
 				},
+				client_specialEdit: true,
 			},
 		},
 		boolean: {
@@ -147,48 +151,34 @@ export const searchListingsSpec: FieldConstraintsCollection = {
 	},
 };
 
-// deep copy
-// I have no clue why deepAssign is not working in this case
-export const userDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
-	JSON.stringify(users)
-);
-// NOTE: deleting some fields
-delete userDataUpdateSpec.required?.string?.password;
-// Make all optional
-userDataUpdateSpec.optional = deepAssign(
-	userDataUpdateSpec.optional,
-	userDataUpdateSpec.required
-);
-delete userDataUpdateSpec.required;
+function prepareUpdateSpec(
+	spec: FieldConstraintsCollection
+): FieldConstraintsCollection {
+	// deep copy
+	// I have no clue why deepAssign is not working in this case
+	const newSpec = filterRules(
+		JSON.parse(JSON.stringify(spec)),
+		["client_specialEdit", "client_readonly"],
+		([isSpecialEdit, isReadOnly]: (boolean | undefined)[]) =>
+			!(isSpecialEdit === true || isReadOnly == true)
+	);
 
-// deep copy
-// I have no clue why deepAssign is not working in this case
-export const orgDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
-	JSON.stringify(organisations)
-);
-// NOTE: deleting some fields
-delete orgDataUpdateSpec.required?.string?.password;
-// Make all optional
-orgDataUpdateSpec.optional = deepAssign(
-	orgDataUpdateSpec.optional,
-	orgDataUpdateSpec.required
-);
-delete orgDataUpdateSpec.required;
+	// Make all optional
+	newSpec.optional = deepAssign(newSpec.optional, newSpec.required);
+	delete newSpec.required;
 
-// deep copy
-// I have no clue why deepAssign is not working in this case
-export const listingDataUpdateSpec: FieldConstraintsCollection = JSON.parse(
-	JSON.stringify(listings)
-);
-// NOTE: deleting some fields
-delete listingDataUpdateSpec.required?.string?.imagePath;
-delete listingDataUpdateSpec.required?.string?.uuid;
+	return newSpec;
+}
 
-// Make all optional
-listingDataUpdateSpec.optional = deepAssign(
-	listingDataUpdateSpec.optional,
-	listingDataUpdateSpec.required
-);
+export const userDataUpdateSpec = prepareUpdateSpec(users);
+
+export const orgDataUpdateSpec = prepareUpdateSpec(organisations);
+
+export const listingDataUpdateSpec = prepareUpdateSpec(listings);
+
+console.log(listingDataUpdateSpec);
+
+// for identification
 listingDataUpdateSpec.required = {
 	string: {
 		uuid: { exactLength: 36 },

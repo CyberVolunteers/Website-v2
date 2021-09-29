@@ -50,7 +50,7 @@ const handlers: HandlerCollection = {
 		const newDoc = await setPassword(session.email, password);
 
 		// reset the session
-		await updateSession(req, res, newDoc._doc);
+		await updateSession(req, res, newDoc);
 
 		return res.end();
 	},

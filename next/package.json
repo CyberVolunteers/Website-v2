@@ -19,7 +19,7 @@
 		"ajv": "^8.6.2",
 		"axios": "^0.21.1",
 		"bcrypt": "^5.0.1",
-		"combined-validator": "^0.3.1",
+		"combined-validator": "^0.3.3",
 		"cookie": "^0.4.1",
 		"dotenv": "^10.0.0",
 		"mongoose": "^5.13.3",
