@@ -9,6 +9,8 @@ services:
 
     volumes:
       - ../../next/:/usr/app
+      # Ignore node_modules
+      - /usr/app/node_modules
 
     depends_on:
       - mongo-dev

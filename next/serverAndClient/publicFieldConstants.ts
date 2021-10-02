@@ -176,7 +176,7 @@ export const orgDataUpdateSpec = prepareUpdateSpec(organisations);
 
 export const listingDataUpdateSpec = prepareUpdateSpec(listings);
 
-console.log(listingDataUpdateSpec);
+// console.log(listingDataUpdateSpec);
 
 // for identification
 listingDataUpdateSpec.required = {

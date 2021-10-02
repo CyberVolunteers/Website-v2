@@ -233,9 +233,8 @@ export const getServerSideProps: GetServerSideProps<{
 	allFields: Flattened;
 	fieldNames: { [key: string]: string };
 	csrfToken: string;
-}> = async (context) => {
+}> = async (context: any) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	console.log(session);
 	let fields: AccountDataType = {};
 	let editableFields: Flattened = {};
 	let allFields: Flattened = {};
