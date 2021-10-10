@@ -231,3 +231,51 @@
 	background-color: #ea6c39;
 	color: #fff;
 }
+
+@media screen and (max-width: 1200px) {
+	.cookie-banner .content {
+		width: 95%;
+	}
+}
+
+@media screen and (max-width: 950px) {
+	.cookie-banner .content {
+		grid-template-columns: 1fr;
+		grid-gap: 1rem;
+	}
+	.buttons-cookies {
+		justify-content: center;
+	}
+
+	.close-icon {
+		top: 25px;
+	}
+	.cookie-banner .content > p {
+		padding-right: 30px;
+	}
+	.cookie-banner .content {
+		width: 93%;
+	}
+}
+
+@media screen and (max-width: 850px) {
+  .cookie-banner .content {
+    flex-direction: column;
+  }
+  .cookie-banner .content > p {
+    margin-bottom: 1rem;
+  }
+}
+
+@media screen and (max-width: 400px) {
+  .buttons-cookies {
+    flex-direction: column;
+  }
+  .buttons-cookies > * {
+    width: 100% !important;
+  }
+  .buttons-cookies > * + * {
+    margin-left: 0rem !important;
+    margin-top: 10px;
+  }
+}
