@@ -10,7 +10,7 @@ import {
 import { getSession } from "../../server/auth/auth-cookie";
 import { isVerifiedOrg } from "../../server/auth/data";
 import { createListing } from "../../server/listings";
-import { HandlerCollection, MulterReq } from "../../server/types";
+import { ExtendedNextApiRequest, HandlerCollection, MulterReq } from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";
 import { allowedFileTypes } from "../../serverAndClient/staticDetails";
 import { logger } from "../../server/logger";

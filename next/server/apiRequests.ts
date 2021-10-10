@@ -155,7 +155,7 @@ async function sanitize(
  * @returns
  */
 export function runMiddleware(
-	req: ExtendedNextApiResponse,
+	req: ExtendedNextApiRequest,
 	res: ExtendedNextApiResponse,
 	middleware: (
 		req: ExtendedNextApiResponse,
