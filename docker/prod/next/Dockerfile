@@ -21,6 +21,4 @@ RUN npm i
 RUN npx next telemetry disable
 RUN npm run build
 
-RUN ls -la .
-
 CMD /wait && npm run start

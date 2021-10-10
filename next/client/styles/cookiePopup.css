@@ -1,0 +1,233 @@
+.cookies-pop-up {
+	position: fixed;
+	width: 100%;
+	height: 100vh;
+	overflow: auto;
+	top: 0;
+	left: 0;
+	background-color: rgba(0, 0, 0, 0.7);
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	z-index: 222;
+}
+.cookies-pop-up .content {
+	width: 500px;
+	background-color: #fff;
+}
+.cookies-pop-up .content .top-area {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	padding: 1rem 1.5rem;
+	border-bottom: 1px solid #ddd;
+}
+.cookies-pop-up .content .top-area img {
+	width: 150px;
+}
+.cookies-pop-up .content .top-area .close-icon-cookie {
+	cursor: pointer;
+}
+.cookies-pop-up .content .presentation-area {
+	padding: 1rem 2rem;
+}
+.cookies-pop-up .content .presentation-area h3,
+.cookie-preference > h3 {
+	color: #333;
+	font-size: 17px;
+}
+.cookies-pop-up .content .presentation-area p {
+	font-size: 15px;
+	margin-top: 0.5rem;
+	line-height: 1.5rem;
+	color: #333;
+}
+
+.cookies-pop-up .content .presentation-area button,
+.confirm-choice button {
+	margin-top: 1rem;
+	width: 150px;
+	padding: 0.8rem 0rem;
+	border: none;
+	outline: none;
+	font-size: 16px;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
+	border-radius: 5px;
+	background-color: #ea6c39;
+	color: #fff;
+}
+.confirm-choice {
+	border-top: 1px solid #ddd;
+}
+.cookie-preference {
+	padding: 1rem 1.5rem;
+}
+.cookie-preference ul {
+	border: 1px solid #ddd;
+	margin-top: 1rem;
+}
+.confirm-choice {
+	margin-top: 0rem;
+	text-align: right;
+	padding: 0rem 1rem;
+	padding-bottom: 1rem;
+}
+.cookies-pop-up .body-content {
+	height: 500px !important;
+	overflow: auto;
+}
+.cookies-pop-up .body-content::-webkit-scrollbar {
+	width: 10px;
+}
+.cookies-pop-up .body-content::-webkit-scrollbar-thumb {
+	background-color: #ddd;
+	border-radius: 99px;
+}
+.cookie-preference ul li .head {
+	display: flex;
+	justify-content: space-between;
+	padding: 1rem 1rem;
+}
+.cookie-preference ul li .body {
+	background-color: #fafafa;
+	padding: 1rem 1rem;
+}
+.cookie-preference ul li .body p {
+	font-size: 15px;
+	line-height: 1.5rem;
+}
+.cookie-preference ul li .presentation {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.cookie-preference ul li .presentation p {
+	font-size: 15px;
+}
+
+.cookie-preference ul li .active-cookie {
+	color: #ea6c39;
+}
+.plus-sign {
+	margin-right: 10px;
+	cursor: pointer;
+	color: #ea6c39;
+	position: relative;
+	width: 15px;
+	height: 15px;
+}
+.plus-sign > * {
+	position: absolute;
+	background-color: #ea6c39;
+	pointer-events: none;
+}
+.plus-sign .horizontal {
+	width: 100%;
+	height: 2px;
+	top: 50%;
+	left: 0;
+	transform: translateY(-50%);
+}
+.plus-sign .vertical {
+	width: 2px;
+	height: 100%;
+	top: 0%;
+	left: 50%;
+	transform: translateX(-50%);
+}
+.cookie-preference .checkbox-wrapper {
+	width: 40px;
+	height: 20px;
+	background-color: #ddd;
+	border-radius: 99px;
+	position: relative;
+	transition: 0.5s ease all;
+	cursor: pointer;
+}
+.cookie-preference .checkbox-wrapper .ball {
+	position: absolute;
+	width: 17px;
+	height: 17px;
+	background-color: #fff;
+	top: 50%;
+	transform: translateY(-50%);
+	left: 5%;
+	border-radius: 99px;
+	transition: 0.5s ease all;
+}
+.cookie-preference input[type="checkbox"]:checked + .checkbox-wrapper {
+	background-color: #ea6c39;
+}
+.cookie-preference input[type="checkbox"]:checked + .checkbox-wrapper .ball {
+	left: 54%;
+}
+.cookie-preference ul li {
+	border-bottom: 1px solid #ddd;
+}
+.cookie-preference ul li > p {
+	font-weight: 600;
+	font-size: 14px;
+	color: #ea6c39;
+}
+.cookie-banner {
+	background-color: #fff;
+	z-index: 222;
+	padding: 1rem 0rem;
+	position: fixed;
+	bottom: 0;
+	left: 0;
+	width: 100%;
+	/* display: none; */
+	box-shadow: 0px -10px 10px rgba(0, 0, 0, 0.1);
+}
+.close-icon {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	right: 20px;
+	cursor: pointer;
+	color: #333;
+}
+.cookie-banner .content {
+	width: 95%;
+	margin: 0rem auto;
+	display: grid;
+	grid-template-columns: 1fr 0.4fr;
+	align-items: center;
+	grid-gap: 5rem;
+}
+.cookie-banner .content button {
+	width: 150px;
+	padding: 0.8rem 0rem;
+	border: none;
+	outline: none;
+	font-size: 16px;
+	border-radius: 5px;
+	font-size: 14px;
+	cursor: pointer;
+	border-radius: 99px;
+}
+.cookie-banner .content > p {
+	color: #333;
+	font-weight: 600;
+	line-height: 1.6rem;
+	font-size: 14px;
+}
+.buttons-cookies {
+	display: flex;
+	justify-content: flex-start;
+}
+.cookie-banner .content .buttons-cookies > * + * {
+	margin-left: 1rem;
+}
+.cookie-banner .content .buttons-cookies > *:first-child {
+	border: 1px solid #ea6c39;
+	color: #ea6c39;
+	background-color: transparent;
+}
+.cookie-banner .content .buttons-cookies > *:last-child {
+	background-color: #ea6c39;
+	color: #fff;
+}

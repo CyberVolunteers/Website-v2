@@ -29,14 +29,19 @@ nav {
 .dflex,
 .dflex-align-center,
 .dflex-justify-center {
-	display: flex;
+	display: flex !important;
 }
 .dflex-align-center {
 	align-items: center;
 }
-
 .dflex-justify-center {
 	justify-content: center;
+}
+.dnone {
+	display: none !important;
+}
+.dblock {
+	display: block !important;
 }
 
 * {
@@ -63,4 +68,10 @@ nav {
 
 .img-container {
 	position: relative;
+}
+
+.body-area {
+	padding: 2rem 0rem;
+	display: flex;
+	justify-content: center;
 }

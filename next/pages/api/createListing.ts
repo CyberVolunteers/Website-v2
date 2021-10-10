@@ -72,7 +72,7 @@ const handlers: HandlerCollection = {
 		const fileExt = getFileExtension(file.originalname);
 		if (fileExt === null || !allowedFileTypes.includes(fileExt)) {
 			logger.info("server.createListing:Invalid extension");
-			return res.status(400).send("Please upload a valid image file");
+			return res.status (400).send("Please upload a valid image file");
 		}
 
 		const result = await createListing(

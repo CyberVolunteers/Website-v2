@@ -27,4 +27,4 @@ RUN npm --loglevel=silly install --unsafe-perm
 
 USER node:node
 
-CMD ls ./node_modules && /wait && npx next telemetry disable && npm run dev
+CMD /wait && npx next telemetry disable && npm run dev

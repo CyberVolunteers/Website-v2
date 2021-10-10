@@ -7,6 +7,9 @@ import { ReactElement } from "react";
 import { useEffect } from "react";
 import { useRouter } from "next/dist/client/router";
 import getConfig from "next/config";
+import CookieBanner from "../client/components/CookieBanner";
+
+import "../client/styles/cookiePopup.css";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -18,6 +21,7 @@ function MyApp({ Component, pageProps }: AppProps): ReactElement {
 			<Header />
 			<Component {...pageProps} />
 			<Footer />
+			<CookieBanner />
 		</>
 	);
 
