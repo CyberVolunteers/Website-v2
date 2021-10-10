@@ -7,8 +7,11 @@ import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { stringify } from "ajv";
-import { isValid, signupValidation } from "../../server/validation";
-import { disableSession, updateSession } from "../../server/auth/auth-cookie";
+import { doAllRulesApply, signupValidation } from "../../server/validation";
+import {
+	clearServersideSession,
+	updateSession,
+} from "../../server/auth/auth-cookie";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -20,7 +23,7 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const signupResult = await signupUser(req.body);
 
-		if (!isValid(req.body, signupValidation))
+		if (!doAllRulesApply(req.body, signupValidation))
 			return res
 				.status(400)
 				.send(
@@ -38,7 +41,7 @@ const handlers: HandlerCollection = {
 
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist
-		disableSession(req);
+		clearServersideSession(req);
 		await updateSession(req, res, signupResult);
 
 		return res.end();

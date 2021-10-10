@@ -5,7 +5,6 @@ import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { ExtendedNextApiRequest } from "../server/types";
 import { getSession } from "../server/auth/auth-cookie";
 import React, { ReactElement, useState } from "react";
-import { sendEmailConfirmationEmail } from "../server/email/emailConfirm";
 import { isLoggedIn, isVerified } from "../server/auth/data";
 import { useViewProtection } from "../client/utils/otherHooks";
 import EditableField from "../client/components/EditableField";
@@ -16,6 +15,7 @@ import { csrfFetch } from "../client/utils/csrf";
 import { updateOverallErrorsForRequests } from "../client/utils/misc";
 import { CircularProgress } from "@material-ui/core";
 import { createEmailChangingFunction } from "./myAccount";
+import { sendEmailConfirmationEmail } from "../server/email";
 
 export default function EmailConfirmationEmailSent({
 	email,

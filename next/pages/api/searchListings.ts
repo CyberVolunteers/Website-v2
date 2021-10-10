@@ -60,13 +60,13 @@ const handlers: HandlerCollection = {
 			searchObj1.category = category;
 		}
 
-		let latLongPair: [lat: number, long: number] | [] = [];
+		let latLongPair: [lat: number, long: number] | undefined = undefined;
 
 		// check beforehand
 		if (typeof targetLoc === "string") {
 			// find the location
 			latLongPair = await getLatAndLong(targetLoc + ", UK");
-			if (latLongPair?.[0] === undefined)
+			if (latLongPair === undefined)
 				return res
 					.status(400)
 					.send(

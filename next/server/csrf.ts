@@ -13,11 +13,23 @@ import {
 } from "../serverAndClient/headersConfig";
 import { logger } from "./logger";
 
-// server
+/**
+ * Generates a random hex string of a specified length
+ * @param length
+ * @returns a random hex string
+ */
 function genRandomToken(length: number) {
-	return randomBytes(Math.floor(length / 2)).toString("hex");
+	// one byte per two hex characters
+	return randomBytes(Math.ceil(length / 2))
+		.toString("hex")
+		.substr(0, length);
 }
 
+/**
+ * Sets a new random token for the current page, while updating the session
+ * @param context nextjs context
+ * @returns the new random token
+ */
 export async function updateCsrf(context: GetServerSidePropsContext<any>) {
 	const newToken = genRandomToken(csrfTokenLength);
 
@@ -38,18 +50,26 @@ export async function updateCsrf(context: GetServerSidePropsContext<any>) {
 	return newToken;
 }
 
-export async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
+/**
+ * Checks that the token received from the client is the same one as the one from within the sealed cookie
+ * NOTE: it might send headers if the csrf token is incorrect
+ * @param req
+ * @param res
+ * @returns undefined
+ */
+export async function enforceValidCsrf(req: NextApiRequest, res: NextApiResponse) {
 	const receivedPageName = req.headers[currentPageHeaderName.toLowerCase()];
 	if (typeof receivedPageName !== "string") {
 		logger.info("server.csrf:Incorrect or undefined current page header");
 
-		return res.status(400).send("Something we received was incorrect. Please refresh the page");
+		return res
+			.status(400)
+			.send("The data we received was incorrect. Please refresh the page");
 	}
 
-	
-	const expectedCsrfToken = (await getCsrf(req))?.[receivedPageName]; // from the sealed csrf cookie
+	const expectedCsrfToken =
+		(await getCsrf(req))?.[receivedPageName] ?? "not-present"; // from the sealed csrf cookie
 	const receivedCsrfToken = req.headers[csrfHeaderName.toLowerCase()]; // from the headers
-	logger.info("Stored tokens: %s, received tokens: %s", await getCsrf(req), receivedCsrfToken);
 
 	if (typeof receivedCsrfToken !== "string") {
 		logger.info("server.csrf:Incorrect or undefined csrf header");
@@ -58,6 +78,12 @@ export async function checkCsrf(req: NextApiRequest, res: NextApiResponse) {
 			.status(400)
 			.send("Something we received was incorrect. Please refresh the page");
 	}
+
+	logger.info(
+		"Stored tokens: %s, received tokens: %s",
+		await getCsrf(req),
+		receivedCsrfToken
+	);
 
 	if (!fixedTimeComparison(expectedCsrfToken, receivedCsrfToken)) {
 		logger.info("server.csrf:Invalid csrf token");

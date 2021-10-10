@@ -179,7 +179,6 @@ function Signup() {
 		let Label = e.target.parentNode.previousElementSibling;
 
 		Label.setAttribute("id", "active");
-		console.log(Label);
 	};
 	const HandleSelectOnBlur = (e) => {
 		let Label = e.target.parentNode.previousElementSibling;
@@ -285,7 +284,6 @@ function Signup() {
 			} else if (ElementId == "year") {
 				HelperElement.textContent = "Invalid year";
 
-				console.log(document.querySelector(".day-active"));
 				if (document.querySelector(".day-active") == null) {
 					document.querySelector(".birthday").classList.add("active");
 				}

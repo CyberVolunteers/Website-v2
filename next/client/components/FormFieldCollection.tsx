@@ -2,7 +2,6 @@ import { Flattened } from "combined-validator";
 import { useEffect } from "react";
 import { useState } from "react";
 import { Dispatch, SetStateAction } from "react";
-import { prepareFormState } from "../../serverAndClient/utils";
 import FormComponent, { FormState, PerElementValidatorCallbacks } from "./FormComponent";
 
 function FormFieldCollection({
@@ -32,7 +31,7 @@ function FormFieldCollection({
 	const [internalFormState, setInternalFormState] = useState(formState);
 
 	useEffect(() => {
-		setFormState(prepareFormState(internalFormState as {[key: string]: any}, fields));
+		setFormState(createInitialFormState(internalFormState as {[key: string]: any}, fields));
 	}, [internalFormState])
 
 	return (
@@ -53,3 +52,30 @@ function FormFieldCollection({
 }
 
 export default FormFieldCollection;
+
+
+
+export function createInitialFormState(
+	input: { [key: string]: any },
+	schema: Flattened
+): { [key: string]: any } {
+	const out = {} as { [key: string]: any };
+	Object.entries(input).forEach(([k, v]) => {
+		if (v === ("" as any)) return;
+
+		const type = schema[k]?.type;
+
+		// check if it is a date
+		if (schema[k]?.type === "date") v = new Date(v ?? "").toISOString();
+
+		if (
+			typeof v === "object" &&
+			v !== undefined &&
+			v !== null &&
+			typeof type !== "string"
+		)
+			out[k] = createInitialFormState(v, type ?? ({} as Flattened));
+		else out[k] = v;
+	});
+	return out;
+}

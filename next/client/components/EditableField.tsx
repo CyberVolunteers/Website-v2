@@ -1,10 +1,10 @@
 import { Flattened } from "combined-validator";
 import React, { useState } from "react";
-import { prepareFormState } from "../../serverAndClient/utils";
 import FormComponent, {
 	FormState,
 	PerElementValidatorCallbacks,
 } from "./FormComponent";
+import { createInitialFormState } from "./FormFieldCollection";
 
 export default function EditableField({
 	name,
@@ -34,7 +34,7 @@ export default function EditableField({
 		// submit if needed
 		if (isCurrentlyEdited) {
 			// a silly workaround
-			const processedFormState = prepareFormState(
+			const processedFormState = createInitialFormState(
 				{ _root: formState },
 				{ _root: editableFields[name] }
 			)._root;

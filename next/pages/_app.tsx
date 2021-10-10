@@ -8,11 +8,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/dist/client/router";
 import getConfig from "next/config";
 
-//TODO: move this into the correct pages (but note that signup requires both of those, so double-check all of them)
-import "../client/styles/signin.css";
-import "../client/styles/signup.css";
-import "../client/styles/layout.css";
-
 const { publicRuntimeConfig } = getConfig();
 
 function MyApp({ Component, pageProps }: AppProps): ReactElement {

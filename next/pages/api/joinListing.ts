@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { addUserToListing, isUser } from "../../server/auth/data";
+import { addUserToListing, isVerifiedUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
@@ -22,7 +22,7 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		if (!isUser(session))
+		if (!isVerifiedUser(session))
 			return res.status(400).send("You need to be a user to do this");
 
 		// TODO: check that all the fields are there

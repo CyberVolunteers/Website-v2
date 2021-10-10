@@ -6,8 +6,9 @@ const client = redis.createClient(6379, "redis");
 
 export type RedisStores = "emailConfirmUUID" | "passwordResetUUID";
 
+//TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisStores) {
-	await hset(k, v, store,);
+	await hset(k, v, store);
 	await expire(k, store);
 }
 
@@ -36,9 +37,21 @@ function resolver<T>(res: (value: T) => void, rej: (reason?: any) => void) {
 	};
 }
 
-export async function verifyUUID(key: string, uuid: string, store: RedisStores){
+/**
+ * checks if the uuid is correct
+ * @param key the key under which the uuid was stored
+ * @param uuid the uuid to check
+ * @param store the name of the store
+ * @returns boolean
+ */
+export async function verifyUUID(
+	key: string,
+	uuid: string,
+	store: RedisStores
+): Promise<boolean> {
 	const storedUUIDRaw = await getKey(key, store);
-	const storedUUID = storedUUIDRaw ?? "";
+	const storedUUID =
+		storedUUIDRaw ?? "this should not be matched under any circumstances";
 
 	// always do this so that the timing is the same
 	const comparisonResult = fixedTimeComparison(uuid, storedUUID);

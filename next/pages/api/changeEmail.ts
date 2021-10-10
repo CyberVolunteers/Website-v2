@@ -6,7 +6,7 @@ import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { isValid, signupValidation } from "../../server/validation";
+import { doAllRulesApply, signupValidation } from "../../server/validation";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -18,7 +18,7 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		if (!isValid(req.body, signupValidation))
+		if (!doAllRulesApply(req.body, signupValidation))
 			return res
 				.status(400)
 				.send(

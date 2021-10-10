@@ -17,7 +17,7 @@ import {
 } from "../client/utils/otherHooks";
 import { updateCsrf } from "../server/csrf";
 import { getSession } from "../server/auth/auth-cookie";
-import { isOrg, isUser } from "../server/auth/data";
+import { isVerifiedOrg, isVerifiedUser } from "../server/auth/data";
 import { ListingJoinPrompt } from "../client/components/listingJoinPrompt";
 import { getAccountInfo } from "../client/utils/userState";
 import EditableField from "../client/components/EditableField";
@@ -331,10 +331,10 @@ export const getServerSideProps: GetServerSideProps<{
 
 	listing.orgName = listing.organisation.orgName;
 	const isOwnerOrg =
-		isOrg(session) && session?._id === listing.organisation._id + ""; // have to convert because the value on the left is an ObjectId
+		isVerifiedOrg(session) && session?._id === listing.organisation._id + ""; // have to convert because the value on the left is an ObjectId
 
 	const hasAppliedForListing =
-		isUser(session) &&
+		isVerifiedUser(session) &&
 		listing.users.some((v: string) => "" + v === session?._id); // same here
 
 	listing = toStrippedObject(listing);

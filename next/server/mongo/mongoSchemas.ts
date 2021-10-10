@@ -17,14 +17,12 @@ export const ListingSchema = constructListingSchema();
 
 function constructUserSchema() {
 	const schema = constructSchema(deepAssign(usersPublic, usersPrivate));
-	// schema.add({
-	// 	listings: [{ type: Schema.Types.ObjectId, ref: "Listings" }],
-	// });
 
 	return schema;
 }
 function constructOrgSchema() {
 	const schema = constructSchema(deepAssign(orgPublic, orgPrivate));
+	// also add a list of listings
 	schema.add({
 		listings: [{ type: Schema.Types.ObjectId, ref: "Listings" }],
 	});
@@ -33,6 +31,7 @@ function constructOrgSchema() {
 
 function constructListingSchema() {
 	const schema = constructSchema(deepAssign(listingPublic, listingPrivate));
+	// also add a reference to the creator, the users who signed up and coordinates
 	schema.add({
 		organisation: { type: Schema.Types.ObjectId, required: true, ref: "Orgs" },
 		users: [{ type: Schema.Types.ObjectId, required: true, ref: "Users" }],
@@ -50,6 +49,7 @@ function constructListingSchema() {
 		},
 	});
 
+	// text index for text search
 	schema.index(
 		{
 			duration: "text",

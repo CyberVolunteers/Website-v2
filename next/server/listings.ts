@@ -6,16 +6,24 @@ import { logger } from "./logger";
 import { getLatAndLong } from "./location";
 import sharp from "sharp";
 
+// TODO: combine creating and updating a lsiting?
+/**
+ * creates a listing
+ * @param params
+ * @param orgSession organisation session id
+ * @param imageFileExt file extension for the listing image
+ * @param imageFileBuffer buffer for the listing image
+ * @returns
+ */
 export async function createListing(
 	params: { [key: string]: any },
-	orgSession: { [key: string]: any },
-	fileExt: string,
-	fileBuffer: Buffer
+	orgId: string,
+	imageFileExt: string,
+	imageFileBuffer: Buffer
 ) {
 	const createdDate = new Date();
-	const organisation = orgSession._id;
 	const uuid = uuidv4();
-	const imagePath = baseListingImagePath + uuid + fileExt;
+	const imagePath = baseListingImagePath + uuid + imageFileExt;
 
 	const address = params.location;
 
@@ -35,7 +43,7 @@ export async function createListing(
 
 	Object.assign(dataToSupply, {
 		createdDate,
-		organisation,
+		organisation: orgId,
 		imagePath,
 		uuid,
 		users: [],
@@ -48,13 +56,13 @@ export async function createListing(
 	try {
 		await connection.transaction(async () => {
 			const newListing = new Listing(dataToSupply);
-			await sharp(fileBuffer)
+			await sharp(imageFileBuffer)
 				.resize({ width: 1024 })
 				.toFile(process.env.baseDir + "/public" + imagePath);
 			await newListing.save();
 			// add the new id to the organisation
 			await Org.updateOne(
-				{ _id: orgSession._id },
+				{ _id: orgId },
 				{ $push: { listings: newListing._id } }
 			);
 		});

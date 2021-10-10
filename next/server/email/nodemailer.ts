@@ -13,7 +13,11 @@ let transporter = createTransport({
 	sendingRate: 1,
 });
 
-export async function sendEmail(data: Mail.Options){
+/**
+ * A simple wrapper around nodemailer sendMail
+ * @param data overrides for options
+ */
+export async function sendEmail(data: Mail.Options) {
 	await transporter.sendMail({
 		from: defaultSenderEmail,
 		...data,

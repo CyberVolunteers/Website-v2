@@ -1,13 +1,13 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isOrg, updateOrgData } from "../../server/auth/data";
+import { isVerifiedOrg, updateOrgData } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { orgDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { isValid, signupValidation } from "../../server/validation";
+import { doAllRulesApply, signupValidation } from "../../server/validation";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -19,7 +19,7 @@ const handlers: HandlerCollection = {
 	POST: async function (req, res) {
 		const session = await getSession(req);
 
-		if (!isValid(req.body, signupValidation))
+		if (!doAllRulesApply(req.body, signupValidation))
 			return res
 				.status(400)
 				.send(
@@ -28,7 +28,7 @@ const handlers: HandlerCollection = {
 
 		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
 
-		if (!isOrg(session))
+		if (!isVerifiedOrg(session))
 			return res.status(400).send("You need to be an organisation to do this");
 
 		const newDoc = await updateOrgData(req.body, session.email);

@@ -13,7 +13,7 @@ import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
-import { isLoggedIn, isOrg } from "../server/auth/data";
+import { isLoggedIn, isVerifiedOrg } from "../server/auth/data";
 import {
 	orgFieldNamesToShow,
 	userFieldNamesToShow,
@@ -240,7 +240,7 @@ export const getServerSideProps: GetServerSideProps<{
 	let allFields: Flattened = {};
 	let fieldNames: { [key: string]: string } = {};
 	if (isLoggedIn(session)) {
-		const isRequestByAnOrg = isOrg(session);
+		const isRequestByAnOrg = isVerifiedOrg(session);
 		fieldNames = isRequestByAnOrg ? orgFieldNamesToShow : userFieldNamesToShow;
 
 		editableFields = isRequestByAnOrg

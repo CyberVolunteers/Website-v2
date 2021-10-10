@@ -2,15 +2,15 @@ import { dbServer, dbName } from "./config";
 import { connect, Mongoose } from "mongoose";
 import { logger } from "../logger";
 
-interface MongoConnectionDetails {
-	instance: Mongoose | null;
-	promise: Promise<Mongoose> | null;
-}
-const mongoConnectionDetails: MongoConnectionDetails = {
+global.mongoConnectionDetails = (global.mongoConnectionDetails ?? {
 	instance: null,
 	promise: null,
-};
+}) as MongoConnectionDetails;
 
+/**
+ * create and return a *new* connection
+ * @returns a new mongo instance
+ */
 async function getNewMongo() {
 	logger.info("server.mongo:Getting new instance");
 	return await connect(`mongodb://${dbServer}/${dbName}`, {
@@ -23,21 +23,27 @@ async function getNewMongo() {
 	});
 }
 
+/**
+ * Get a (possibly cached) mongo instance
+ * @returns a mongo instance
+ */
 export const getMongo = async function () {
-	if (!!mongoConnectionDetails.instance) return mongoConnectionDetails.instance;
-	if (!!mongoConnectionDetails.promise)
-		return await mongoConnectionDetails.promise;
+	if (!!global.mongoConnectionDetails.instance)
+		return global.mongoConnectionDetails.instance;
+	if (!!global.mongoConnectionDetails.promise)
+		return await global.mongoConnectionDetails.promise;
 
-	mongoConnectionDetails.promise = getNewMongo();
+	global.mongoConnectionDetails.promise = getNewMongo();
 
-	mongoConnectionDetails.promise
+	global.mongoConnectionDetails.promise
 		.then((newInstance) => {
-			mongoConnectionDetails.instance = newInstance;
+			global.mongoConnectionDetails.instance = newInstance;
 		})
 		.catch((err) => {
 			logger.error("server.mongo.index:", err);
-			mongoConnectionDetails.instance = mongoConnectionDetails.promise = null;
+			global.mongoConnectionDetails.instance =
+				global.mongoConnectionDetails.promise = null;
 		});
 
-	return await mongoConnectionDetails.promise;
+	return await global.mongoConnectionDetails.promise;
 };

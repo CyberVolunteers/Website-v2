@@ -4,7 +4,7 @@ import { createHandler, ajv } from "../../server/apiRequests";
 import { isLoggedIn, login } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import {
-	disableSession,
+	clearServersideSession,
 	getSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
@@ -25,7 +25,7 @@ const handlers: HandlerCollection = {
 		if (isLoggedIn(session)) {
 			logger.info("server.login:Signing in a someone else");
 			// Delete the session cache so that the data does not persist
-			disableSession(req);
+			clearServersideSession(req);
 		}
 
 		const loginResult = await login(req.body);

@@ -36,7 +36,18 @@ const accountInfoCookieOptions: CookieSerializeOptions = {
 	path: "/",
 };
 
-export async function getSession(req: ExtendedNextApiRequest) {
+export type SessionObject = { [key: string]: any } | null;
+export type CsrfObject = { [key: string]: string } | null;
+
+/**
+ * Get the session object of the current request
+ * @param req the request to extract the data from
+ * @returns the session object or null if there was an error
+ */
+export async function getSession(
+	req: ExtendedNextApiRequest
+): Promise<SessionObject> {
+	// cache
 	if (req.session !== undefined) return req.session;
 
 	const out = (req.session = await unsealCookieRaw(
@@ -46,24 +57,39 @@ export async function getSession(req: ExtendedNextApiRequest) {
 	return out;
 }
 
-export async function disableSession(req: ExtendedNextApiRequest) {
+/**
+ * deletes the cookie data along with the cached session data
+ * @param req request to clear
+ */
+export async function clearServersideSession(req: ExtendedNextApiRequest) {
 	req.session = undefined;
-	if (req.cookies !== undefined)
+	if (typeof req.cookies === "object" && req.cookies !== null)
 		req.cookies[sessionCookieName] = "invalid cookie string";
 }
 
-export async function getCsrf(req: ExtendedNextApiRequest) {
+/**
+ * Gets the csrf tokens for all the pages
+ * @param req the request to unwrap
+ * @returns a object containing page paths and their tokens
+ */
+export async function getCsrf(
+	req: ExtendedNextApiRequest
+): Promise<CsrfObject> {
 	if (req.csrfData !== undefined) return req.csrfData;
 
 	const out = (req.csrfData = await unsealCookieRaw(
 		req.cookies?.[csrfCookieName]
 	));
-
 	return out;
 }
 
+/**
+ * Used to unseal a cookie safely
+ * @param data the cookie contents (any type)
+ * @returns data or `null` in case of an error
+ */
 async function unsealCookieRaw(data: any) {
-	if (data === undefined) return null;
+	if (typeof data !== "string") return null;
 	try {
 		return await unseal(data);
 	} catch (err) {
@@ -71,28 +97,55 @@ async function unsealCookieRaw(data: any) {
 	}
 }
 
+/**
+ * Overrides the keys in the session with the ones specified by the data and csrf parameters
+ * Note: if the `data` or the `csrf` parameters are `null`, the data will be destroyed
+ * @param req the request object
+ * @param res the response object
+ * @param _data the overrides for the session object (if `undefined`, it is skipped)
+ * @param _csrf the overrides for the csrf object (if `undefined`, it is skipped)
+ */
 export async function updateSession(
 	req: ExtendedNextApiRequest,
 	res: ExtendedNextApiResponse,
-	data?: any,
-	csrf?: any
+	_data?: SessionObject,
+	_csrf?: CsrfObject
 ) {
+	//NOTE: keeping "null"
+	const data = _data === undefined ? {} : _data;
+	const csrf = _csrf === undefined ? {} : _csrf;
+
 	const session = (await getSession(req)) ?? {};
 	const oldCsrf = (await getCsrf(req)) ?? {};
 
-	const newData = data === undefined ? session : deepAssign(session, data);
-	const newCsrf = csrf === undefined ? oldCsrf : deepAssign(oldCsrf, csrf);
+	const newData = data === null ? {} : deepAssign(session, data);
+	const newCsrf = csrf === null ? {} : deepAssign(oldCsrf, csrf);
 
-	if (newData._doc !== undefined)
+	if (newData?._doc !== undefined)
 		logger.error(
 			"server.auth-cookie:There is an error with _doc being sent to the cookie wrapper"
 		);
 
 	await setSession(res, newData, newCsrf);
+
+	// set the new data
+	req.csrfData = newCsrf;
 	req.session = newData;
 }
 
-async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
+/**
+ * Overrides the session to contain the new data and csrf. If either is undefined or null, it is treated as `{}`
+ * @param res
+ * @param _data
+ * @param _csrf
+ */
+async function setSession(
+	res: NextApiResponse,
+	_data?: SessionObject,
+	_csrf?: CsrfObject
+) {
+	const data = _data ?? {};
+	const csrf = _csrf ?? {};
 	// keep a cookie that tells the client that it is logged in and other data
 	const isOrg = data?.isOrg === true;
 	const publicData = {
@@ -102,13 +155,18 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
 		isOrganisationVerified: data?.isOrganisationVerified === true,
 	} as { [key: string]: any };
 
-	// missing field names
-	const allPublicKeys = Object.keys(flatten(users));
-	const missingFieldNames = allPublicKeys.filter(
-		(v) => !Object.keys(data).includes(v) && !["password"].includes(v)
-	);
-
+	// if is a user
 	if (!isOrg && isLoggedIn(data)) {
+		// missing field names, e.g. when an optional field has not been set
+		const allPublicKeys = Object.keys(flatten(users));
+		const missingFieldNames = allPublicKeys.filter(
+			// if the key is not found
+			(v) =>
+				!Object.keys(data ?? {}).includes(v) &&
+				// also ignore the password because it isn't ever stored in the first place
+				!["password"].includes(v)
+		);
+		// store both openly and in the session
 		publicData.missingFields = missingFieldNames;
 		data.missingFields = missingFieldNames;
 	}
@@ -119,21 +177,18 @@ async function setSession(res: NextApiResponse, data?: any, csrf?: any) {
 			JSON.stringify(publicData),
 			accountInfoCookieOptions
 		),
+		serialize(sessionCookieName, await seal(data), sessionCookieOptions),
+		serialize(csrfCookieName, await seal(csrf), csrfCookieOptions),
 	];
-
-	if (csrf !== undefined)
-		cookies.push(
-			serialize(csrfCookieName, await seal(csrf), csrfCookieOptions)
-		);
-	if (data !== undefined)
-		cookies.push(
-			serialize(sessionCookieName, await seal(data), sessionCookieOptions)
-		);
 
 	logger.info("server.auth.auth-cookie:Setting session");
 	res.setHeader("Set-Cookie", cookies);
 }
 
+/**
+ * Deletes all the known cookies
+ * @param res
+ */
 export function removeSession(res: NextApiResponse) {
 	const emptyCookieSettings = {
 		maxAge: -1,

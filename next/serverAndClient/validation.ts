@@ -4,7 +4,12 @@ import { PerElementValidatorCallback } from "../client/components/FormComponent"
 import { minPasswordScore } from "./staticDetails";
 
 const dayLength = 24 * 60 * 60 * 1000;
-export function isDateInPast(v: string) {
+/**
+ * Pretty self-explanatory
+ * @param v date string (anything that a Date constructor can parse)
+ * @returns true if the ate is in the past, false if the date is invalid or an error message
+ */
+export function isDateInPast(v: string): boolean | string {
 	const date = new Date(v);
 	const currentDate = new Date();
 
@@ -24,12 +29,17 @@ export function isDateInPast(v: string) {
 	}
 }
 
-export function isNonNegative(v: string) {
+export function isNonNegative(v: string): boolean {
 	const int = parseInt(v);
 	if (isNaN(int)) return false;
 	return int >= 0;
 }
 
+/**
+ * Returns true if the password is strong enough or a string specifying how to improve the password
+ * @param p
+ * @returns
+ */
 export function passwordStrengthSuggestions(p: string) {
 	const result = zxcvbn(p);
 	const score = result.score;
@@ -54,6 +64,12 @@ export function passwordStrengthSuggestions(p: string) {
 	return base + warning + suggestions;
 }
 
+/**
+ * Returns true or a message saying that passwords do not match
+ * @param password2
+ * @param root
+ * @returns
+ */
 export const passwordEquality: PerElementValidatorCallback = (
 	password2,
 	root

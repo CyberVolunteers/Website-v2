@@ -1,7 +1,7 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isOrg, isUser, updateListingData, updateUserData } from "../../server/auth/data";
+import { isVerifiedOrg, isVerifiedUser, updateListingData, updateUserData } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import {
 	listingDataUpdateSpec,
@@ -28,7 +28,7 @@ const handlers: HandlerCollection = {
 			req.body
 		);
 
-		if (!isOrg(session))
+		if (!isVerifiedOrg(session))
 			return res.status(400).send("You need to be a charity to do this");
 
 		const orgId = session._id;

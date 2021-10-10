@@ -7,7 +7,6 @@ import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import {
 	getSession,
-	removeSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
 import { verifyHash } from "../../server/auth/password";
@@ -27,12 +26,12 @@ const handlers: HandlerCollection = {
 			session
 		);
 
-		if (!isLoggedIn(session))
+		if (session === null || !isLoggedIn(session))
 			return res.status(400).send("You need to be logged in to do this");
 
 		const { oldPassword, password } = req.body;
 
-		// NOTE: we are not supplying a way to update the password here - this is intentional because we will set it again later
+		// NOTE: we are not supplying a way to update the password here - this is intentional because we will set it the password later
 		const verificationResult = await verifyHash(
 			oldPassword,
 			session.passwordHash,

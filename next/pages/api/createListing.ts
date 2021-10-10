@@ -8,11 +8,10 @@ import {
 	verifyJSONShape,
 } from "../../server/apiRequests";
 import { getSession } from "../../server/auth/auth-cookie";
-import { isOrg } from "../../server/auth/data";
+import { isVerifiedOrg } from "../../server/auth/data";
 import { createListing } from "../../server/listings";
 import { HandlerCollection, MulterReq } from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";
-import { getFileExtension } from "../../serverAndClient/utils";
 import { allowedFileTypes } from "../../serverAndClient/staticDetails";
 import { logger } from "../../server/logger";
 import _default from "next/dist/client/router";
@@ -65,7 +64,7 @@ const handlers: HandlerCollection = {
 
 		const session = await getSession(req);
 
-		if (!isOrg(session)) {
+		if (session === null || !isVerifiedOrg(session)) {
 			logger.info("server.createListing:Not an org");
 			return res.status(403).send("You need to be an organisation to do that");
 		}
@@ -76,7 +75,12 @@ const handlers: HandlerCollection = {
 			return res.status(400).send("Please upload a valid image file");
 		}
 
-		const result = await createListing(req.body, session, fileExt, file.buffer);
+		const result = await createListing(
+			req.body,
+			session._id,
+			fileExt,
+			file.buffer
+		);
 
 		if (result === true) return res.end();
 
@@ -109,4 +113,10 @@ export default async function createListingRequest(
 			POST: bodyParser,
 		}
 	)(req, res);
+}
+
+function getFileExtension(input: string) {
+	const lastIndex = input.lastIndexOf(".");
+	if (lastIndex === -1) return null;
+	return input.slice(lastIndex);
 }
