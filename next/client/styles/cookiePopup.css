@@ -232,6 +232,14 @@
 	color: #fff;
 }
 
+@media screen and (max-width: 1250px) {
+  .close-icon {
+    top: 10px;
+    transform: translateY(0%);
+    right: 20px;
+  }
+}
+
 @media screen and (max-width: 1200px) {
 	.cookie-banner .content {
 		width: 95%;

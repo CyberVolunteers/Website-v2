@@ -1,9 +1,15 @@
 // import styles from "../styles/card.module.css";
 
-import { Dispatch, SetStateAction, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { allowedCookiesCookieName } from "../../serverAndClient/cookiesConfig";
+import { getCookie } from "../utils/userState";
 
-const cookiesData = [
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faTimes } from "@fortawesome/free-solid-svg-icons";
+
+export const cookieTypes = [
 	{
+		id: "required",
 		name: "Strictly necessory Cookies",
 		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
 											Architecto blanditiis amet explicabo tenetur, natus
@@ -11,18 +17,21 @@ const cookiesData = [
 		isAlwaysActive: true,
 	},
 	{
+		id: "functional",
 		name: "Functional Cookies",
 		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
 											Architecto blanditiis amet explicabo tenetur, natus
 											consequatur repellendus maxime deleniti ex laboriosam.`,
 	},
 	{
+		id: "performance",
 		name: "Performance Cookies",
 		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
 											Architecto blanditiis amet explicabo tenetur, natus
 											consequatur repellendus maxime deleniti ex laboriosam.`,
 	},
 	{
+		id: "targeting",
 		name: "Trageting Cookies",
 		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
 											Architecto blanditiis amet explicabo tenetur, natus
@@ -44,21 +53,48 @@ function setAll<T>(arr: Dispatch<SetStateAction<T>>[], val: T) {
 }
 
 function CookieBanner() {
-	const [isBannerShown, setIsBannerShown] = useState(true);
+	const [isBannerShown, setIsBannerShown] = useState(false);
 	const [isPopupShown, setIsPopupShown] = useState(false);
+	const [areCookiesFinalized, setAreCookiesFinalized] = useState(false);
 
 	const cookieCheckedStates: boolean[] = [];
 	const setCookieCheckedStates: Dispatch<SetStateAction<boolean>>[] = [];
 
-	cookiesData.forEach((cookieData) => {
+	// restore the cookie
+	const previousCookieSettings: { [key: string]: boolean } =
+		getCookie(allowedCookiesCookieName) ?? {};
+
+	// hide it if the previous cookie settings are not empty
+	useEffect(() => {
+		if (Object.keys(previousCookieSettings).length === 0)
+			setIsBannerShown(true);
+	}, []);
+
+	cookieTypes.forEach((cookieData) => {
+		const preStoredData = previousCookieSettings[cookieData.id];
 		const [isActive, setIsActive] = cookieData.isAlwaysActive
 			? [true, () => undefined]
-			: useState(false);
+			: useState(preStoredData ?? false);
 		cookieCheckedStates.push(isActive);
 		setCookieCheckedStates.push(setIsActive);
 	});
 
-	console.log(cookieCheckedStates);
+	function rememberAllowedCookies() {
+		// TODO: respect the choices
+		// remember the accepted cookies in a cookie
+		const out: { [key: string]: boolean } = {};
+		cookieTypes
+			.map((cookieType) => cookieType.id)
+			.forEach((id, i) => {
+				out[id] = cookieCheckedStates[i];
+			});
+
+		document.cookie = `${allowedCookiesCookieName}=${JSON.stringify(out)}`;
+	}
+
+	useEffect(() => {
+		if (areCookiesFinalized) rememberAllowedCookies();
+	}, [areCookiesFinalized]);
 
 	return (
 		<>
@@ -75,6 +111,7 @@ function CookieBanner() {
 							onClick={() => {
 								setIsBannerShown(false);
 								setAll(setCookieCheckedStates, true as boolean);
+								setAreCookiesFinalized(true);
 							}}
 						>
 							Accept All Cookies
@@ -88,17 +125,20 @@ function CookieBanner() {
 					</div>
 				</div>
 				<span className="close-icon" onClick={() => setIsBannerShown(false)}>
-					<i className="fas fa-times"></i>
+					<FontAwesomeIcon icon={faTimes} />
 				</span>
 			</div>
 			<div className={`cookies-pop-up ${isPopupShown ? "dflex" : "dnone"}`}>
 				<div className="content">
 					<div className="top-area">
+						<div className="logo">
+							<img src="/img/logo.svg" alt="Our logo" />
+						</div>
 						<div
 							className="close-icon-cookie"
 							onClick={() => setIsPopupShown(false)}
 						>
-							<i className="fas fa-times"></i>
+							<FontAwesomeIcon icon={faTimes} />
 						</div>
 					</div>
 					<div className="body-content">
@@ -114,7 +154,10 @@ function CookieBanner() {
 								quos dolore.
 							</p>
 							<button
-								onClick={() => setAll(setCookieCheckedStates, true as boolean)}
+								onClick={() => {
+									setAll(setCookieCheckedStates, true as boolean);
+									setAreCookiesFinalized(true);
+								}}
 							>
 								Allow All
 							</button>
@@ -122,7 +165,7 @@ function CookieBanner() {
 						<div className="cookie-preference">
 							<h3>Cookie Preference</h3>
 							<ul>
-								{cookiesData.map((cookieData, i) => {
+								{cookieTypes.map((cookieData, i) => {
 									const [showBody, setShowBody] = useState(false);
 									return (
 										<li key={i}>
@@ -172,6 +215,7 @@ function CookieBanner() {
 						onClick={() => {
 							setIsPopupShown(false);
 							setIsBannerShown(false);
+							setAreCookiesFinalized(true);
 						}}
 					>
 						<button>Confirm my Choices</button>

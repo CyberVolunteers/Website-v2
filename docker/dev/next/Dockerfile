@@ -23,7 +23,7 @@ RUN apk add python build-base
 # RUN npm install sharp
 # RUN npm install --unsafe-perm --ignore-scripts=false sharp
 
-RUN npm --loglevel=silly install --unsafe-perm
+RUN npm install --unsafe-perm --silent
 
 USER node:node
 

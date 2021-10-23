@@ -9,7 +9,10 @@ import { useRouter } from "next/dist/client/router";
 import getConfig from "next/config";
 import CookieBanner from "../client/components/CookieBanner";
 
+// TODO: move it into the module
 import "../client/styles/cookiePopup.css";
+import "../client/styles/index.css";
+import "../client/styles/community-cards.css";
 
 const { publicRuntimeConfig } = getConfig();
 
