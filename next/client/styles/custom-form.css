@@ -1,0 +1,29 @@
+.custom-form {
+	background-color: #fff;
+	width: 440px;
+	border: 1px solid #ddd;
+	padding: 2rem 2rem;
+}
+
+.custom-form > p.header {
+	text-align: center;
+	font-size: 1.5rem;
+	line-height: 2.25rem;
+}
+
+.custom-form .helper {
+	text-align: center;
+	margin-top: 10px;
+	font-size: 0.875rem;
+	line-height: 1.2rem;
+	color: #484848;
+	margin-bottom: 2rem;
+}
+
+.custom-form > p:first-child a {
+	color: #f85220;
+}
+
+.custom-form > p:first-child a {
+	color: #f85220;
+}

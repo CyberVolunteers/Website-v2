@@ -13,6 +13,8 @@ import CookieBanner from "../client/components/CookieBanner";
 import "../client/styles/cookiePopup.css";
 import "../client/styles/index.css";
 import "../client/styles/community-cards.css";
+import "../client/styles/custom-form.css";
+import "../client/styles/login.css";
 
 const { publicRuntimeConfig } = getConfig();
 

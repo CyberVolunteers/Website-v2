@@ -1,7 +1,7 @@
 import React from "react";
 // TODO: do this
-// import "../../Assets/styles/css/CommunityCards.css";
-function Card({ img, title, subtitle, desc, meternow, totalgo }) {
+// import "../../Assets/styles/css/Community-Cards.module.css";
+function Card({}) {
 	return (
 		<div className="Card community-card">
 			<img src="/img/placeholder1.jpg" alt="" />
