@@ -2,7 +2,7 @@ import Mail from "nodemailer/lib/mailer";
 import { v4 as uuidv4 } from "uuid";
 import { protocolAndHost } from "../../serverAndClient/staticDetails";
 import { sendEmail } from "./nodemailer";
-import { addTempKey, RedisStores } from "./redis";
+import { addTempKey, RedisUUIDStores } from "./redis";
 
 /**
  * Inserts a uuid into the email template and sends it to an email address, remembering the uuid
@@ -14,7 +14,7 @@ import { addTempKey, RedisStores } from "./redis";
 export async function sendEmailWithUUID(
 	email: string,
 	getProps: (uuid: string) => { html: string; text: string },
-	store: RedisStores,
+	store: RedisUUIDStores,
 	data?: Mail.Options
 ) {
 	const uuid = uuidv4();

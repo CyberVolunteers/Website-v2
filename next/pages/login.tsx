@@ -1,16 +1,10 @@
-import { flatten, Flattened } from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
-import React, { FormEvent, ReactElement, useEffect } from "react";
+import React, { ReactElement } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
-import { FormFieldCollectionData } from "../client/types";
-import { updateOverallErrorsForRequests } from "../client/utils/misc";
-import { updateLoginState } from "../client/utils/userState";
 import { updateCsrf } from "../server/csrf";
-import { loginSpec } from "../serverAndClient/publicFieldConstants";
 import Head from "../client/components/Head";
-import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
 import { csrfFetch } from "../client/utils/csrf";
 import CustomForm from "../client/components/CustomForm";
 
@@ -74,9 +68,6 @@ export default function Login({
 		<div>
 			<Head title="Sign in - cybervolunteers" />
 			<div className="SignIn">
-				{/* <div className="sign-in-header">
-					<img src={logo} alt="" />
-				</div> */}
 				<div className="body-area">
 					<CustomForm
 						onSubmit={(e) => {
@@ -109,17 +100,7 @@ export default function Login({
 								variant="outlined"
 								style={{ width: "100%" }}
 							/>
-							<span
-								className="helping-text email-helper"
-								style={{
-									marginBottom: "20px",
-									display: "inline-block",
-									marginTop: 7,
-									fontSize: 13,
-									paddingLeft: 12,
-									color: "#F65B4E",
-								}}
-							>
+							<span className="helping-text email-helper">
 								{emailErrorMessage}
 							</span>
 							<div className="text-field">
@@ -147,29 +128,14 @@ export default function Login({
 									type={showPassword ? "test" : "password"}
 								/>
 
-								<span
-									className="helping-text password-helper"
-									style={{
-										marginBottom: "20px",
-										display: "inline-block",
-										marginTop: 7,
-										fontSize: 13,
-										paddingLeft: 12,
-										color: "#F65B4E",
-									}}
-								>
+								<span className="helping-text password-helper">
 									{passwordErrorMessage}
 								</span>
 
 								<span
 									className="helping-text login-helper"
 									style={{
-										marginBottom: "20px",
 										display: loginErrorMessage === "" ? "none" : "inline-block",
-										marginTop: 7,
-										fontSize: 13,
-										paddingLeft: 12,
-										color: "#F65B4E",
 									}}
 								>
 									{loginErrorMessage}

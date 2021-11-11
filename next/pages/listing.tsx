@@ -18,7 +18,7 @@ import {
 import { updateCsrf } from "../server/csrf";
 import { getSession } from "../server/auth/auth-cookie";
 import { isVerifiedOrg, isVerifiedUser } from "../server/auth/data";
-import { ListingJoinPrompt } from "../client/components/listingJoinPrompt";
+import { ListingJoinPrompt } from "../client/components/ListingJoinPrompt";
 import { getAccountInfo } from "../client/utils/userState";
 import EditableField from "../client/components/EditableField";
 import { listingFieldNamesToShow } from "../serverAndClient/displayNames";

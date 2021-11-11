@@ -1,0 +1,319 @@
+.helping-text {
+	display: inline-block;
+	margin-top: 7px;
+	font-size: 13px;
+	padding-left: 12px;
+	color: #f65b4e;
+}
+
+.dropdown-form-control {
+	margin: 8px;
+	min-width: 120;
+}
+
+.button-wrapper a:first-child:hover {
+	background-color: rgb(243, 243, 243) !important;
+}
+
+.birthday.active {
+	display: inline-block;
+	margin-top: 16px;
+}
+.available-message {
+	bottom: -18px;
+}
+.personal-info-wrapper {
+	grid-gap: 5px;
+}
+@media screen and (max-width: 430px) {
+	.SignUp form {
+		padding: 2rem 1rem !important;
+	}
+	.SignUp form {
+		padding: 2rem 1rem !important;
+	}
+	.SignUp .address-wrapper {
+		padding: 0rem !important;
+	}
+}
+@media screen and (max-width: 350px) {
+	.expand-address {
+		grid-template-columns: 1fr;
+	}
+	.expand-address > * {
+		grid-column: span 2 !important;
+	}
+	.SignUp .body-area form > p:first-child > br {
+		display: none !important;
+	}
+	.day-wrapper small {
+		font-size: 8px;
+	}
+	.personal-info-wrapper {
+		grid-gap: 3px !important;
+	}
+}
+@media screen and (max-width: 300px) {
+	.available-message {
+		bottom: -45% !important;
+	}
+}
+
+.password-ui-strong {
+	margin-bottom: 1.2rem;
+}
+.passwordStrength {
+	padding-left: 12px;
+}
+/* password bars */
+.bars {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr 1fr;
+
+	grid-gap: 5px;
+}
+.bars > * {
+	min-height: 5px;
+	background-color: #ddd;
+	border-radius: 99px;
+}
+
+.bar.password-strength-bar-level-1 {
+	background-color: #f63b3b;
+}
+
+.bar.password-strength-bar-level-2 {
+	background-color: #dec193;
+}
+
+.bar.password-strength-bar-level-3 {
+	background-color: #7299c5;
+}
+
+.bar.password-strength-bar-level-4 {
+	background-color: #7ab89e;
+}
+
+/* select box */
+.select-box .MuiInput-root {
+	position: relative !important;
+	border: 1px solid rgba(0, 0, 0, 0.23);
+	height: 50px !important;
+	border-radius: 5px !important;
+	padding: 0rem 0rem !important;
+}
+.Month-select .select-box {
+	margin-top: 1px !important;
+}
+.select-box .MuiInput-underline:after {
+	border-bottom: none !important;
+}
+.select-box .MuiInput-root select {
+	padding-left: 0.7rem !important;
+	height: 100%;
+}
+.select-box .MuiFormControl-root {
+	width: 100% !important;
+	margin: 0px !important;
+}
+
+/* custom checkbox */
+.checkbox-wrapper {
+	display: flex;
+	align-items: center;
+}
+.password-checkbox-wrapper > * {
+	cursor: pointer;
+}
+.checkbox-wrapper input:checked + label .custom-checkbox-box,
+.checkbox-wrapper input:checked + label > .custom-checkbox-box {
+	background-color: #f85220;
+	border-color: #f85220;
+}
+.white-fa-check {
+	color: #fff;
+}
+
+.checkbox-wrapper > label {
+	display: flex;
+	align-items: center;
+}
+.password-checkbox-wrapper > label {
+	cursor: pointer !important;
+}
+.checkbox-wrapper > label > * {
+	cursor: pointer;
+}
+.checkbox-wrapper .custom-checkbox-box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.checkbox-wrapper .custom-checkbox-box {
+	margin-right: 10px;
+
+	width: 20px;
+	height: 20px;
+	border: 1px solid #ddd;
+}
+.checkbox-wrapper .custom-checkbox-box i {
+	font-size: 12px;
+	color: #fff;
+}
+.checkbox-wrapper > label .custom-checkbox-box + label:hover {
+	color: rgb(105, 102, 103) !important;
+	/* color: rgb(116, 112, 113); */
+}
+
+.MuiInput-underline:before {
+	border-bottom: none !important;
+}
+
+/** selectbox **/
+.MuiInput-root {
+	position: relative !important;
+	border: 1px solid rgba(0, 0, 0, 0.23);
+	height: 50px !important;
+	border-radius: 5px !important;
+	padding: 0rem 0rem !important;
+}
+.MuiInputBase-root {
+	height: 50px;
+}
+.MuiFormControl-root {
+	width: 100% !important;
+	margin: 0px !important;
+}
+.MuiInput-underline:before {
+	border-bottom: none !important;
+}
+
+select:focus {
+	background-color: transparent !important;
+}
+select .MuiInputLabel-animated {
+	left: 13px !important;
+	top: 8px !important;
+}
+.select-box label {
+	background-color: #fff;
+	top: 10px !important;
+	left: 8px;
+	z-index: 2;
+	padding: 0rem 0.2rem;
+}
+select:focus {
+	background-color: transparent !important;
+}
+.create-account-label {
+	background-color: #f85220 !important;
+	color: #fff !important;
+	border-radius: 5px;
+}
+.create-account-label.disable {
+	pointer-events: none;
+	background-color: #e0e0e0 !important;
+	color: #b0b0b0 !important;
+}
+.country-select {
+	margin-top: 15px;
+}
+.country-select.active {
+	margin-top: 2px;
+}
+@media screen and (max-width: 350px) {
+	.Month-select .MuiSelect-icon {
+		z-index: 9 !important;
+	}
+}
+@media screen and (max-width: 300px) {
+	.country-select {
+		margin-top: 30px;
+	}
+}
+
+/** results wrapper **/
+.result-wrapper {
+	border: 1px solid #000;
+	border-top: none;
+
+	padding-bottom: 0.2rem;
+	/* display: none; */
+	border-bottom-left-radius: 5px;
+
+	border-bottom-right-radius: 5px;
+}
+
+.expanded-address-input-field .MuiOutlinedInput-notchedOutline {
+	border-radius: 4px 4px 0px 0px;
+	border-color: #000;
+}
+
+.secondpart {
+	max-height: 250px;
+	overflow: auto;
+}
+
+@media screen and (max-width: 1200px) {
+	.secondpart .row,
+	.firstpart .row {
+		transition: 0.05s ease all;
+	}
+	.secondpart .row.blue_bg,
+	.firstpart .row.blue_bg {
+		background-color: #b4deed;
+	}
+}
+.secondpart .row.blue_bg:hover,
+.firstpart .row.blue_bg:hover {
+	background-color: #b4deed;
+}
+.secondpart .row > *,
+.firstpart .row > * {
+	pointer-events: none;
+}
+.result-wrapper p {
+	padding: 0.5rem 1rem;
+}
+.result-wrapper .row {
+	padding: 0.5rem 1rem;
+	cursor: pointer;
+	display: flex;
+	align-items: flex-start !important;
+	justify-content: space-between;
+}
+.result-wrapper .row > p {
+	margin: 0 !important;
+	padding: 0 !important;
+	color: #8f8f8f;
+	font-size: 13px;
+}
+.result-wrapper .row:hover,
+.manual-address:hover {
+	background-color: #f4f4f3;
+}
+.result-wrapper .row > * {
+	pointer-events: none;
+}
+.result-wrapper .row h5 {
+	font-size: 15px;
+	font-weight: 600;
+}
+.result-wrapper .row small {
+	color: #b0b0b0;
+}
+
+.expand-address {
+	grid-template-columns: 1fr 1fr;
+	grid-column-gap: 16px;
+}
+.expand-address {
+	display: grid;
+}
+.expand-address > * {
+	grid-column: span 2;
+}
+.expand-address > *:nth-child(3),
+.expand-address > *:nth-child(4) {
+	grid-column: span 1;
+}

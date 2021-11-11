@@ -12,9 +12,10 @@ import CookieBanner from "../client/components/CookieBanner";
 // TODO: move it into the module
 import "../client/styles/cookiePopup.css";
 import "../client/styles/index.css";
-import "../client/styles/community-cards.css";
-import "../client/styles/custom-form.css";
+import "../client/styles/communityCards.css";
+import "../client/styles/customForm.css";
 import "../client/styles/login.css";
+import "../client/styles/userSignup.css";
 
 const { publicRuntimeConfig } = getConfig();
 

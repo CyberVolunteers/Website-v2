@@ -11,6 +11,7 @@ import styles from "../styles/header.module.css";
 import { useIsAfterRehydration } from "../utils/otherHooks";
 import { ViewerType } from "../types";
 import { useRouter } from "next/dist/client/router";
+import { route } from "next/dist/server/router";
 
 function Header() {
 	const sidebarLimitWidth = 600;
@@ -169,7 +170,15 @@ function Header() {
 						</li>
 
 						{signUpOrMyAccountEl}
-						{isAfterRehydration && windowWidth <= sidebarLimitWidth ? (
+						{/* Only show on small screens and when not on certain pages */}
+						{isAfterRehydration &&
+						windowWidth <= sidebarLimitWidth &&
+						![
+							"/login",
+							"/organisationSignup",
+							"/userSignup",
+							"/signupSelect",
+						].includes(router.pathname) ? (
 							<li className={`${styles["bottomButton"]}`}>
 								<Link href="/login" passHref>
 									<a>

@@ -151,6 +151,14 @@ export const searchListingsSpec: FieldConstraintsCollection = {
 	},
 };
 
+export const getAddressByPostcodeSpec: FieldConstraintsCollection = {
+	required: {
+		string: {
+			postcode: { maxLength: 7 },
+		},
+	},
+};
+
 function prepareUpdateSpec(
 	spec: FieldConstraintsCollection
 ): FieldConstraintsCollection {
