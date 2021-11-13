@@ -1,3 +1,5 @@
+export const pagesWithReducedHeaderAndFooter = ["/welcome"];
+
 export const countryCodes = [
 	{ code: "AF", name: "Afghanistan" },
 	{ code: "AL", name: "Albania" },

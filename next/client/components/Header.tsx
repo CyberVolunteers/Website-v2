@@ -11,7 +11,7 @@ import styles from "../styles/header.module.css";
 import { useIsAfterRehydration } from "../utils/otherHooks";
 import { ViewerType } from "../types";
 import { useRouter } from "next/dist/client/router";
-import { route } from "next/dist/server/router";
+import { pagesWithReducedHeaderAndFooter } from "../utils/const";
 
 function Header() {
 	const sidebarLimitWidth = 600;
@@ -26,6 +26,25 @@ function Header() {
 
 	const [isSidebarUp, setIsSidebarUp] = useState(false);
 	const [searchKeywords, setSearchKeywords] = useState("");
+	const windowSize = useWindowSize();
+
+	const windowWidth = windowSize.width ?? 1000; // to make sure that the larger version is displayed otherwise
+
+	// If the page needs the "simplistic" header
+	if (pagesWithReducedHeaderAndFooter.includes(router.pathname))
+		return (
+			<>
+				<Link href="/" passHref>
+					<a className={`${styles["simplified-header"]}`}>
+						<img
+							className={`pointer ${styles["simplified-header-img"]}`}
+							src="/img/logo.svg"
+							alt="Our logo"
+						/>
+					</a>
+				</Link>
+			</>
+		);
 
 	const onSearch: React.FormEventHandler<HTMLFormElement> = (evt) => {
 		evt.preventDefault();
@@ -35,10 +54,6 @@ function Header() {
 			})}`
 		);
 	};
-
-	const windowSize = useWindowSize();
-
-	const windowWidth = windowSize.width ?? 1000; // to make sure that the larger version is displayed otherwise
 
 	const actionSlot = !isAfterRehydration ? null : [
 			"org",

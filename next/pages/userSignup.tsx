@@ -16,13 +16,11 @@ import CustomForm from "../client/components/CustomForm";
 
 import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
-import { countryCodes, months } from "../client/utils/const";
+import { months } from "../client/utils/const";
 
 export default function UserSignup(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
 ): ReactElement {
-	if (typeof window !== "undefined")
-		window.getPostcodeSuggestions = getPostcodeSuggestions;
 	const [firstPageData, setFirstPageData] = useState(
 		{} as {
 			firstName: string;

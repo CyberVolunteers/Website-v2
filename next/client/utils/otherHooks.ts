@@ -38,6 +38,11 @@ export function useIsAfterRehydration() {
 	return isFirstRender;
 }
 
+/**
+ * Redirects the used if the user is not allowed to view that page
+ * @param allow User types to allow
+ * @returns whether the user is allowed
+ */
 export function useViewProtection(allow: ViewerType[]) {
 	const router = useRouter();
 	const currentViewType = useViewerType();

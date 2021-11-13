@@ -1,0 +1,22 @@
+.button {
+	padding: 0.8rem 1.5rem;
+	background-color: #fa562b;
+	color: #fff;
+	border: none;
+	outline: none;
+	cursor: pointer;
+	border: 1px solid #fa562b;
+	border-radius: 2px;
+	border-bottom-width: 2px !important;
+}
+
+@media screen and (max-width: 450px) {
+	.button {
+		padding: 0.7rem 1.2rem;
+		font-size: 12px;
+	}
+}
+@media screen and (max-width: 380px) {
+	.button {
+	}
+}

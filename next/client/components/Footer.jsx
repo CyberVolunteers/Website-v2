@@ -3,7 +3,13 @@ import Link from "next/link";
 
 import styles from "../styles/footer.module.css";
 
+import { useRouter } from "next/dist/client/router";
+import { pagesWithReducedHeaderAndFooter } from "../utils/const";
+
 function Footer() {
+	const router = useRouter();
+
+	if (pagesWithReducedHeaderAndFooter.includes(router.pathname)) return <></>;
 	return (
 		<div className={`${styles["Footer"]} w-1000`}>
 			<div className={`${styles["top-area"]}`}>

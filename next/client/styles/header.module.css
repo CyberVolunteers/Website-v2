@@ -282,3 +282,20 @@
 		display: none !important;
 	}
 }
+
+/*simplified header*/
+.simplified-header {
+  height: 5rem;
+  background-color: #f8f9fb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.simplified-header-img {
+  width: 230px;
+}
+@media screen and (max-width: 680px) {
+  .simplified-header-img {
+    width: 180px;
+  }
+}
