@@ -4,8 +4,8 @@ import { createHandler, ajv } from "../../server/apiRequests";
 import { createAjvJTDSchema } from "combined-validator";
 
 import { HandlerCollection } from "../../server/types";
-import { getAddressByPostcodeSpec } from "../../serverAndClient/publicFieldConstants";
 import { logger } from "../../server/logger";
+import { cacheQuery } from "../../server/email/redis";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -17,9 +17,21 @@ const handlers: HandlerCollection = {
 	GET: async function (req, res) {
 		//TODO: ratelimit
 
-		//TODO: implementation
+		const postcode = req.query.postcode;
+		if (Array.isArray(postcode))
+			return res.status(400).send("The postcode should be a string");
 
-		return res.end();
+		//TODO: implementation
+		const address = await cacheQuery(
+			postcode,
+			"postcodeAddress",
+			async () => "test"
+		);
+		console.log(postcode, address);
+
+		return res.json({
+			address,
+		});
 	},
 };
 
@@ -27,11 +39,13 @@ export default async function getAddressByPostcode(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {
-	await createHandler(
-		handlers,
-		{ useCsrf: true },
-		{
-			GET: ajv.compileParser(createAjvJTDSchema(getAddressByPostcodeSpec)),
-		}
-	)(req, res);
+	await createHandler(handlers, { useCsrf: false }, undefined, {
+		GET: {
+			required: {
+				string: {
+					postcode: { maxLength: 7 },
+				},
+			},
+		},
+	})(req, res);
 }

@@ -1,6 +1,7 @@
 import { fixedTimeComparison } from "@hapi/cryptiles";
 import redis from "redis";
-import { expireTimeSecondsByStore } from "./config";
+import { logger } from "../logger";
+import { cacheExpirationSeconds, expireTimeSecondsByStore } from "./config";
 
 const client = redis.createClient(6379, "redis");
 
@@ -10,7 +11,8 @@ export type RedisCacheStores = "postcodeAddress";
 //TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
 	await hset(k, v, store);
-	await expire(k, store);
+	// TODO: this is broken
+	// await expire(k, store);
 }
 
 async function hset(k: string, v: string, store: RedisUUIDStores) {
@@ -62,11 +64,37 @@ export async function verifyUUID(
 	else return comparisonResult;
 }
 
-export function cacheQuery<Value>(
+export async function cacheQuery(
 	key: string,
-	cacheExpirationTime: number,
 	store: RedisCacheStores,
-	getValue: (key: string) => Value
-) {
-	//TODO: hook it up
+	getValue: (key: string) => Promise<string | Object>
+): Promise<string> {
+	return new Promise((res, rej) => {
+		// prefix the key with the store name to prevent collisions
+		// TODO: see if there is a better way
+		const compoundKey = store + key;
+
+		client.get(compoundKey, (err, storedValue) => {
+			if (err !== null) throw err;
+			// if found, return the value
+			if (typeof storedValue === "string") return res(storedValue);
+
+			// else, calculate the value and store it
+			getValue(key).then((rawValue) => {
+				const value =
+					typeof rawValue === "string" ? rawValue : JSON.stringify(rawValue);
+
+				// remember the value
+				client.setex(
+					compoundKey,
+					cacheExpirationSeconds[store],
+					value,
+					(err) => {
+						if (err !== null) throw err;
+					}
+				);
+				return res(value);
+			});
+		});
+	});
 }
