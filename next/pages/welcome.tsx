@@ -24,7 +24,7 @@ function Welcome({
 				<h1 className={styles.main_heading}>Welcome to Cyber Volunteer</h1>
 				<p className={styles.main_para}>
 					You have created a Cyber Volunteers account. A verification email has
-					been sent to {email ?? "your email account"}
+					been sent to {email ?? "your email address"}
 					{/*TODO: test if this works*/}. Please verify your email to be able to
 					sign up for volunteering opportunities.
 				</p>

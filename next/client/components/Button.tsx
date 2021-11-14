@@ -5,23 +5,33 @@ function Button({
 	children,
 	style,
 	href,
+	disabled,
 	onClick,
 }: React.PropsWithChildren<{
 	style?: React.CSSProperties;
 	href?: string;
+	disabled?: boolean;
 	onClick?: () => void;
 }>) {
 	if (href !== undefined)
 		return (
 			<Link href={href}>
-				<div style={style} className={styles.button}>
+				<div
+					style={style}
+					className={`${styles.button} ${disabled ? styles.disabled : ""}`}
+				>
 					<>{children}</>
 				</div>
 			</Link>
 		);
 	else
 		return (
-			<button style={style} className={styles.button} onClick={onClick}>
+			<button
+				style={style}
+				className={`${styles.button}  ${disabled ? styles.disabled : ""}`}
+				onClick={onClick}
+				type="submit"
+			>
 				{children}
 			</button>
 		);

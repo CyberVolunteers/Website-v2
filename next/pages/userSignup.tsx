@@ -13,10 +13,14 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import CustomForm from "../client/components/CustomForm";
+import CustomButton from "../client/components/Button";
 
 import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
 import { months } from "../client/utils/const";
+
+const postcodeRegex =
+	/^[a-zA-Z]{1,2}([0-9]{1,2}|[0-9][a-zA-Z])\s*[0-9][a-zA-Z]{2}$/;
 
 export default function UserSignup(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>
@@ -30,35 +34,20 @@ export default function UserSignup(
 			email: string;
 		}
 	);
+	const [secondPageData, setSecondPageData] = useState(
+		{} as {
+			addressLine1: string;
+			addressLine2: string;
+			postcode: string;
+			month: string;
+			city: string;
+			day: string;
+			year: string;
+			hasUserAcceptedPolicies: boolean;
+		}
+	);
 	const [isFirstPageDataValid, setIsFirstPageDataValid] = useState(false);
-
-	const [addressLine1, setAddressLine1] = useState("");
-	const [addressLine2, setAddressLine2] = useState("");
-	const [postcode, setPostcode] = useState("");
-	const [month, setMonth] = useState("");
-	const [city, setCity] = useState("");
-	const [day, setDay] = useState("");
-	const [year, setYear] = useState("");
-
-	const [dayErrorMessage, setDayErrorMessage] = useState("");
-	const [yearErrorMessage, setYearErrorMessage] = useState("");
-
-	const isSecondPageValid =
-		addressLine1 !== "" &&
-		postcode !== "" &&
-		month !== "" &&
-		city !== "" &&
-		day !== "" &&
-		year !== "" &&
-		dayErrorMessage === "" &&
-		yearErrorMessage === "";
-	// Number(day) < 32 &&
-	// Number(year) <= new Date().getFullYear();
-
-	const [isSimpleAddressInputShown, setIsSimpleAddressInputShown] =
-		useState(true);
-
-	const [hasUserAcceptedPolicies, setHasUserAcceptedPolicies] = useState(false);
+	const [isSecondPageDataValid, setIsSecondPageDataValid] = useState(false);
 
 	const [pageNum, setPageNum] = useState(0);
 
@@ -104,290 +93,13 @@ export default function UserSignup(
 								}}
 							/>
 						) : (
-							<div className="step-2">
-								<div className="full-address-container">
-									{isSimpleAddressInputShown ? (
-										<AddressMenu
-											{...{
-												setAddressLine1,
-												setPostcode,
-												setIsSimpleAddressInputShown,
-												setCity,
-											}}
-										/>
-									) : (
-										<>
-											<div className="expand-address" style={{ marginTop: 20 }}>
-												<div className="text-field-wrapper">
-													<TextField
-														className="address"
-														id="address1"
-														// onBlur={CheckIsValid}
-														// onFocus={RemoveMessages}
-														label="Address Line 1"
-														variant="outlined"
-														style={{ width: "100%" }}
-														type="text"
-														value={addressLine1}
-														onChange={(e) => setAddressLine1(e.target.value)}
-													/>
-													<span className="helping-text password-helper"></span>
-												</div>
-												<div className="text-field-wrapper">
-													<TextField
-														// onBlur={CheckIsValid}
-														// onFocus={RemoveMessages}
-														className="address"
-														id="address2"
-														// onChange={HandleSecondStepText}
-														label="Address Line 2 (optional)"
-														variant="outlined"
-														style={{ width: "100%" }}
-														type="text"
-														value={addressLine2}
-														onChange={(e) => setAddressLine2(e.target.value)}
-													/>
-													<span className="helping-text password-helper"></span>
-												</div>
-												<div className="text-field-wrapper">
-													<TextField
-														// onBlur={CheckIsValid}
-														// onFocus={RemoveMessages}
-														className="address"
-														id="postcode"
-														// onChange={HandleSecondStepText}
-														label="Postcode"
-														variant="outlined"
-														style={{ width: "100%" }}
-														type="text"
-														value={postcode}
-														onChange={(e) => setPostcode(e.target.value)}
-													/>
-													{/* TODO: fill in other fields when selecting place as well */}
-													<span className="helping-text password-helper"></span>
-												</div>
-												<div className="text-field-wrapper">
-													<TextField
-														// onBlur={CheckIsValid}
-														// onFocus={RemoveMessages}
-														className="address"
-														id="town"
-														value={city}
-														onChange={(e) => setCity(e.target.value)}
-														// onChange={HandleSecondStepText}
-														label="Town/City"
-														variant="outlined"
-														style={{ width: "100%" }}
-														type="text"
-													/>
-												</div>
-											</div>
-										</>
-									)}
-								</div>
-
-								{/* <div className="country-select select-box">
-									<FormControl className="dropdown-form-control">
-										<InputLabel
-											htmlFor="age-native-simple"
-											style={{ pointerEvents: "none" }}
-										>
-											Country/Region
-										</InputLabel>
-										<Select
-											native
-											// onChange={HandleSecondStepText}
-											id="country-select"
-											// onBlur={HandleSelectOnBlur}
-											// onFocus={HandleSelectOnFocus}
-											defaultValue=""
-										>
-											<option value="" style={{ display: "none" }}></option>
-											{countryCodes.map((country) => (
-												<option key={country.code} value={country.code}>
-													{country.name}
-												</option>
-											))}
-										</Select>
-									</FormControl>
-								</div> */}
-
-								<div
-									className="grid-col-3 personal-info-wrapper"
-									style={{
-										// An awful workaround to spacing
-										marginTop: isSimpleAddressInputShown ? "16px" : "10px",
-									}}
-								>
-									<div className="day-wrapper" style={{ marginTop: 16 }}>
-										<TextField
-											// onBlur={CheckIsValid}
-											// onFocus={RemoveMessages}
-											className="Day"
-											// onChange={HandleSecondStepText}
-											id="Day"
-											label="Day"
-											variant="outlined"
-											style={{ width: "100%" }}
-											type="text"
-											value={day}
-											// only allow digits
-											onChange={(e) =>
-												setDay(e.target.value.replace(/\D/g, ""))
-											}
-										/>
-										<span
-											className="helping-text day-helper"
-											style={{
-												display: "none",
-											}}
-										>
-											Invalid Day
-										</span>
-										<small
-											style={{ fontSize: 12, color: "#7F7A7B" }}
-											className="birthday"
-										>
-											Your birthday
-										</small>
-									</div>
-									<div className="Month-select select-box">
-										<FormControl className="dropdown-form-control">
-											<InputLabel
-												htmlFor="age-native-simple"
-												style={{ pointerEvents: "none" }}
-											>
-												Month
-											</InputLabel>
-											<Select
-												native
-												// onChange={HandleSecondStepText}
-												id="month-select"
-												// onBlur={HandleSelectOnBlur}
-												value={month}
-												onChange={(e) => setMonth(e.target.value as string)}
-											>
-												<option
-													disabled
-													value=""
-													style={{ display: "none" }}
-												></option>
-												{months.map((month) => (
-													<option key={month} value={month}>
-														{month}
-													</option>
-												))}
-											</Select>
-										</FormControl>
-									</div>
-									<div className="text-field-wrapper" style={{ marginTop: 16 }}>
-										<TextField
-											// onBlur={CheckIsValid}
-											// onFocus={RemoveMessages}
-											// onChange={HandleSecondStepText}
-											className="address"
-											id="year"
-											label="Year"
-											variant="outlined"
-											style={{ width: "100%" }}
-											type="text"
-											value={year}
-											// only allow digits
-											onChange={(e) =>
-												setYear(e.target.value.replace(/\D/g, ""))
-											}
-										/>
-
-										<span className="helping-text password-helper"></span>
-									</div>
-								</div>
-
-								<div
-									className="checkbox-wrapper"
-									style={{ marginBottom: 20, marginTop: 18 }}
-								>
-									<input
-										type="checkbox"
-										name=""
-										// onChange={HandleSecondStepText}
-										id="AggrementCheckbox"
-										style={{ display: "none" }}
-										checked={hasUserAcceptedPolicies}
-										onChange={() => {
-											setHasUserAcceptedPolicies(!hasUserAcceptedPolicies);
-										}}
-									/>
-									<label>
-										<label
-											htmlFor="AggrementCheckbox"
-											className="custom-checkbox custom-checkbox-box"
-											// onClick={ShowPasswords}
-											style={{ minWidth: 20 }}
-										>
-											<FontAwesomeIcon
-												className="white-fa-check"
-												icon={faCheck}
-											/>
-										</label>
-										<label
-											htmlFor="AggrementCheckbox"
-											className="custom-checkbox-line"
-											// onClick={ShowPasswords}
-											style={{
-												fontSize: 13,
-												color: "rgb(116, 112, 113)",
-												fontWeight: 600,
-											}}
-										>
-											By creating an account you agree that you've read and
-											agree with the{" "}
-											<Link
-												// TODO: make that page
-												href="/termsOfService"
-												// style={{
-												// 	color: "#000",
-												// }}
-											>
-												terms of service
-											</Link>{" "}
-											and{" "}
-											<Link
-												//TODO: same here
-												href="/privacyPolicy"
-												// style={{
-												// 	color: "#000",
-												// }}
-											>
-												privacy policy
-											</Link>
-										</label>
-									</label>
-								</div>
-
-								<input
-									type="submit"
-									value=""
-									id="create-accout"
-									style={{ display: "none" }}
-								/>
-								<label
-									htmlFor="create-accout"
-									className={`create-account-label ${
-										isSecondPageValid ? "" : "disable"
-									}`}
-									style={{
-										cursor: "pointer",
-										width: "100%",
-										display: "flex",
-										alignItems: "center",
-										justifyContent: "center",
-										fontSize: "14px",
-										height: 45,
-									}}
-								>
-									CREATE ACCOUNT
-								</label>
-							</div>
+							<SecondPage
+								{...{
+									isSecondPageDataValid,
+									setSecondPageData,
+									setIsSecondPageDataValid,
+								}}
+							/>
 						)}
 					</CustomForm>
 				</div>
@@ -409,7 +121,9 @@ function AddressMenu({
 }) {
 	const [addressStageNum, setAddressStageNum] = useState(0);
 
+	// the "raw" address is the address that is then used for suggestions
 	const [rawAddress, setRawAddress] = useState("");
+	const [visitedFields, setVisitedFields] = useState([] as string[]);
 
 	// TODO: fetch results: create a server-side api, fetch the actual api from there and then double-check the postcode on submit. store as postcode + address in db + cache - no transitive deps please
 	let [addressSuggestions, setAddressSuggestions] = useState(
@@ -426,17 +140,26 @@ function AddressMenu({
 				? []
 				: [
 						{
-							postcode: "AB1 CD1",
+							postcode: "AB1 1CD",
 							address: "1 Boogeyman cave str, East Sussex, UK",
 							city: "Cavetown",
 						},
 						{
-							postcode: "AB1 CD2",
+							postcode: "AB1 2CD",
 							shortDesc: "Placeholder str, East Sussex, UK",
 							city: "London",
 							address: [
 								"1 Placeholder str, East Sussex, UK",
 								"2 Placeholder str, East Sussex, UK",
+								"3 Placeholder str, East Sussex, UK",
+								"4 Placeholder str, East Sussex, UK",
+								"5 Placeholder str, East Sussex, UK",
+								"6 Placeholder str, East Sussex, UK",
+								"7 Placeholder str, East Sussex, UK",
+								"8 Placeholder str, East Sussex, UK",
+								"9 Placeholder str, East Sussex, UK",
+								"10 Placeholder str, East Sussex, UK",
+								"11 Placeholder str, East Sussex, UK",
 							],
 						},
 				  ]
@@ -458,12 +181,16 @@ function AddressMenu({
 		setIsInFocus(thisRef.current.contains(e.target as Node));
 	}
 
+	// wait for clicks outside
 	useEffect(() => {
 		document.addEventListener("click", onClickOutside, true);
 		return () => {
 			document.removeEventListener("click", onClickOutside, true);
 		};
 	}, []);
+
+	const showRawAddressError =
+		visitedFields.includes("rawAddress") && !isInFocus && rawAddress === "";
 
 	return (
 		<div ref={thisRef}>
@@ -481,7 +208,7 @@ function AddressMenu({
 				<TextField
 					className={`address ${
 						isInFocus ? "expanded-address-input-field" : ""
-					}`}
+					} ${getFieldClasses("rawAddress", visitedFields)}`}
 					id="address"
 					autoComplete="off"
 					label="Enter your postcode"
@@ -489,6 +216,11 @@ function AddressMenu({
 					style={{ width: "100%", marginTop: 20 }}
 					type="text"
 					value={rawAddress}
+					error={showRawAddressError}
+					// not onFocus to avoid flashes of the error message
+					onBlur={() => {
+						addVisitedField("rawAddress", visitedFields, setVisitedFields);
+					}}
 					onChange={(e) => {
 						// invalidate the current option
 						setAddressStageNum(0);
@@ -496,23 +228,24 @@ function AddressMenu({
 						setRawAddress(e.target.value);
 					}}
 				/>
-				<small
-					style={{
-						display: "none",
-						marginTop: "7px",
-						fontSize: "13px",
-						color: "rgb(246, 91, 78)",
-					}}
-					className="address-error"
-				>
-					Invalid Address
-				</small>
+				{showRawAddressError ? (
+					<small
+						style={{
+							display: "block",
+							marginTop: "7px",
+							fontSize: "13px",
+							color: "rgb(246, 91, 78)",
+						}}
+						className="address-error"
+					>
+						Invalid Address
+					</small>
+				) : null}
 				{isInFocus ? null : (
 					<small
 						style={{
 							fontSize: "12px",
 							color: " rgb(127, 122, 123)",
-							position: "absolute",
 							width: "100%",
 							left: "0%",
 						}}
@@ -562,15 +295,14 @@ function AddressMenu({
 													})
 												);
 												setAddressSuggestions(newSuggestions);
-												// TODO: separate into components to make it more readable
 											} else {
 												// select that option
-												setAddressLine1(suggestion.address); //TODO: there might be a better way to split that up
+												setAddressLine1(suggestion.address);
 												setPostcode(suggestion.postcode);
 
 												setCity(suggestion.city);
 
-												// TODO: close that popup
+												// close that popup
 												setIsSimpleAddressInputShown(false);
 											}
 										}}
@@ -600,7 +332,7 @@ function AddressMenu({
 										padding: "10px 0px",
 										cursor: "pointer",
 									}}
-									// Because onClick does not fire for some time and the element gets deleted
+									// Because onClick does not fire for a couple milliseconds and the element gets deleted
 									onMouseDown={() => setIsSimpleAddressInputShown(true)}
 								>
 									{/*
@@ -672,6 +404,8 @@ function FirstPage({
 	const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 	let [password2ErrorMessage, setPassword2ErrorMessage] = useState("");
 
+	const [visitedFields, setVisitedFields] = useState([] as string[]);
+
 	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 
@@ -711,17 +445,15 @@ function FirstPage({
 
 	// record the vals
 	useEffect(() => {
-		// TODO: maybe refs are better
+		// TODO: maybe refs are better; also look at the second page
 		setFirstPageData(allFields);
 		setIsFirstPageDataValid(
 			!allFieldVals.includes("") &&
-				[
-					firstNameErrorMessage,
-					secondNameErrorMessage,
-					emailErrorMessage,
-					passwordErrorMessage,
-					password2ErrorMessage,
-				].every((e) => e === "")
+				// also some exceptions for the unusual checks
+				// can use error message for passwords because those are updated whenever the passwords change
+				passwordErrorMessage === "" &&
+				password2ErrorMessage === "" &&
+				isEmail(email)
 		);
 	}, allFieldVals);
 
@@ -729,12 +461,15 @@ function FirstPage({
 		<>
 			<div className="input-collection">
 				<TextField
+					className={`firstName ${getFieldClasses("firstName", visitedFields)}`}
 					onBlur={(e) => {
 						if (e.target.value === "")
 							setFirstNameErrorMessage("Please enter a first name");
 					}}
-					onFocus={generateErrorResetter(setFirstNameErrorMessage)}
-					// onChange={HandleTextValidation}
+					onFocus={() => {
+						addVisitedField("firstName", visitedFields, setVisitedFields);
+						setFirstNameErrorMessage("");
+					}}
 					onChange={(e) => setFirstName(e.target.value)}
 					id="fname"
 					label="First name"
@@ -753,11 +488,18 @@ function FirstPage({
 				</span>
 
 				<TextField
+					className={`secondName ${getFieldClasses(
+						"secondName",
+						visitedFields
+					)}`}
 					onBlur={(e) => {
 						if (e.target.value === "")
 							setSecondNameErrorMessage("Please enter a last name");
 					}}
-					onFocus={generateErrorResetter(setSecondNameErrorMessage)}
+					onFocus={() => {
+						addVisitedField("secondName", visitedFields, setVisitedFields);
+						setSecondNameErrorMessage("");
+					}}
 					// onChange={HandleTextValidation}
 					onChange={(e) => setLastName(e.target.value)}
 					id="lname"
@@ -777,13 +519,17 @@ function FirstPage({
 				</span>
 
 				<TextField
+					className={`email ${getFieldClasses("email", visitedFields)}`}
 					onBlur={(e) => {
 						if (e.target.value === "")
 							return setEmailErrorMessage("Please enter an email");
 						if (!isEmail(email))
 							return setEmailErrorMessage("Please enter a valid email");
 					}}
-					onFocus={generateErrorResetter(setEmailErrorMessage)}
+					onFocus={() => {
+						addVisitedField("email", visitedFields, setVisitedFields);
+						setEmailErrorMessage("");
+					}}
 					// onChange={HandleEmailValidation}
 					onChange={(e) => setEmail(e.target.value)}
 					id="email"
@@ -803,11 +549,11 @@ function FirstPage({
 				</span>
 
 				<TextField
+					className={`password ${getFieldClasses("password", visitedFields)}`}
 					onBlur={(e) => {
 						if (e.target.value === "")
 							setPasswordErrorMessage("Please enter a password");
 					}}
-					className="password"
 					// onChange={HandlePasswordValidation}
 					onChange={(e) => setPassword(e.target.value)}
 					id="password"
@@ -816,7 +562,10 @@ function FirstPage({
 					style={{ width: "100%" }}
 					type={showPassword ? "text" : "password"}
 					error={passwordErrorMessage !== ""}
-					onFocus={generateErrorResetter(setPasswordErrorMessage)}
+					onFocus={() => {
+						addVisitedField("password", visitedFields, setVisitedFields);
+						setPasswordErrorMessage("");
+					}}
 				/>
 
 				<span
@@ -855,7 +604,7 @@ function FirstPage({
 				)}
 
 				<TextField
-					className="password"
+					className={`password2 ${getFieldClasses("password2", visitedFields)}`}
 					onChange={(e) => setPassword2(e.target.value)}
 					id="ConfirmPassword"
 					label="Confirm Password"
@@ -863,7 +612,10 @@ function FirstPage({
 					style={{ width: "100%" }}
 					type={showPassword ? "text" : "password"}
 					error={password2ErrorMessage !== ""}
-					onFocus={generateErrorResetter(setPassword2ErrorMessage)}
+					onFocus={() => {
+						addVisitedField("password2", visitedFields, setVisitedFields);
+						setPassword2ErrorMessage("");
+					}}
 				/>
 
 				<span
@@ -929,6 +681,482 @@ function FirstPage({
 				</div>
 			</div>
 		</>
+	);
+}
+
+function SecondPage({
+	isSecondPageDataValid,
+	setSecondPageData,
+	setIsSecondPageDataValid,
+}: {
+	isSecondPageDataValid: boolean;
+	setIsSecondPageDataValid: React.Dispatch<React.SetStateAction<boolean>>;
+	setSecondPageData: React.Dispatch<
+		React.SetStateAction<{
+			addressLine1: string;
+			addressLine2: string;
+			postcode: string;
+			month: string;
+			city: string;
+			day: string;
+			year: string;
+			hasUserAcceptedPolicies: boolean;
+		}>
+	>;
+}) {
+	const [addressLine1, setAddressLine1] = useState("");
+	const [addressLine2, setAddressLine2] = useState("");
+	const [postcode, setPostcode] = useState("");
+	const [month, setMonth] = useState("");
+	const [city, setCity] = useState("");
+	const [day, setDay] = useState("");
+	const [year, setYear] = useState("");
+
+	const [addressLine1ErrorMessage, setAddressLine1ErrorMessage] = useState("");
+	const [postcodeErrorMessage, setPostcodeErrorMessage] = useState("");
+	const [cityErrorMessage, setCityErrorMessage] = useState("");
+	const [dayErrorMessage, setDayErrorMessage] = useState("");
+	const [yearErrorMessage, setYearErrorMessage] = useState("");
+
+	const [visitedFields, setVisitedFields] = useState([] as string[]);
+
+	const [isSimpleAddressInputShown, setIsSimpleAddressInputShown] =
+		useState(true);
+
+	const [hasUserAcceptedPolicies, setHasUserAcceptedPolicies] = useState(false);
+
+	const allFields = {
+		addressLine1,
+		addressLine2,
+		postcode,
+		month,
+		city,
+		day,
+		year,
+		hasUserAcceptedPolicies,
+	};
+	const allFieldVals = Object.values(allFields);
+
+	useEffect(() => {
+		setSecondPageData(allFields);
+		setIsSecondPageDataValid(
+			Object.entries(allFields).every(
+				([k, v]) => k === "addressLine2" || v !== ""
+			) &&
+				hasUserAcceptedPolicies &&
+				dayErrorMessage === "" &&
+				yearErrorMessage === "" &&
+				postcodeRegex.test(postcode)
+		);
+	}, allFieldVals);
+
+	function checkDay() {
+		if (!visitedFields.includes("day")) return;
+		const parsedDay = parseInt(day);
+		if (day === "" || parsedDay > 31 || parsedDay === 0)
+			setDayErrorMessage("Please enter a valid day");
+		else setDayErrorMessage("");
+	}
+
+	function checkYear() {
+		if (!visitedFields.includes("year")) return;
+		const parsedYear = parseInt(year);
+
+		if (
+			year === "" ||
+			parsedYear > new Date().getFullYear() ||
+			parsedYear < 1900
+		)
+			setYearErrorMessage("Please enter a valid year");
+		else setYearErrorMessage("");
+	}
+
+	useEffect(checkDay, [day]);
+	useEffect(checkYear, [year]);
+
+	return (
+		<>
+			<div className="full-address-container">
+				{isSimpleAddressInputShown ? (
+					<>
+						<AddressMenu
+							{...{
+								setAddressLine1,
+								setPostcode,
+								setIsSimpleAddressInputShown,
+								setCity,
+							}}
+						/>
+						<div
+							className="layout"
+							style={{
+								height: "15px",
+							}}
+						></div>
+					</>
+				) : (
+					<>
+						<div className="expand-address" style={{ marginTop: 20 }}>
+							<div className="text-field-wrapper">
+								<TextField
+									className={`address ${getFieldClasses(
+										"addressLine1",
+										visitedFields
+									)}`}
+									id="address1"
+									// onBlur={CheckIsValid}
+									// onFocus={RemoveMessages}
+									label="Address Line 1"
+									variant="outlined"
+									style={{ width: "100%" }}
+									type="text"
+									value={addressLine1}
+									error={addressLine1ErrorMessage !== ""}
+									onChange={(e) => setAddressLine1(e.target.value)}
+									onBlur={(e) => {
+										addVisitedField(
+											"addressLine1",
+											visitedFields,
+											setVisitedFields
+										);
+										if (e.target.value === "")
+											setAddressLine1ErrorMessage("Please enter an address");
+									}}
+									onFocus={generateErrorResetter(setAddressLine1ErrorMessage)}
+								/>
+								<span className="helping-text address-line-1">
+									{addressLine1ErrorMessage}
+								</span>
+							</div>
+
+							<div className="text-field-wrapper">
+								<TextField
+									// onBlur={CheckIsValid}
+									// onFocus={RemoveMessages}
+									className={`address ${getFieldClasses(
+										"addressLine2",
+										visitedFields
+									)}`}
+									id="address2"
+									// onChange={HandleSecondStepText}
+									label="Address Line 2 (optional)"
+									variant="outlined"
+									style={{ width: "100%" }}
+									type="text"
+									value={addressLine2}
+									onChange={(e) => setAddressLine2(e.target.value)}
+									onBlur={(e) => {
+										addVisitedField(
+											"addressLine2",
+											visitedFields,
+											setVisitedFields
+										);
+									}}
+								/>
+							</div>
+
+							<span className="helping-text layout"></span>
+							<div className="postcode-city-container">
+								<div className="text-field-wrapper half-width">
+									<TextField
+										// onBlur={CheckIsValid}
+										// onFocus={RemoveMessages}
+										className={`postcode ${getFieldClasses(
+											"postcode",
+											visitedFields
+										)}`}
+										id="postcode"
+										// onChange={HandleSecondStepText}
+										label="Postcode"
+										variant="outlined"
+										type="text"
+										value={postcode}
+										error={postcodeErrorMessage !== ""}
+										onChange={(e) => setPostcode(e.target.value)}
+										onBlur={(e) => {
+											addVisitedField(
+												"postcode",
+												visitedFields,
+												setVisitedFields
+											);
+											if (!postcodeRegex.test(e.target.value))
+												setPostcodeErrorMessage(
+													"Please enter a valid postcode"
+												);
+										}}
+										onFocus={generateErrorResetter(setPostcodeErrorMessage)}
+									/>
+									<div className="helping-text postcode-helper">
+										{postcodeErrorMessage}
+									</div>
+								</div>
+								<div className="text-field-wrapper half-width">
+									<TextField
+										// onBlur={CheckIsValid}
+										// onFocus={RemoveMessages}
+										className={`town ${getFieldClasses("town", visitedFields)}`}
+										id="town"
+										value={city}
+										onChange={(e) => setCity(e.target.value)}
+										error={cityErrorMessage !== ""}
+										// onChange={HandleSecondStepText}
+										label="Town/City"
+										variant="outlined"
+										type="text"
+										onBlur={(e) => {
+											addVisitedField("town", visitedFields, setVisitedFields);
+											if (e.target.value === "")
+												setCityErrorMessage("Please enter a town/city");
+										}}
+										onFocus={generateErrorResetter(setCityErrorMessage)}
+									/>
+									<div className="helping-text postcode-helper">
+										{cityErrorMessage}
+									</div>
+								</div>
+							</div>
+						</div>
+					</>
+				)}
+			</div>
+
+			{/* <div className="country-select select-box">
+									<FormControl className="dropdown-form-control">
+										<InputLabel
+											htmlFor="age-native-simple"
+											style={{ pointerEvents: "none" }}
+										>
+											Country/Region
+										</InputLabel>
+										<Select
+											native
+											// onChange={HandleSecondStepText}
+											id="country-select"
+											// onBlur={HandleSelectOnBlur}
+											// onFocus={HandleSelectOnFocus}
+											defaultValue=""
+										>
+											<option value="" style={{ display: "none" }}></option>
+											{countryCodes.map((country) => (
+												<option key={country.code} value={country.code}>
+													{country.name}
+												</option>
+											))}
+										</Select>
+									</FormControl>
+								</div> */}
+			<div className="grid-col-3 personal-info-wrapper">
+				<div className="day-wrapper">
+					<TextField
+						// onBlur={CheckIsValid}
+						// onFocus={RemoveMessages}
+						className={`day ${getFieldClasses("day", visitedFields)}`}
+						// onChange={HandleSecondStepText}
+						id="Day"
+						label="Day"
+						variant="outlined"
+						style={{ width: "100%" }}
+						type="text"
+						value={day}
+						error={dayErrorMessage !== ""}
+						// only allow digits
+						onChange={(e) => setDay(e.target.value.replace(/\D/g, ""))}
+						onFocus={generateErrorResetter(setDayErrorMessage)}
+						onBlur={() => {
+							addVisitedField("day", visitedFields, setVisitedFields);
+							checkDay();
+						}}
+					/>
+					<span
+						className="helping-text password-helper"
+						style={{ marginBottom: "0px" }}
+					>
+						{dayErrorMessage}
+					</span>
+					<small
+						style={{ fontSize: 12, color: "#7F7A7B" }}
+						className="birthday"
+					>
+						Your birthday
+					</small>
+				</div>
+				<div className="Month-select select-box">
+					<FormControl
+						className={`dropdown-form-control ${getFieldClasses(
+							"month",
+							visitedFields
+						)}`}
+					>
+						<InputLabel
+							htmlFor="age-native-simple"
+							style={{ pointerEvents: "none" }}
+						>
+							Month
+						</InputLabel>
+						<Select
+							native
+							id="month-select"
+							// TODO: change it to onFocus for others for consistency
+							onFocus={() => {
+								addVisitedField("month", visitedFields, setVisitedFields);
+							}}
+							value={month}
+							onChange={(e) => setMonth(e.target.value as string)}
+						>
+							<option disabled value="" style={{ display: "none" }}></option>
+							{Object.entries(months).map(([month, shortMonthName]) => (
+								<option key={month} value={shortMonthName}>
+									{shortMonthName}
+								</option>
+							))}
+						</Select>
+					</FormControl>
+				</div>
+				<div className="text-field-wrapper">
+					<TextField
+						// onBlur={CheckIsValid}
+						// onFocus={RemoveMessages}
+						// onChange={HandleSecondStepText}
+						className={`year ${getFieldClasses("year", visitedFields)}`}
+						id="year"
+						label="Year"
+						variant="outlined"
+						style={{ width: "100%" }}
+						type="text"
+						value={year}
+						error={yearErrorMessage !== ""}
+						// only allow digits
+						onChange={(e) => setYear(e.target.value.replace(/\D/g, ""))}
+						onFocus={generateErrorResetter(setYearErrorMessage)}
+						onBlur={() => {
+							addVisitedField("year", visitedFields, setVisitedFields);
+							checkYear();
+						}}
+					/>
+
+					<span className="helping-text password-helper">
+						{yearErrorMessage}
+					</span>
+				</div>
+			</div>
+
+			<TermsOfServiceNote
+				{...{ hasUserAcceptedPolicies, setHasUserAcceptedPolicies }}
+			/>
+
+			<CustomButton disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
+				CREATE ACCOUNT
+			</CustomButton>
+
+			{/* <input
+				type="submit"
+				value=""
+				id="create-accout"
+				style={{ display: "none" }}
+			/>
+			<label
+				htmlFor="create-accout"
+				className={`create-account-label ${
+					isSecondPageDataValid ? "" : "disable"
+				}`}
+				style={{
+					cursor: "pointer",
+					width: "100%",
+					display: "flex",
+					alignItems: "center",
+					justifyContent: "center",
+					fontSize: "14px",
+					height: 45,
+				}}
+			>
+				CREATE ACCOUNT
+			</label> */}
+		</>
+	);
+}
+
+function addVisitedField(
+	field: string,
+	visitedFields: string[],
+	setVisitedFields: React.Dispatch<React.SetStateAction<string[]>>
+) {
+	if (visitedFields.includes(field)) return;
+	setVisitedFields(visitedFields.concat([field]));
+
+	// finally, change the actual value
+	visitedFields.push(field);
+}
+
+function getFieldClasses(field: string, visitedFields: string[]) {
+	return visitedFields.includes(field) ? "highlight-black" : "";
+}
+
+function TermsOfServiceNote({
+	hasUserAcceptedPolicies,
+	setHasUserAcceptedPolicies,
+}: {
+	hasUserAcceptedPolicies: boolean;
+	setHasUserAcceptedPolicies: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
+	return (
+		<div
+			className="checkbox-wrapper"
+			style={{ marginBottom: 20, marginTop: 18 }}
+		>
+			<input
+				type="checkbox"
+				name=""
+				// onChange={HandleSecondStepText}
+				id="tos-checkbox"
+				style={{ display: "none" }}
+				checked={hasUserAcceptedPolicies}
+				onChange={() => {
+					setHasUserAcceptedPolicies(!hasUserAcceptedPolicies);
+				}}
+			/>
+			<label>
+				<label
+					htmlFor="tos-checkbox"
+					className="custom-checkbox custom-checkbox-box"
+					// onClick={ShowPasswords}
+					style={{ minWidth: 20 }}
+				>
+					<FontAwesomeIcon className="white-fa-check" icon={faCheck} />
+				</label>
+				<label
+					htmlFor="tos-checkbox"
+					className="custom-checkbox-line"
+					// onClick={ShowPasswords}
+					style={{
+						fontSize: 13,
+						color: "rgb(116, 112, 113)",
+						fontWeight: 600,
+					}}
+				>
+					(Required) By creating an account you agree that you've read and agree
+					with the{" "}
+					<Link
+						// TODO: make that page
+						href="/termsOfService"
+						// style={{
+						// 	color: "#000",
+						// }}
+					>
+						terms of service
+					</Link>{" "}
+					and{" "}
+					<Link
+						//TODO: same here
+						href="/privacyPolicy"
+						// style={{
+						// 	color: "#000",
+						// }}
+					>
+						privacy policy
+					</Link>
+				</label>
+			</label>
+		</div>
 	);
 }
 

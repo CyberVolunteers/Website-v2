@@ -43,6 +43,9 @@ nav {
 .dblock {
 	display: block !important;
 }
+.dgrid {
+	display: grid !important;
+}
 
 .grid-col-3 {
 	display: grid;
@@ -71,10 +74,6 @@ select:-webkit-autofill {
 
 .w-100 {
 	width: 100%;
-}
-
-.d-block {
-	display: block;
 }
 
 .img-container {
