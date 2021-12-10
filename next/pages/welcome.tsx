@@ -8,8 +8,6 @@ import { getSession } from "../server/auth/auth-cookie";
 import { isLoggedIn } from "../server/auth/data";
 import { ExtendedNextApiRequest } from "../server/types";
 
-// import { HeaderNoOption } from "../Components/common/Organizer/Header/HeaderNoOption";
-// import styles from "../../Assets/styles/pages/Welcome.module.css";
 function Welcome({
 	email,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
