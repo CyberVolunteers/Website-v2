@@ -12,6 +12,7 @@ import {
 	clearServersideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
+import { schemaHasRules } from "ajv/dist/compile/util";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -21,7 +22,7 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const signupResult = await signupUser(req.body);
+		console.log(req.body);
 
 		if (!doAllRulesApply(req.body, signupValidation))
 			return res
@@ -29,6 +30,8 @@ const handlers: HandlerCollection = {
 				.send(
 					"This data does not seem correct. Could you please double-check it?"
 				);
+
+		const signupResult = await signupUser(req.body);
 
 		if (signupResult === false) {
 			logger.info("server.signupUser:Signup failed");
@@ -58,7 +61,13 @@ export default async function signUp(
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(users)),
+			POST: ajv.compileParser(
+				(() => {
+					const schema = createAjvJTDSchema(users);
+					console.log(schema);
+					return schema;
+				})()
+			),
 		}
 	)(req, res);
 }

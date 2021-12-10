@@ -111,15 +111,3 @@ export async function rawGetPlaceAutocomplete(query: string) {
 	});
 	return placeAutocompleteResults;
 }
-
-// export async function getAddressSuggestions(q: string) {
-// 	const client = new Client({});
-// 	const placeAutocompleteResults = await client.placeAutocomplete({
-// 		params: {
-// 			input: q,
-// 			// TODO: location + radius
-// 			key: geocodingKey ?? "",
-// 		},
-// 	});
-// 	console.log(JSON.stringify(placeAutocompleteResults.data.predictions));
-// }

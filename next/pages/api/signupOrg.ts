@@ -22,14 +22,14 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const signupResult = await signupOrg(req.body);
-
 		if (!doAllRulesApply(req.body, signupValidation))
 			return res
 				.status(400)
 				.send(
 					"This data does not seem correct. Could you please double-check it?"
 				);
+
+		const signupResult = await signupOrg(req.body);
 
 		if (signupResult === false) {
 			logger.info("server.signupOrg:Signup failed");

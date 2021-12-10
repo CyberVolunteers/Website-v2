@@ -15,8 +15,12 @@ export const users: FieldConstraintsCollection = {
 			lastName: { maxLength: 30 },
 			email: { maxLength: 320, client_specialEdit: true },
 			password: { client_specialEdit: true },
-			city: { maxLength: 85 },
-			country: { maxLength: 56 },
+			address1: { maxLength: 100 },
+			postcode: { maxLength: 8 },
+
+			// city: { maxLength: 85 },
+			// assuming it is UK for now
+			// country: { maxLength: 56 },
 		},
 		date: {
 			birthDate: {},
@@ -31,6 +35,8 @@ export const users: FieldConstraintsCollection = {
 			nationality: { maxLength: 60 },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
+
+			address2: { maxLength: 100 },
 		},
 	},
 };

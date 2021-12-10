@@ -15,19 +15,21 @@ import Select from "@material-ui/core/Select";
 import CustomForm from "../client/components/CustomForm";
 import CustomButton from "../client/components/Button";
 
+import { csrfFetch } from "../client/utils/csrf";
 import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
 import { months } from "../client/utils/const";
 import Image from "next/image";
+import { isEmailFree } from "../server/auth/data";
 
 const minSearchCooldownMillis = 700;
 
 const postcodeRegex =
 	/^[a-zA-Z]{1,2}([0-9]{1,2}|[0-9][a-zA-Z])\s*[0-9][a-zA-Z]{2}$/;
 
-export default function UserSignup(
-	props: InferGetServerSidePropsType<typeof getServerSideProps>
-): ReactElement {
+export default function UserSignup({
+	csrfToken,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const [firstPageData, setFirstPageData] = useState(
 		{} as {
 			firstName: string;
@@ -54,10 +56,39 @@ export default function UserSignup(
 
 	const [pageNum, setPageNum] = useState(0);
 
-	function handleMovingToNextPage() {
+	async function handleMovingToNextPage() {
 		if (!isFirstPageDataValid) return;
-		pageNum === 0 ? setPageNum(1) : null; //TODO: submit, maybe this https://ideal-postcodes.co.uk/autocomplete
-		// or https://www.addressify.co.uk/
+		if (pageNum === 0) return setPageNum(1);
+		if (!isSecondPageDataValid) return;
+
+		const dayNum = parseInt(secondPageData.day);
+		const yearNum = parseInt(secondPageData.year);
+		let monthNum = Object.values(months).indexOf(secondPageData.month);
+		if (monthNum === -1)
+			monthNum = Object.keys(months).indexOf(secondPageData.month);
+
+		const birthDate = new Date(yearNum, monthNum, dayNum);
+
+		const userData = {
+			birthDate: birthDate.toISOString(),
+			firstName: firstPageData.firstName,
+			lastName: firstPageData.lastName,
+			email: firstPageData.email,
+			password: firstPageData.password,
+			address1: secondPageData.addressLine1,
+			postcode: secondPageData.postcode.replaceAll(/[^0-9a-zA-Z]/g, ""),
+		};
+
+		const res = await csrfFetch(csrfToken, `/api/signupUser`, {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify(userData),
+		});
+		// TODO: show an error
 	}
 
 	return (
@@ -317,7 +348,6 @@ function AddressMenu({
 														}),
 													});
 													const newPostcode = (await res.json()).results ?? "";
-													console.log(newPostcode);
 													setPostcode(newPostcode);
 												})();
 												// setPostcode(suggestion.postcode);
@@ -485,7 +515,7 @@ function FirstPage({
 				password2ErrorMessage === "" &&
 				isEmail(email)
 		);
-	}, allFieldVals);
+	}, [...allFieldVals, passwordErrorMessage, password2ErrorMessage, email]);
 
 	return (
 		<>
@@ -555,6 +585,23 @@ function FirstPage({
 							return setEmailErrorMessage("Please enter an email");
 						if (!isEmail(email))
 							return setEmailErrorMessage("Please enter a valid email");
+
+						(async () => {
+							const res = await fetch(
+								`/api/isEmailFree?${new URLSearchParams({ email })}`,
+								{
+									method: "GET",
+									credentials: "same-origin", // only send cookies for same-origin requests
+									headers: {
+										"content-type": "application/json",
+										accept: "application/json",
+									},
+								}
+							);
+
+							if ((await res.json()) !== true)
+								return setEmailErrorMessage("This email is already used");
+						})();
 					}}
 					onFocus={() => {
 						addVisitedField("email", visitedFields, setVisitedFields);
@@ -778,7 +825,13 @@ function SecondPage({
 				yearErrorMessage === "" &&
 				postcodeRegex.test(postcode)
 		);
-	}, allFieldVals);
+	}, [
+		...allFieldVals,
+		hasUserAcceptedPolicies,
+		dayErrorMessage,
+		yearErrorMessage,
+		postcode,
+	]);
 
 	function checkDay() {
 		if (!visitedFields.includes("day")) return;
@@ -791,7 +844,6 @@ function SecondPage({
 	function checkYear() {
 		if (!visitedFields.includes("year")) return;
 		const parsedYear = parseInt(year);
-
 		if (
 			year === "" ||
 			parsedYear > new Date().getFullYear() ||
