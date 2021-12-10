@@ -14,6 +14,7 @@ import { faUserCircle, faSurprise } from "@fortawesome/free-regular-svg-icons";
 import {
 	faDollarSign,
 	faHandsHelping,
+	faSearch,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function Home(): ReactElement {
@@ -69,16 +70,16 @@ export default function Home(): ReactElement {
 						<div className="reel-wrapper">
 							<div className="reel first-reel reel-h3">
 								<h3 className="active reel-h3" id="top-nav-1">
-									Women
+									Community
 								</h3>
 								<h3 className="reel-h3" id="top-nav-2">
 									Covid 19
 								</h3>
 								<h3 className="reel-h3" id="top-nav-3">
-									Shelter
+									Education
 								</h3>
 								<h3 className="reel-h3" id="top-nav-4">
-									Kiva U.S
+									Healthcare
 								</h3>
 								<h3 className="reel-h3" id="top-nav-5">
 									Refugees
@@ -87,16 +88,16 @@ export default function Home(): ReactElement {
 									Refugees
 								</h3>
 								<h3 className="reel-h3" id="top-nav-7">
-									Agriculture
+									Refugees
 								</h3>
 								<h3 className="reel-h3" id="top-nav-8">
-									Education
+									Refugees
 								</h3>
 								<h3 className="reel-h3" id="top-nav-9">
-									Technology
+									Refugees
 								</h3>
 								<h3 className="reel-h3" id="top-nav-10">
-									Health
+									Refugees
 								</h3>
 							</div>
 						</div>
@@ -256,42 +257,68 @@ export default function Home(): ReactElement {
 				<div className="how-it-works-section">
 					<h1>How it works</h1>
 					<p>
-						By lending as little as $25 on Kiva, you can support the causes you
-						<br />
-						care about and make a real personal impact.
+						Easily find volunteering opportunities on Cyber Volunteers to
+						support causes that you care about and have a real impact.
 					</p>
 
 					<div className="steps-area">
 						<div className="step">
-							<FontAwesomeIcon icon={faUserCircle} />
+							<div className="space-8"></div>
+
+							<FontAwesomeIcon
+								icon={faUserCircle}
+								style={{
+									marginBottom: "8px",
+								}}
+							/>
 
 							<div className="presentation">
 								<h3>Make an Account</h3>
-								<p>Browse by category and find an entrepreneur to support.</p>
+								<p>Create your personal account to connect with charities.</p>
 							</div>
 						</div>
 						<div className="step">
-							<FontAwesomeIcon icon={faSurprise} />
+							<div className="space-8"></div>
+
+							<img
+								className="icon-48"
+								alt=""
+								src="/img/mag_glass_icon.svg"
+							></img>
+
+							<div className="space-8"></div>
 
 							<div className="presentation">
 								<h3>Find an Opportunity</h3>
-								<p>Help fund a loan with as little as $25.</p>
+								<p>
+									Browse our opportunities and find a charity to volunteer for.
+								</p>
 							</div>
 						</div>
 						<div className="step">
-							<FontAwesomeIcon icon={faDollarSign} />
-
+							<img className="icon-64" alt="" src="/img/mail_icon.svg"></img>
 							<div className="presentation">
 								<h3>Register your interest</h3>
-								<p>Kiva borrowers have a 96% repayment rate historically.</p>
+								<p>
+									Simply click "Volunteer Now" to notify the charity of your
+									interest.
+								</p>
 							</div>
 						</div>
 						<div className="step">
-							<FontAwesomeIcon icon={faHandsHelping} />
+							<div className="space-8"></div>
+							<FontAwesomeIcon
+								icon={faHandsHelping}
+								style={{
+									marginBottom: "8px",
+								}}
+							/>
 
 							<div className="presentation">
 								<h3>Volunteer</h3>
-								<p>Relend your money or withdraw your funds.</p>
+								<p>
+									Volunteer and help support meaningful causes you care about.
+								</p>
 							</div>
 						</div>
 					</div>
@@ -311,18 +338,28 @@ export default function Home(): ReactElement {
 						style={{ textAlign: "center", color: "#4D4D4D" }}
 						className="landing-heading"
 					>
-						What our landing community thinks
+						What our volunteering community thinks
 					</h1>
 					<div className="community-cards-wrapper">
-						<CommunityCard />
-						<CommunityCard />
+						<CommunityCard
+							text="Being able to find local opportunities this easily makes the process so much quicker and means I can spend more time actually volunteering."
+							img_src="/img/headshot1.png"
+							title="Elijah Taylor"
+							subtitle="Volunteer"
+						/>
+						<CommunityCard
+							text="Being able to find causes I care about has allowed me to engage more with my community and have more of an impact."
+							img_src="/img/headshot2.png"
+							title="Elijah Taylor"
+							subtitle="Volunteer"
+						/>
 					</div>
 
 					<h1
 						style={{ marginTop: "30px", fontWeight: 400 }}
 						className="make-loan-heading"
 					>
-						Make a loan today !
+						Volunteer now!
 					</h1>
 					<span className="find-opportunity-button">
 						<Link href="#">Find an opportunity</Link>
@@ -342,27 +379,20 @@ export default function Home(): ReactElement {
 				<ul>
 					<li>
 						<div className="icon-wrapper">
-							<img src="https://images.ctfassets.net/j0p9a6ql0rn7/7hfs4sFAAKYTSnaaVJF9ET/d97263a88b53779c2de62f465e20c9e4/piggy2x.png?w=65&h=64&fm=webp&q=80" />
-							<p>
-								Our community has funded over <b>$1.6 billion in loans</b>.
-							</p>
+							<img className="icon-64" src="/img/org_icon.svg" />
+							<p>Create your organisation's profile.</p>
 						</div>
 					</li>
 					<li>
 						<div className="icon-wrapper">
-							<img src="https://images.ctfassets.net/j0p9a6ql0rn7/RSuALqEgjABfxd5VW1HKH/a05eb47bb7a762afe111ba9e176483c8/dollar2x.png?w=65&h=64&fm=webp&q=80" />
-							<p>
-								Kiva borrowers have a <b>96% repayment rate</b>.
-							</p>
+							<img className="icon-64" src="/img/listings_icon.svg" />
+							<p>Create volunteering opportunities.</p>
 						</div>
 					</li>
 					<li>
 						<div className="icon-wrapper">
-							<img src="https://images.ctfassets.net/j0p9a6ql0rn7/1FyQ1lX43xsIoOTi6fwj2L/cce03c18332bf24b924a03f6abc1469d/world2x.png?w=65&h=64&fm=webp&q=80" />
-							<p>
-								The Kiva community spans <b>77 countries</b> and{" "}
-								<b>1.9M lenders.</b>
-							</p>
+							<img className="icon-64" src="/img/volunteers_icon.svg" />
+							<p>Get connected to passionate volunteers.</p>
 						</div>
 					</li>
 				</ul>
@@ -375,9 +405,9 @@ export default function Home(): ReactElement {
 
 				{/* image area */}
 
-				<div className="image-wrapper" style={{ margin: "4rem auto" }}>
+				{/* <div className="image-wrapper" style={{ margin: "4rem auto" }}>
 					<img src="/img/student.jpg" style={{ width: "100%" }} />
-				</div>
+				</div> */}
 			</div>
 		</div>
 	);

@@ -76,6 +76,20 @@
 .request-navigation-area.touch .reel {
 	overflow: scroll;
 }
+
+.space-8 {
+	margin-top: 8px;
+}
+.icon-64 {
+	width: 64px;
+	height: 64px;
+}
+
+.icon-48 {
+	width: 48px;
+	height: 48px;
+}
+
 .request-navigation-area.touch .icon-wrapper.left,
 .request-navigation-area.touch .icon-wrapper.right {
 	display: none;

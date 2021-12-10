@@ -1,0 +1,34 @@
+<svg id="Layer_1" data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 57.465 59.7149">
+  <defs>
+    <style>
+      .cls-1, .cls-3, .cls-5 {
+        fill: none;
+      }
+
+      .cls-2 {
+        clip-path: url(#clip-path);
+      }
+
+      .cls-3 {
+        stroke: #ed6d3f;
+        stroke-width: 6px;
+      }
+
+      .cls-4 {
+        fill: #ef6e43;
+      }
+
+      .cls-5 {
+        stroke: #f16f47;
+      }
+    </style>
+    <clipPath id="clip-path" transform="translate(-114.8925 -250.01765)">
+      <rect class="cls-1" x="114.8925" y="250.01745" width="57.465" height="59.715"/>
+    </clipPath>
+  </defs>
+  <g class="cls-2">
+    <circle class="cls-3" cx="25" cy="25" r="22"/>
+    <path class="cls-4" d="M154.089,291.46405a2.96465,2.96465,0,0,0,0,4.193l12.707,12.707a2.9649,2.9649,0,1,0,4.193-4.193l-12.707-12.707a2.96465,2.96465,0,0,0-4.193,0" transform="translate(-114.8925 -250.01765)"/>
+    <path class="cls-5" d="M154.089,291.46405a2.96465,2.96465,0,0,0,0,4.193l12.707,12.707a2.9649,2.9649,0,1,0,4.193-4.193l-12.707-12.707A2.96465,2.96465,0,0,0,154.089,291.46405Z" transform="translate(-114.8925 -250.01765)"/>
+  </g>
+</svg>
