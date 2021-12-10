@@ -6,7 +6,7 @@ import { cacheExpirationSeconds, expireTimeSecondsByStore } from "./config";
 const client = redis.createClient(6379, "redis");
 
 export type RedisUUIDStores = "emailConfirmUUID" | "passwordResetUUID";
-export type RedisCacheStores = "postcodeAddress";
+export type RedisCacheStores = "postcodeByStreet" | "streetByAddress";
 
 //TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
@@ -67,13 +67,22 @@ export async function verifyUUID(
 export async function cacheQuery(
 	key: string,
 	store: RedisCacheStores,
-	getValue: (key: string) => Promise<string | Object>
+	isCaseInsensitive: boolean,
+	getValue: (key: string) => Promise<
+		| string
+		| {
+				// the return value for the specific key
+				ret: string;
+				// the other computed pairs.
+				otherPairs: { key: string; value: string }[];
+		  }
+	>
 ): Promise<string> {
 	return new Promise((res, rej) => {
 		// prefix the key with the store name to prevent collisions
 		// TODO: see if there is a better way
-		const compoundKey = store + key;
-
+		let compoundKey = store + key;
+		compoundKey = isCaseInsensitive ? compoundKey.toLowerCase() : compoundKey;
 		client.get(compoundKey, (err, storedValue) => {
 			if (err !== null) throw err;
 			// if found, return the value
@@ -81,18 +90,32 @@ export async function cacheQuery(
 
 			// else, calculate the value and store it
 			getValue(key).then((rawValue) => {
-				const value =
-					typeof rawValue === "string" ? rawValue : JSON.stringify(rawValue);
+				const value = typeof rawValue === "string" ? rawValue : rawValue.ret;
 
+				function rawStore(k: string, v: string) {
+					client.setex(
+						isCaseInsensitive ? k.toLowerCase() : k,
+						cacheExpirationSeconds[store],
+						v,
+						(err) => {
+							if (err !== null) throw err;
+						}
+					);
+				}
 				// remember the value
-				client.setex(
-					compoundKey,
-					cacheExpirationSeconds[store],
-					value,
-					(err) => {
-						if (err !== null) throw err;
-					}
-				);
+				rawStore(compoundKey, value);
+
+				if (typeof rawValue !== "string") {
+					rawValue.otherPairs.forEach((pair) => {
+						let newCompoundKey = store + pair.key;
+						newCompoundKey = isCaseInsensitive
+							? newCompoundKey.toLowerCase()
+							: newCompoundKey;
+
+						rawStore(newCompoundKey, pair.value);
+					});
+				}
+
 				return res(value);
 			});
 		});

@@ -18,6 +18,9 @@ import CustomButton from "../client/components/Button";
 import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
 import { months } from "../client/utils/const";
+import Image from "next/image";
+
+const minSearchCooldownMillis = 700;
 
 const postcodeRegex =
 	/^[a-zA-Z]{1,2}([0-9]{1,2}|[0-9][a-zA-Z])\s*[0-9][a-zA-Z]{2}$/;
@@ -128,42 +131,43 @@ function AddressMenu({
 	// TODO: fetch results: create a server-side api, fetch the actual api from there and then double-check the postcode on submit. store as postcode + address in db + cache - no transitive deps please
 	let [addressSuggestions, setAddressSuggestions] = useState(
 		[] as (
-			| { postcode: string; city: string; address: string }
-			| { postcode: string; city: string; address: string[]; shortDesc: string }
+			| { postcode: string; city: string; address: string; place_id: string }
+			| {
+					postcode: string;
+					city: string;
+					address: string[];
+					place_id: string;
+					shortDesc: string;
+			  }
 		)[]
 	);
 
-	function updateAddressSuggestions() {
-		if (addressStageNum !== 0) return;
-		setAddressSuggestions(
-			rawAddress.length === 0
-				? []
-				: [
-						{
-							postcode: "AB1 1CD",
-							address: "1 Boogeyman cave str, East Sussex, UK",
-							city: "Cavetown",
-						},
-						{
-							postcode: "AB1 2CD",
-							shortDesc: "Placeholder str, East Sussex, UK",
-							city: "London",
-							address: [
-								"1 Placeholder str, East Sussex, UK",
-								"2 Placeholder str, East Sussex, UK",
-								"3 Placeholder str, East Sussex, UK",
-								"4 Placeholder str, East Sussex, UK",
-								"5 Placeholder str, East Sussex, UK",
-								"6 Placeholder str, East Sussex, UK",
-								"7 Placeholder str, East Sussex, UK",
-								"8 Placeholder str, East Sussex, UK",
-								"9 Placeholder str, East Sussex, UK",
-								"10 Placeholder str, East Sussex, UK",
-								"11 Placeholder str, East Sussex, UK",
-							],
-						},
-				  ]
-		);
+	async function updateAddressSuggestions() {
+		const thisUpdatorId = Math.random();
+		window.lastAddressSuggestionsUpdatorId = thisUpdatorId;
+
+		if (addressStageNum !== 0) return setAddressSuggestions([]);
+		if (rawAddress.length <= 3) return setAddressSuggestions([]);
+
+		await wait(minSearchCooldownMillis);
+		// if there have been no more requests, proceed
+		if (window.lastAddressSuggestionsUpdatorId !== thisUpdatorId) return;
+		const results: {
+			description: string;
+			place_id: string;
+			structured_formatting: {
+				secondary_text: string;
+			};
+		}[] = await getPlaceIdentifierSuggestions(rawAddress);
+
+		const newSuggestions = results.map((el) => ({
+			postcode: "",
+			address: el.description,
+			city: el.structured_formatting.secondary_text,
+			place_id: el.place_id,
+		}));
+
+		setAddressSuggestions(newSuggestions);
 	}
 
 	const showAddressSuggestions = rawAddress.length > 0;
@@ -211,7 +215,7 @@ function AddressMenu({
 					} ${getFieldClasses("rawAddress", visitedFields)}`}
 					id="address"
 					autoComplete="off"
-					label="Enter your postcode"
+					label="Enter your address"
 					variant="outlined"
 					style={{ width: "100%", marginTop: 20 }}
 					type="text"
@@ -238,6 +242,7 @@ function AddressMenu({
 						}}
 						className="address-error"
 					>
+						{/* Invalid postcode */}
 						Invalid Address
 					</small>
 				) : null}
@@ -267,7 +272,10 @@ function AddressMenu({
 					}}
 				>
 					{!showAddressSuggestions ? (
-						<p>e.g. “SW12 7EU” or “64 London Road”</p>
+						<p>
+							e.g. “1 Gristhorpe Road” {/*“SW12 7EU” or “L26 5QA”*/}or “64
+							London Road”
+						</p>
 					) : (
 						<div className="typing-start-result">
 							<div className="firstpart">
@@ -286,19 +294,33 @@ function AddressMenu({
 													address: string[];
 													city: string;
 													shortDesc: string;
+													place_id: string;
 												};
 												const newSuggestions = oldSuggestions.address.map(
 													(a) => ({
 														postcode: oldSuggestions.postcode,
 														address: a,
 														city: oldSuggestions.city,
+														place_id: oldSuggestions.place_id,
 													})
 												);
 												setAddressSuggestions(newSuggestions);
 											} else {
 												// select that option
 												setAddressLine1(suggestion.address);
-												setPostcode(suggestion.postcode);
+												// fetch the postcode
+												(async function () {
+													const res = await fetch(`/api/getPostcode`, {
+														method: "POST",
+														body: JSON.stringify({
+															place_id: suggestion.place_id,
+														}),
+													});
+													const newPostcode = (await res.json()).results ?? "";
+													console.log(newPostcode);
+													setPostcode(newPostcode);
+												})();
+												// setPostcode(suggestion.postcode);
 
 												setCity(suggestion.city);
 
@@ -322,6 +344,33 @@ function AddressMenu({
 								))}
 
 								<span
+									className="powered-by-google-container"
+									style={{
+										display: "block",
+										color: "#F85220",
+										fontSize: "15px",
+										textAlign: "center",
+										borderTop: "1px solid #ddd",
+										padding: "5px 0px",
+									}}
+								>
+									<div
+										className="powered-by-google"
+										style={{
+											marginTop: "4px", // to make it appear vertically centered
+											marginLeft: "3px",
+										}}
+									>
+										<Image
+											src="/img/powered_by_google_on_white.png"
+											alt="powered by google"
+											width="112"
+											height="14"
+										></Image>
+									</div>
+								</span>
+
+								<span
 									className="manual-address"
 									style={{
 										display: "block",
@@ -335,25 +384,6 @@ function AddressMenu({
 									// Because onClick does not fire for a couple milliseconds and the element gets deleted
 									onMouseDown={() => setIsSimpleAddressInputShown(true)}
 								>
-									{/*
-															// onClick={(e) => {
-															// 	e.preventDefault();
-
-															// 	document.querySelector(
-															// 		".address-wrapper"
-															// 	).style.display = "none";
-															// 	document.querySelector(
-															// 		".result-wrapper"
-															// 	).style.display = "none";
-															// 	document
-															// 		.querySelector(".expand-address")
-															// 		.classList.add("active");
-															// 	document.querySelector(
-															// 		".country-select"
-															// 	).style.marginTop = "-16px";
-															// }}
-														>
-														 */}
 									Enter address manually
 								</span>
 							</div>
@@ -804,8 +834,6 @@ function SecondPage({
 										visitedFields
 									)}`}
 									id="address1"
-									// onBlur={CheckIsValid}
-									// onFocus={RemoveMessages}
 									label="Address Line 1"
 									variant="outlined"
 									style={{ width: "100%" }}
@@ -831,14 +859,11 @@ function SecondPage({
 
 							<div className="text-field-wrapper">
 								<TextField
-									// onBlur={CheckIsValid}
-									// onFocus={RemoveMessages}
 									className={`address ${getFieldClasses(
 										"addressLine2",
 										visitedFields
 									)}`}
 									id="address2"
-									// onChange={HandleSecondStepText}
 									label="Address Line 2 (optional)"
 									variant="outlined"
 									style={{ width: "100%" }}
@@ -859,14 +884,11 @@ function SecondPage({
 							<div className="postcode-city-container">
 								<div className="text-field-wrapper half-width">
 									<TextField
-										// onBlur={CheckIsValid}
-										// onFocus={RemoveMessages}
 										className={`postcode ${getFieldClasses(
 											"postcode",
 											visitedFields
 										)}`}
 										id="postcode"
-										// onChange={HandleSecondStepText}
 										label="Postcode"
 										variant="outlined"
 										type="text"
@@ -892,14 +914,11 @@ function SecondPage({
 								</div>
 								<div className="text-field-wrapper half-width">
 									<TextField
-										// onBlur={CheckIsValid}
-										// onFocus={RemoveMessages}
 										className={`town ${getFieldClasses("town", visitedFields)}`}
 										id="town"
 										value={city}
 										onChange={(e) => setCity(e.target.value)}
 										error={cityErrorMessage !== ""}
-										// onChange={HandleSecondStepText}
 										label="Town/City"
 										variant="outlined"
 										type="text"
@@ -948,10 +967,7 @@ function SecondPage({
 			<div className="grid-col-3 personal-info-wrapper">
 				<div className="day-wrapper">
 					<TextField
-						// onBlur={CheckIsValid}
-						// onFocus={RemoveMessages}
 						className={`day ${getFieldClasses("day", visitedFields)}`}
-						// onChange={HandleSecondStepText}
 						id="Day"
 						label="Day"
 						variant="outlined"
@@ -1014,9 +1030,6 @@ function SecondPage({
 				</div>
 				<div className="text-field-wrapper">
 					<TextField
-						// onBlur={CheckIsValid}
-						// onFocus={RemoveMessages}
-						// onChange={HandleSecondStepText}
 						className={`year ${getFieldClasses("year", visitedFields)}`}
 						id="year"
 						label="Year"
@@ -1047,30 +1060,6 @@ function SecondPage({
 			<CustomButton disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
 				CREATE ACCOUNT
 			</CustomButton>
-
-			{/* <input
-				type="submit"
-				value=""
-				id="create-accout"
-				style={{ display: "none" }}
-			/>
-			<label
-				htmlFor="create-accout"
-				className={`create-account-label ${
-					isSecondPageDataValid ? "" : "disable"
-				}`}
-				style={{
-					cursor: "pointer",
-					width: "100%",
-					display: "flex",
-					alignItems: "center",
-					justifyContent: "center",
-					fontSize: "14px",
-					height: 45,
-				}}
-			>
-				CREATE ACCOUNT
-			</label> */}
 		</>
 	);
 }
@@ -1106,7 +1095,6 @@ function TermsOfServiceNote({
 			<input
 				type="checkbox"
 				name=""
-				// onChange={HandleSecondStepText}
 				id="tos-checkbox"
 				style={{ display: "none" }}
 				checked={hasUserAcceptedPolicies}
@@ -1118,7 +1106,6 @@ function TermsOfServiceNote({
 				<label
 					htmlFor="tos-checkbox"
 					className="custom-checkbox custom-checkbox-box"
-					// onClick={ShowPasswords}
 					style={{ minWidth: 20 }}
 				>
 					<FontAwesomeIcon className="white-fa-check" icon={faCheck} />
@@ -1126,7 +1113,6 @@ function TermsOfServiceNote({
 				<label
 					htmlFor="tos-checkbox"
 					className="custom-checkbox-line"
-					// onClick={ShowPasswords}
 					style={{
 						fontSize: 13,
 						color: "rgb(116, 112, 113)",
@@ -1138,9 +1124,6 @@ function TermsOfServiceNote({
 					<Link
 						// TODO: make that page
 						href="/termsOfService"
-						// style={{
-						// 	color: "#000",
-						// }}
 					>
 						terms of service
 					</Link>{" "}
@@ -1148,9 +1131,6 @@ function TermsOfServiceNote({
 					<Link
 						//TODO: same here
 						href="/privacyPolicy"
-						// style={{
-						// 	color: "#000",
-						// }}
 					>
 						privacy policy
 					</Link>
@@ -1160,41 +1140,52 @@ function TermsOfServiceNote({
 	);
 }
 
-async function getPostcodeSuggestions(postcodeFragment: string): Promise<null> {
-	postcodeFragment = postcodeFragment.toUpperCase().replaceAll(/[\W_]/g, "");
+async function getPlaceIdentifierSuggestions(
+	placeIdentifierFragment: string
+): Promise<[]> {
+	// // treating it as a postcode:
+	// placeIdentifierFragment = placeIdentifierFragment.toUpperCase().replaceAll(/[\W_]/g, "");
+	// // if too long, truncate
+	// if (placeIdentifierFragment.length > 7)
+	// 	placeIdentifierFragment = placeIdentifierFragment.substr(0, 7);
+	// // pre-fill a full postcode
+	// let postcodesToCheck = [placeIdentifierFragment];
+	// // if the length is 7, it has to be complete
+	// if (placeIdentifierFragment.length < 7) {
+	// 	const res = await fetch(
+	// 		`https://api.postcodes.io/postcodes/${placeIdentifierFragment}/autocomplete`
+	// 	);
+	// 	if (res.status !== 200) return null; //TODO: show an error
+	// 	const parsedRes = await res.json();
+	// 	if (parsedRes.result === null) return [];
+	// 	postcodesToCheck = parsedRes.result;
+	// }
 
-	// if too long, truncate
-	if (postcodeFragment.length > 7)
-		postcodeFragment = postcodeFragment.substr(0, 7);
+	// if (postcodesToCheck.length > 10) {
+	// 	postcodesToCheck = postcodesToCheck.slice(0, 10);
+	// }
 
-	// pre-fill a full postcode
-	let postcodesToCheck = [postcodeFragment];
+	// // get more information on those postcodes
+	// const res = await (
+	// 	await fetch(`/api/bulkGetPostcodeInfo`, {
+	// 		method: "POST",
+	// 		body: JSON.stringify({
+	// 			query: postcodesToCheck,
+	// 		}),
+	// 	})
+	// ).json();
 
-	// if the length is 7, it has to be complete
-	if (postcodeFragment.length < 7) {
-		const res = await fetch(
-			`https://api.postcodes.io/postcodes/${postcodeFragment}/autocomplete`
-		);
-		if (res.status !== 200) return null;
+	// get more information on those postcodes
+	const res = await (
+		await fetch(`/api/getAddressInfo`, {
+			method: "POST",
+			body: JSON.stringify({
+				query: placeIdentifierFragment,
+			}),
+		})
+	).json();
 
-		const parsedRes = await res.json();
-
-		postcodesToCheck = parsedRes.result;
-	}
-
-	// get data on postcodes
-	const res = await fetch("https://api.postcodes.io/postcodes", {
-		method: "POST",
-		body: JSON.stringify({
-			postcodes: postcodesToCheck,
-		}),
-		headers: {
-			"Content-Type": "application/json",
-		},
-	});
-
-	const parsedRes = await res.json();
-	console.log(parsedRes);
+	return res.results;
 }
 
 function generateErrorResetter(
@@ -1212,3 +1203,11 @@ export const getServerSideProps: GetServerSideProps<{
 		}, // will be passed to the page component as props
 	};
 };
+
+async function wait(time: number): Promise<void> {
+	return new Promise((res, rej) => {
+		setTimeout(() => {
+			res();
+		}, time);
+	});
+}

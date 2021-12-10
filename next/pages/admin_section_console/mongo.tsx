@@ -59,6 +59,7 @@ export default function Console({
 					try {
 						out = JSON.parse(resText);
 						// eslint-disable-next-line
+						console.log(out);
 						out = JSON.stringify(out, null, "<br/>");
 					} catch {
 						out = resText;

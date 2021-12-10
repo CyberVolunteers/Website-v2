@@ -4,7 +4,8 @@ export const expireTimeSecondsByStore = {
 };
 
 export const cacheExpirationSeconds = {
-	postcodeAddress: 30 * 24 * 60 * 60,
+	postcodeByStreet: 30 * 24 * 60 * 60,
+	streetByAddress: 30 * 24 * 60 * 60,
 };
 
 export const defaultSenderEmail = "noreply@cybervolunteers.org.uk";

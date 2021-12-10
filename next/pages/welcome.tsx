@@ -43,8 +43,6 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context: any) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 
-	console.log(session);
-
 	return {
 		props: {
 			email: isLoggedIn(session) && session !== null ? session.email : null,

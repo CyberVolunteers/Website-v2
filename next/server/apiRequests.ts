@@ -149,7 +149,7 @@ async function sanitize(
 
 /**
  * A wrapper around express middleware so that it can be used with async-await
- * @param req 
+ * @param req
  * @param res
  * @param middleware the actual middleware
  * @returns

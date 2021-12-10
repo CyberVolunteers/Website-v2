@@ -1,5 +1,4 @@
-FROM node:alpine3.11
-# FROM node:16-bullseye
+FROM node:alpine
 
 RUN mkdir /usr/app
 WORKDIR /usr/app
@@ -12,7 +11,7 @@ RUN chmod +x /wait
 
 # for sharp
 #RUN apk add vips
-RUN apk add python build-base
+RUN apk add build-base
 # RUN apk add --upgrade --no-cache vips-dev build-base --repository https://alpine.global.ssl.fastly.net/alpine/v3.10/community/
 # RUN apk add --update --no-cache --repository http://dl-3.alpinelinux.org/alpine/edge/community --repository http://dl-3.alpinelinux.org/alpine/edge/main vips-dev
 #RUN npm install --platform=linuxmusl sharp
@@ -23,7 +22,7 @@ RUN apk add python build-base
 # RUN npm install sharp
 # RUN npm install --unsafe-perm --ignore-scripts=false sharp
 
-RUN npm install --unsafe-perm --silent
+RUN npm install --unsafe-perm
 
 USER node:node
 

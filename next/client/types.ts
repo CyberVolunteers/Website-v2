@@ -28,5 +28,6 @@ export type FormFieldCollectionData = {
 declare global {
 	interface Window {
 		wasHeadIncluded?: boolean;
+		lastAddressSuggestionsUpdatorId?: number;
 	}
 }
