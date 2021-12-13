@@ -372,18 +372,11 @@ export const months = {
 };
 
 export const categoryNames = [
-	// "Women",
-	// "Covid 19",
-	// "Shelter",
-	// "Kiva U.S",
-	// "Refugees",
 	"Community", // 0
-	"Computers & Technology", // 1
+	"Technology", // 1
 	"Education", // 2
-	"Healthcare & Medicine", // 3
+	"Healthcare", // 3
 	"Elderly", // 4
-	// "Arts & Culture", // 5
-	// "Advocacy & Human Rights", // 6
 ];
 
 export type CarouselListingData = {
@@ -450,7 +443,7 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Network Manager",
 		charityName: "Freedom Power Chairs",
 		imgName: "network.jpg",
-		desc: "Oversee the management & growth of our intranet & web. We provide induction training.",
+		desc: "Oversee the management and growth of our intranet and web. We provide induction training.",
 	},
 	{
 		uuid: "1602cd06-9195-11eb-afb8-dadd5bd8c1d2",
@@ -458,7 +451,8 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Youth Club Social Media Volunteer",
 		charityName: "Hangleton and Knoll Project",
 		imgName: "socialMediaVolunteer.jpg",
-		desc: "The Hangleton and Knoll project youth team need a social media volunteer to advertise our sessions and post relevant content to our social media platforms. You will be liaising with the youth team staff to see what youth club sessions are happening and advertising them.",
+		desc: "The Hangleton and Knoll project youth team need a social media volunteer to...",
+		//  advertise our sessions and post relevant content to our social media platforms. You will be liaising with the youth team staff to see what youth club sessions are happening and advertising them.",
 	},
 	{
 		uuid: "c37df565-9583-11eb-afb8-dadd5bd8c1d2",
@@ -466,7 +460,7 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "CAD Designer",
 		charityName: "Freedom Power Chairs",
 		imgName: "cad.jpg",
-		desc: "Design parts from scratch – mainly for our new electric trikes.",
+		desc: "Our charity needs a person who can design parts from scratch – mainly for our new electric trikes.",
 	},
 	{
 		uuid: "b5a544db-8bff-11eb-afb8-dadd5bd8c1d2",
@@ -522,7 +516,7 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Admin – Assistant to the Trustees",
 		charityName: "Freedom Power Chairs",
 		imgName: "trustees.jpg",
-		desc: "Maintaining action lists, agendas and minutes.",
+		desc: "We are looking for someone who can be maintaining action lists, agendas and minutes.",
 	},
 	{
 		uuid: "9bd6f5d6-8c17-11eb-afb8-dadd5bd8c1d2",
@@ -538,7 +532,7 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Assessor - Clients",
 		charityName: "Freedom Power Chairs",
 		imgName: "FPC2.jpg",
-		desc: "Visiting clients to conduct assessments, post phone discussion.",
+		desc: "We need someone who would visit our clients to conduct assessments, post phone discussion.",
 	},
 	{
 		uuid: "0c8c3b1c-8c20-11eb-afb8-dadd5bd8c1d2",
@@ -546,7 +540,8 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Befriending an older person in the community.",
 		charityName: "Time to Talk Befriending",
 		imgName: "ttb_befriending_older_people.jpeg",
-		desc: "Based on similar interests and hobbies befriending matches between older people and volunteers are made to help overcome feelings of loneliness. Many older people in our community spend days, weeks and sometimes months without anyone else to talk to.",
+		desc: "Based on similar interests and hobbies befriending matches between older people and...",
+		//  volunteers are made to help overcome feelings of loneliness. Many older people in our community spend days, weeks and sometimes months without anyone else to talk to.",
 	},
 	{
 		uuid: "710627d9-9586-11eb-afb8-dadd5bd8c1d2",
@@ -578,7 +573,7 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Assessor - Clients",
 		charityName: "Freedom Power Chairs",
 		imgName: "FPC2.jpg",
-		desc: "Visiting clients to conduct assessments, post phone discussion.",
+		desc: "We need someone who would visit our clients to conduct assessments, post phone discussion.",
 	},
 	{
 		uuid: "9bd6f5d6-8c17-11eb-afb8-dadd5bd8c1d2",
@@ -594,6 +589,6 @@ export const indexPageListings: CarouselListingData[] = [
 		opportunityTitle: "Admin – Assistant to the Trustees",
 		charityName: "Freedom Power Chairs",
 		imgName: "trustees.jpg",
-		desc: "Maintaining action lists, agendas and minutes.",
+		desc: "We are looking for someone who can be maintaining action lists, agendas and minutes.",
 	},
 ];

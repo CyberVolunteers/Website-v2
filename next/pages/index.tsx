@@ -1,13 +1,7 @@
 import {
-	Children,
-	Component,
 	Dispatch,
-	ReactChild,
-	ReactChildren,
-	ReactComponentElement,
 	ReactElement,
 	ReactNode,
-	Ref,
 	RefObject,
 	SetStateAction,
 	useRef,
@@ -19,27 +13,19 @@ import CommunityCard from "../client/components/CommunityCard";
 
 import Link from "next/link";
 
-// import { HandleSliderMovement } from "../client/js/HandleSliderMovement";
-import {
-	useIsAfterRehydration,
-	useWindowSize,
-} from "../client/utils/otherHooks";
+import { useWindowSize } from "../client/utils/otherHooks";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faUserCircle, faSurprise } from "@fortawesome/free-regular-svg-icons";
+import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 
-import {
-	faDollarSign,
-	faHandsHelping,
-	faSearch,
-} from "@fortawesome/free-solid-svg-icons";
+import { faHandsHelping } from "@fortawesome/free-solid-svg-icons";
 import {
 	CarouselListingData,
 	categoryNames,
 	indexPageListings,
 } from "../client/utils/const";
 
-export const MAX_LISTINGS_PER_REEL = 3;
+const MAX_CHAR_NUM_IN_DESC = 100;
 
 export default function Home(): ReactElement {
 	// if (useIsAfterRehydration()) HandleSliderMovement();
@@ -47,15 +33,6 @@ export default function Home(): ReactElement {
 	const applicableListings = indexPageListings.filter(
 		(el) => el.categoryIndex === categoryIndex
 	);
-	const applicableListingGroupings: CarouselListingData[][] = [[]];
-	applicableListings.forEach((el) => {
-		function getLastGrouping() {
-			return applicableListingGroupings[applicableListingGroupings.length - 1];
-		}
-		if (getLastGrouping().length >= MAX_LISTINGS_PER_REEL)
-			applicableListingGroupings.push([]);
-		getLastGrouping().push(el);
-	});
 
 	const [firstVisibleCard, setFirstVisibleCard] = useState(0);
 	const [hasCardReelHitTheEnd, setHasCardReelHitTheEnd] = useState(false);
@@ -78,6 +55,8 @@ export default function Home(): ReactElement {
 	// 	: windowWidth <= 1150
 	// 	? 2
 	// 	: 3;
+
+	const catsNumToSkip = 1;
 
 	return (
 		<div>
@@ -111,7 +90,16 @@ export default function Home(): ReactElement {
 						Support Causes you care about
 					</h1>
 					<div className="top-navigation-area">
-						<div className={`icon-wrapper left`}>
+						<div
+							className={`icon-wrapper ${
+								firstVisibleCat <= 0 ? "disable" : ""
+							} left`}
+							onClick={() => {
+								setHasCatReelHitTheEnd(false);
+								if (firstVisibleCat > 0)
+									setFirstVisibleCat(firstVisibleCat - catsNumToSkip);
+							}}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="23"
@@ -128,7 +116,10 @@ export default function Home(): ReactElement {
 							</svg>
 						</div>
 						<div className="reel-wrapper">
-							<div className="reel first-reel reel-h3">
+							<div
+								className="reel first-reel reel-h3"
+								ref={catReelViewWindowRef}
+							>
 								<Carousel
 									viewWindowRef={catReelViewWindowRef}
 									className="cat-reel"
@@ -145,7 +136,11 @@ export default function Home(): ReactElement {
 											} reel-h3`}
 											id="top-nav-1"
 											key={i}
-											onClick={() => setCategoryIndex(i)}
+											onClick={() => {
+												setFirstVisibleCard(0);
+												setCategoryIndex(i);
+											}}
+											ref={i === 0 ? firstCatRef : undefined}
 										>
 											{name}
 										</h3>
@@ -154,7 +149,15 @@ export default function Home(): ReactElement {
 							</div>
 						</div>
 
-						<div className="icon-wrapper right">
+						<div
+							className={`icon-wrapper  ${
+								hasCatReelHitTheEnd ? "disable" : ""
+							} right`}
+							onClick={() => {
+								if (!hasCatReelHitTheEnd)
+									setFirstVisibleCat(firstVisibleCat + catsNumToSkip);
+							}}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="23"
@@ -220,7 +223,14 @@ export default function Home(): ReactElement {
 												img="/img/placeholder1.jpg"
 												title={el.opportunityTitle}
 												subtitle={el.charityName}
-												desc={el.desc}
+												desc={(() => {
+													if (el.desc.length <= MAX_CHAR_NUM_IN_DESC)
+														return el.desc;
+													return (
+														el.desc.substring(0, MAX_CHAR_NUM_IN_DESC - 3) +
+														"..."
+													);
+												})()}
 												divRef={i === 0 ? firstCardRef : undefined}
 												// meternow="20"
 												// totalgo="120"
@@ -231,10 +241,15 @@ export default function Home(): ReactElement {
 												key="final card"
 												className="card-wrapper link-box"
 												style={{
+													textAlign: "center",
 													padding: "3rem 1.5rem",
 												}}
 											>
-												<Link href="#">View all loans to women</Link>
+												<Link href="#">
+													{categoryIndex === 4
+														? `View all listings about ${categoryNames[categoryIndex]}` // Make sure nothing weird happens
+														: `View all ${categoryNames[categoryIndex]} listings`}
+												</Link>
 											</div>
 										)}
 								</Carousel>
@@ -454,39 +469,36 @@ function Carousel({
 	let [initX, setInitX] = useState(null as number | null);
 	let [newX, setNewX] = useState(0);
 
-	let proposedTransform: number = 0;
+	const [proposedTransformOnClick, setProposedTransformOnClick] = useState(0);
+
 	const width = viewWindowRef?.current?.clientWidth;
 	const elementWidth = firstElementRef?.current?.clientWidth;
+
+	let proposedTransform: number = 0;
 	if (typeof width === "number" && typeof elementWidth === "number") {
-		proposedTransform = firstVisibleElement * elementWidth;
+		// only do this if it is not dragged:
+		if (initX === null) {
+			proposedTransform = firstVisibleElement * elementWidth;
+			// position of the last element relative to the view window in the reel
+			const lastElementPosition =
+				numberOfElements * elementWidth - proposedTransform;
 
-		// position of the last element relative to the view window in the reel
-		const lastElementPosition =
-			numberOfElements * elementWidth - proposedTransform;
+			const hasHitTheEnd = lastElementPosition <= width;
+			// if the last element turns out to be in a place that shows empty space, bring it back
+			if (hasHitTheEnd) {
+				// lastElementPosition has to equal the width
+				// width = numberOfElements * elementWidth - proposedTransform;
+				proposedTransform = numberOfElements * elementWidth - width;
 
-		// if the last element turns out to be in a place that shows empty space, bring it back
-		if (lastElementPosition <= width) {
-			// undo it if not scrolling
-			// lastElementPosition has to equal the width
-			// width = numberOfElements * elementWidth - proposedTransform;
-			proposedTransform = numberOfElements * elementWidth - width;
-
-			// make sure we do not "scroll" past what is possible
-			// can only do that asynchronously
-			setTimeout(() => {
-				setHasReelHitTheEnd(true);
-			});
-			// do not snap to anything when dragging
-			if (initX !== null) {
-				setTimeout(() => {
-					setFirstVisibleElement(Math.ceil(proposedTransform / elementWidth));
-				});
+				// make sure we do not "scroll" past what is possible
+				// can only do that asynchronously
 			}
-		}
-
-		// account for drag
-		if (initX !== null) {
-			proposedTransform -= newX - initX;
+			setTimeout(() => {
+				setHasReelHitTheEnd(hasHitTheEnd);
+			});
+		} else {
+			// account for dragging
+			proposedTransform = proposedTransformOnClick + initX - newX;
 		}
 	}
 
@@ -497,6 +509,7 @@ function Carousel({
 			if (selfRef.current) {
 				setInitX(e.x);
 				setNewX(e.x);
+				setProposedTransformOnClick(proposedTransform);
 				selfRef.current.setPointerCapture(e.pointerId);
 			}
 		};
@@ -508,13 +521,12 @@ function Carousel({
 				selfRef.current.onpointermove = null;
 				selfRef.current.releasePointerCapture(e.pointerId);
 				setInitX(null);
-				setHasReelHitTheEnd(false);
 
-				// determine which slide to show
-				// proposedTransform = firstVisibleElement * elementWidth;
 				if (elementWidth !== undefined) {
+					// determine which slide to show
+					// proposedTransform = firstVisibleElement * elementWidth;
 					firstVisibleElement = proposedTransform / elementWidth;
-					// Do not scroll past 0
+					// Do not scroll past 0; get the closest one
 					setFirstVisibleElement(Math.max(0, Math.round(firstVisibleElement)));
 				}
 			}

@@ -1,4 +1,4 @@
-import React, { Ref, RefObject } from "react";
+import React, { RefObject } from "react";
 const StyleSheet = {
 	VolenteerButton: {
 		backgroundColor: "#f85220",
@@ -43,6 +43,8 @@ const StyleSheet = {
 	Card: {},
 	Title: {
 		marginBottom: "8px",
+		minHeight: "3rem",
+		letterSpacing: "-0.045rem",
 	},
 };
 function IndexCard({
@@ -86,6 +88,7 @@ function IndexCard({
 						borderBottomLeftRadius: "10px",
 						borderBottomRightRadius: "10px",
 						padding: "1.5rem 1rem",
+						paddingTop: "1rem",
 					}}
 				>
 					<h3 className="title" style={StyleSheet.Title}>
