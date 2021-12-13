@@ -220,7 +220,7 @@ export default function Home(): ReactElement {
 										.map((el, i) => (
 											<IndexCard
 												key={i}
-												img="/img/placeholder1.jpg"
+												img={`/img/${el.imgName}`}
 												title={el.opportunityTitle}
 												subtitle={el.charityName}
 												desc={(() => {
