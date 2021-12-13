@@ -1,12 +1,29 @@
-import { ReactElement } from "react";
+import {
+	Children,
+	Component,
+	Dispatch,
+	ReactChild,
+	ReactChildren,
+	ReactComponentElement,
+	ReactElement,
+	ReactNode,
+	Ref,
+	RefObject,
+	SetStateAction,
+	useRef,
+	useState,
+} from "react";
 import Head from "../client/components/Head";
 import IndexCard from "../client/components/IndexCard";
 import CommunityCard from "../client/components/CommunityCard";
 
 import Link from "next/link";
 
-import { HandleSliderMovement } from "../client/js/HandleSliderMovement";
-import { useIsAfterRehydration } from "../client/utils/otherHooks";
+// import { HandleSliderMovement } from "../client/js/HandleSliderMovement";
+import {
+	useIsAfterRehydration,
+	useWindowSize,
+} from "../client/utils/otherHooks";
 
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUserCircle, faSurprise } from "@fortawesome/free-regular-svg-icons";
@@ -16,9 +33,52 @@ import {
 	faHandsHelping,
 	faSearch,
 } from "@fortawesome/free-solid-svg-icons";
+import {
+	CarouselListingData,
+	categoryNames,
+	indexPageListings,
+} from "../client/utils/const";
+
+export const MAX_LISTINGS_PER_REEL = 3;
 
 export default function Home(): ReactElement {
-	if (useIsAfterRehydration()) HandleSliderMovement();
+	// if (useIsAfterRehydration()) HandleSliderMovement();
+	const [categoryIndex, setCategoryIndex] = useState(0);
+	const applicableListings = indexPageListings.filter(
+		(el) => el.categoryIndex === categoryIndex
+	);
+	const applicableListingGroupings: CarouselListingData[][] = [[]];
+	applicableListings.forEach((el) => {
+		function getLastGrouping() {
+			return applicableListingGroupings[applicableListingGroupings.length - 1];
+		}
+		if (getLastGrouping().length >= MAX_LISTINGS_PER_REEL)
+			applicableListingGroupings.push([]);
+		getLastGrouping().push(el);
+	});
+
+	const [firstVisibleCard, setFirstVisibleCard] = useState(0);
+	const [hasCardReelHitTheEnd, setHasCardReelHitTheEnd] = useState(false);
+	const firstCardRef: RefObject<HTMLDivElement> = useRef(null);
+	const cardReelViewWindowRef: RefObject<HTMLDivElement> = useRef(null);
+
+	const [firstVisibleCat, setFirstVisibleCat] = useState(0);
+	const [hasCatReelHitTheEnd, setHasCatReelHitTheEnd] = useState(false);
+	const firstCatRef: RefObject<HTMLDivElement> = useRef(null);
+	const catReelViewWindowRef: RefObject<HTMLDivElement> = useRef(null);
+
+	// make sure to rerender on window size changes
+	const windowWidth = useWindowSize().width;
+
+	const cardsNumToSkip = 1;
+	// windowWidth === undefined
+	// 	? 3
+	// 	: windowWidth <= 800
+	// 	? 1
+	// 	: windowWidth <= 1150
+	// 	? 2
+	// 	: 3;
+
 	return (
 		<div>
 			<Head title="Cybervolunteers" />
@@ -51,7 +111,7 @@ export default function Home(): ReactElement {
 						Support Causes you care about
 					</h1>
 					<div className="top-navigation-area">
-						<div className="icon-wrapper disable left">
+						<div className={`icon-wrapper left`}>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="23"
@@ -69,36 +129,28 @@ export default function Home(): ReactElement {
 						</div>
 						<div className="reel-wrapper">
 							<div className="reel first-reel reel-h3">
-								<h3 className="active reel-h3" id="top-nav-1">
-									Community
-								</h3>
-								<h3 className="reel-h3" id="top-nav-2">
-									Covid 19
-								</h3>
-								<h3 className="reel-h3" id="top-nav-3">
-									Education
-								</h3>
-								<h3 className="reel-h3" id="top-nav-4">
-									Healthcare
-								</h3>
-								<h3 className="reel-h3" id="top-nav-5">
-									Refugees
-								</h3>
-								<h3 className="reel-h3" id="top-nav-6">
-									Refugees
-								</h3>
-								<h3 className="reel-h3" id="top-nav-7">
-									Refugees
-								</h3>
-								<h3 className="reel-h3" id="top-nav-8">
-									Refugees
-								</h3>
-								<h3 className="reel-h3" id="top-nav-9">
-									Refugees
-								</h3>
-								<h3 className="reel-h3" id="top-nav-10">
-									Refugees
-								</h3>
+								<Carousel
+									viewWindowRef={catReelViewWindowRef}
+									className="cat-reel"
+									setFirstVisibleElement={setFirstVisibleCat}
+									firstVisibleElement={firstVisibleCat}
+									firstElementRef={firstCatRef}
+									numberOfElements={categoryNames.length}
+									setHasReelHitTheEnd={setHasCatReelHitTheEnd}
+								>
+									{categoryNames.map((name, i) => (
+										<h3
+											className={`${
+												categoryIndex === i ? "active" : ""
+											} reel-h3`}
+											id="top-nav-1"
+											key={i}
+											onClick={() => setCategoryIndex(i)}
+										>
+											{name}
+										</h3>
+									))}
+								</Carousel>
 							</div>
 						</div>
 
@@ -124,7 +176,16 @@ export default function Home(): ReactElement {
 						className="request-navigation-area "
 						style={{ margin: "2rem auto" }}
 					>
-						<div className="icon-wrapper disable left">
+						<div
+							className={`icon-wrapper ${
+								firstVisibleCard <= 0 ? "disable" : ""
+							} left`}
+							onClick={() => {
+								setHasCardReelHitTheEnd(false);
+								if (firstVisibleCard > 0)
+									setFirstVisibleCard(firstVisibleCard - cardsNumToSkip);
+							}}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="23"
@@ -142,98 +203,52 @@ export default function Home(): ReactElement {
 						</div>
 
 						<div className="reel-wrapper">
-							<div className="reel second-reel">
-								<div className="cards-wrap ">
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-								</div>
-
-								<div className="cards-wrap">
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-								</div>
-
-								<div className="cards-wrap ">
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<IndexCard
-										img="/img/placeholder1.jpg"
-										title="Miguel Antonio"
-										subtitle="only 47 minutes left"
-										desc="A loan of $525 helps to improve his tomato greenhouse and acquire an irrigation machine."
-										meternow="20"
-										totalgo="120"
-									/>
-									<div
-										className="card-wrapper link-box"
-										style={{ padding: "3rem 1.5rem" }}
-									>
-										<Link
-											// TODO: do this
-											// style={{
-											// 	boxShadow:
-											// 		"0 0.65rem 0.875rem 0.4375rem rgb(153 153 153 / 10%)",
-											// 	borderRadius: "10px",
-											// }}
-											href="#"
-										>
-											View all loans to women
-										</Link>
-									</div>
-								</div>
+							<div className="reel second-reel" ref={cardReelViewWindowRef}>
+								<Carousel
+									viewWindowRef={cardReelViewWindowRef}
+									className="cards-wrap"
+									setFirstVisibleElement={setFirstVisibleCard}
+									firstVisibleElement={firstVisibleCard}
+									firstElementRef={firstCardRef}
+									numberOfElements={applicableListings.length + 1} // including the "see more" card
+									setHasReelHitTheEnd={setHasCardReelHitTheEnd}
+								>
+									{applicableListings
+										.map((el, i) => (
+											<IndexCard
+												key={i}
+												img="/img/placeholder1.jpg"
+												title={el.opportunityTitle}
+												subtitle={el.charityName}
+												desc={el.desc}
+												divRef={i === 0 ? firstCardRef : undefined}
+												// meternow="20"
+												// totalgo="120"
+											/>
+										))
+										.concat(
+											<div
+												key="final card"
+												className="card-wrapper link-box"
+												style={{
+													padding: "3rem 1.5rem",
+												}}
+											>
+												<Link href="#">View all loans to women</Link>
+											</div>
+										)}
+								</Carousel>
 							</div>
 						</div>
-						<div className="icon-wrapper right">
+						<div
+							className={`icon-wrapper  ${
+								hasCardReelHitTheEnd ? "disable" : ""
+							} right`}
+							onClick={() => {
+								if (!hasCardReelHitTheEnd)
+									setFirstVisibleCard(firstVisibleCard + cardsNumToSkip);
+							}}
+						>
 							<svg
 								xmlns="http://www.w3.org/2000/svg"
 								width="23"
@@ -340,6 +355,7 @@ export default function Home(): ReactElement {
 					>
 						What our volunteering community thinks
 					</h1>
+
 					<div className="community-cards-wrapper">
 						<CommunityCard
 							text="Being able to find local opportunities this easily makes the process so much quicker and means I can spend more time actually volunteering."
@@ -409,6 +425,114 @@ export default function Home(): ReactElement {
 					<img src="/img/student.jpg" style={{ width: "100%" }} />
 				</div> */}
 			</div>
+		</div>
+	);
+}
+
+function Carousel({
+	children,
+	firstVisibleElement,
+	setFirstVisibleElement,
+	className,
+	// cardsNum,
+	firstElementRef,
+	numberOfElements,
+	viewWindowRef,
+	setHasReelHitTheEnd,
+}: {
+	firstVisibleElement: number;
+	setFirstVisibleElement: Dispatch<SetStateAction<number>>;
+	setHasReelHitTheEnd: Dispatch<SetStateAction<boolean>>;
+	className: string;
+	children: ReactNode;
+	firstElementRef: RefObject<HTMLDivElement>;
+	viewWindowRef: RefObject<HTMLDivElement>;
+	numberOfElements: number;
+}): ReactElement {
+	const selfRef: RefObject<HTMLDivElement> = useRef(null);
+
+	let [initX, setInitX] = useState(null as number | null);
+	let [newX, setNewX] = useState(0);
+
+	let proposedTransform: number = 0;
+	const width = viewWindowRef?.current?.clientWidth;
+	const elementWidth = firstElementRef?.current?.clientWidth;
+	if (typeof width === "number" && typeof elementWidth === "number") {
+		proposedTransform = firstVisibleElement * elementWidth;
+
+		// position of the last element relative to the view window in the reel
+		const lastElementPosition =
+			numberOfElements * elementWidth - proposedTransform;
+
+		// if the last element turns out to be in a place that shows empty space, bring it back
+		if (lastElementPosition <= width) {
+			// undo it if not scrolling
+			// lastElementPosition has to equal the width
+			// width = numberOfElements * elementWidth - proposedTransform;
+			proposedTransform = numberOfElements * elementWidth - width;
+
+			// make sure we do not "scroll" past what is possible
+			// can only do that asynchronously
+			setTimeout(() => {
+				setHasReelHitTheEnd(true);
+			});
+			// do not snap to anything when dragging
+			if (initX !== null) {
+				setTimeout(() => {
+					setFirstVisibleElement(Math.ceil(proposedTransform / elementWidth));
+				});
+			}
+		}
+
+		// account for drag
+		if (initX !== null) {
+			proposedTransform -= newX - initX;
+		}
+	}
+
+	// handle dragging
+	if (selfRef.current) {
+		selfRef.current.onpointerdown = (e) => {
+			e.preventDefault();
+			if (selfRef.current) {
+				setInitX(e.x);
+				setNewX(e.x);
+				selfRef.current.setPointerCapture(e.pointerId);
+			}
+		};
+		selfRef.current.onpointermove = (e) => {
+			setNewX(e.x);
+		};
+		selfRef.current.onpointerup = (e) => {
+			if (selfRef.current) {
+				selfRef.current.onpointermove = null;
+				selfRef.current.releasePointerCapture(e.pointerId);
+				setInitX(null);
+				setHasReelHitTheEnd(false);
+
+				// determine which slide to show
+				// proposedTransform = firstVisibleElement * elementWidth;
+				if (elementWidth !== undefined) {
+					firstVisibleElement = proposedTransform / elementWidth;
+					// Do not scroll past 0
+					setFirstVisibleElement(Math.max(0, Math.round(firstVisibleElement)));
+				}
+			}
+		};
+	}
+
+	return (
+		<div
+			ref={selfRef}
+			className={`carousel ${className}`}
+			style={{
+				transform: `translateX(-${proposedTransform}px)`,
+				transition:
+					// only do animations if not dragging to ensure it is responsive when dragged
+					initX === null ? "500ms transform" : undefined,
+			}}
+		>
+			{children}
 		</div>
 	);
 }

@@ -357,17 +357,243 @@ export const countryCodes = [
 ];
 
 export const months = {
-	"January": "Jan",
-	"February": "Feb",
-	"March": "Mar",
-	"April": "Apr",
-	"May": "May",
-	"June": "Jun",
-	"July": "Jul",
-	"August": "Aug",
-	"September": "Sep",
-	"October": "Oct",
-	"November": "Nov",
-	"December": "Dec",
+	January: "Jan",
+	February: "Feb",
+	March: "Mar",
+	April: "Apr",
+	May: "May",
+	June: "Jun",
+	July: "Jul",
+	August: "Aug",
+	September: "Sep",
+	October: "Oct",
+	November: "Nov",
+	December: "Dec",
+};
 
-}
+export const categoryNames = [
+	// "Women",
+	// "Covid 19",
+	// "Shelter",
+	// "Kiva U.S",
+	// "Refugees",
+	"Community", // 0
+	"Computers & Technology", // 1
+	"Education", // 2
+	"Healthcare & Medicine", // 3
+	"Elderly", // 4
+	// "Arts & Culture", // 5
+	// "Advocacy & Human Rights", // 6
+];
+
+export type CarouselListingData = {
+	uuid: string;
+	categoryIndex: number;
+	opportunityTitle: string;
+	charityName: string;
+	imgName: string;
+	desc: string;
+};
+
+export const indexPageListings: CarouselListingData[] = [
+	{
+		uuid: "7af5a892-8bfc-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 0,
+		opportunityTitle: "BMEYPP Champions",
+		charityName: "Black and Minority Ethnic Young People's Project",
+		imgName: "BMEYPP_youth_champs.jpeg",
+		desc: "The BMEYPP is a youth led project for Black, Arab, Asian and Dual Heritage young people aged 11-25. The BME Youth Champions is a way in which we ensure that young people have a say in the activities that happen at the BMEEYPP and play a role in making them happen.",
+	},
+	{
+		uuid: "25d459b7-8c18-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 0,
+		opportunityTitle: "Gardening volunteer",
+		charityName: "Guild Care",
+		imgName: "gardening.jpg",
+		desc: "Assisting Guild Care’s gardener in the grounds of our Care Homes. Will involve light gardening duties, weeding, sweeping, cutting back and as importantly sharing your ideas.",
+	},
+	{
+		uuid: "710627d9-9586-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 0,
+		opportunityTitle: "Workshop Manager",
+		charityName: "Freedom Power Chairs",
+		imgName: "workshop.jpg",
+		desc: "Oversight of all activities in the workshop. Delegated in part to supervisors. We have so far been unable to obtain funding to make this a paid role.",
+	},
+	{
+		uuid: "b5a544db-8bff-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 0,
+		opportunityTitle: "Retail Charity Shop Assistant",
+		charityName: "Guild Care",
+		imgName: "guildCare2.jpg",
+		desc: "Our charity shop assistants help us to create a warm and friendly shopping environment to help in one of our Guild Care shops. We currently have 11 shops: Rustington, Broadwater, Rowlands Road, Goring Road, The Greenhouse (East Worthing), Strand Parade, Findon Valley, Warwick Street, Littlehampton, South Farm Road.",
+	},
+	{
+		uuid: "ed6ea111-8c20-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 0,
+		opportunityTitle: "Youth Club volunteers",
+		charityName: "Hangleton and Knoll Project",
+		imgName: "socialMediaVolunteer.jpg",
+		desc: "Step Out is a group of young people who volunteer to make their community a better place. We are looking for young people aged 16-19 (25 with SEND) to support younger volunteers (age 12-14) to take part in a community action project. We will work as a group to deliver community information leaflets around the Hangleton and Knoll area. ",
+	},
+	{
+		uuid: "21b505cb-9553-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 1,
+		opportunityTitle: "Social Media Manager",
+		charityName: "OSCAR Foundation",
+		imgName: "oscar_social_media_manger.jpeg",
+		desc: "The OSCAR Foundation is a youth led organisation based in Mumbai which uses football as a tool to engage underprivileged girls and boys living in the slum communities in education. OSCAR has one simple rule, No School, No Football and as a result over 3,500 girls and boys are regularly attending school and taking part in OSCAR’s life skills and football programme.",
+	},
+	{
+		uuid: "85730846-8ca5-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 1,
+		opportunityTitle: "Network Manager",
+		charityName: "Freedom Power Chairs",
+		imgName: "network.jpg",
+		desc: "Oversee the management & growth of our intranet & web. We provide induction training.",
+	},
+	{
+		uuid: "1602cd06-9195-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 1,
+		opportunityTitle: "Youth Club Social Media Volunteer",
+		charityName: "Hangleton and Knoll Project",
+		imgName: "socialMediaVolunteer.jpg",
+		desc: "The Hangleton and Knoll project youth team need a social media volunteer to advertise our sessions and post relevant content to our social media platforms. You will be liaising with the youth team staff to see what youth club sessions are happening and advertising them.",
+	},
+	{
+		uuid: "c37df565-9583-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 1,
+		opportunityTitle: "CAD Designer",
+		charityName: "Freedom Power Chairs",
+		imgName: "cad.jpg",
+		desc: "Design parts from scratch – mainly for our new electric trikes.",
+	},
+	{
+		uuid: "b5a544db-8bff-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 1,
+		opportunityTitle: "Retail Charity Shop Assistant",
+		charityName: "Guild Care",
+		imgName: "guildCareShop.jpg",
+		desc: "Our charity shop assistants help us to create a warm and friendly shopping environment to help in one of our Guild Care shops. We currently have 11 shops: Rustington, Broadwater, Rowlands Road, Goring Road, The Greenhouse (East Worthing), Strand Parade, Findon Valley, Warwick Street, Littlehampton, South Farm Road.",
+	},
+	{
+		uuid: "470037bb-9553-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 2,
+		opportunityTitle: "Mentoring Young People",
+		charityName: "OSCAR Foundation",
+		imgName: "oscar_mentioring_young_people.jpeg",
+		desc: "The OSCAR Foundation is a youth led organisation based in Mumbai which uses football as a tool to engage underprivileged girls and boys living in the slum communities in education. OSCAR has one simple rule, No School, No Football and as a result over 3,500 girls and boys are regularly attending school and taking part in OSCAR’s life skills and football programme.",
+	},
+	{
+		uuid: "7af5a892-8bfc-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 2,
+		opportunityTitle: "BMEYPP Champions",
+		charityName: "Black and Minority Ethnic Young People's Project",
+		imgName: "BMEYPP_youth_champs.jpeg",
+		desc: "The BMEYPP is a youth led project for Black, Arab, Asian and Dual Heritage young people aged 11-25. The BME Youth Champions is a way in which we ensure that young people have a say in the activities that happen at the BMEEYPP and play a role in making them happen.",
+	},
+	{
+		uuid: "f7b249b7-9552-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 2,
+		opportunityTitle: "Report Writing",
+		charityName: "OSCAR Foundation",
+		imgName: "oscar_report_writing.jpeg",
+		desc: "The OSCAR Foundation is a youth led organisation based in Mumbai which uses football as a tool to engage underprivileged girls and boys living in the slum communities in education. OSCAR has one simple rule, No School, No Football and as a result over 3,500 girls and boys are regularly attending school and taking part in OSCAR’s life skills and football programme.",
+	},
+	{
+		uuid: "7d9da10d-92e8-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 2,
+		opportunityTitle: "Records & Statistics",
+		charityName: "Freedom Power Chairs",
+		imgName: "stats.png",
+		desc: "Your role will involve tracking information to guide workshop and fundraising efforts.",
+	},
+	{
+		uuid: "d2b5ac05-9552-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 2,
+		opportunityTitle: "Part Time Helper",
+		charityName: "OSCAR Foundation",
+		imgName: "oscar1.jpg",
+		desc: "The OSCAR Foundation is a youth led organisation based in Mumbai which uses football as a tool to engage underprivileged girls and boys living in the slum communities in education. OSCAR has one simple rule, No School, No Football and as a result over 3,500 girls and boys are regularly attending school and taking part in OSCAR’s life skills and football programme.",
+	},
+	{
+		uuid: "5ad1b3b8-8ca4-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 3,
+		opportunityTitle: "Admin – Assistant to the Trustees",
+		charityName: "Freedom Power Chairs",
+		imgName: "trustees.jpg",
+		desc: "Maintaining action lists, agendas and minutes.",
+	},
+	{
+		uuid: "9bd6f5d6-8c17-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 3,
+		opportunityTitle: "Home from Hospital Volunteers",
+		charityName: "Guild Care",
+		imgName: "Guild_care_home_and_hosptial_volunteers.jpeg",
+		desc: "This is a completely free service to any older person who lives alone and is due to be discharged from hospital. Our wonderful Home from Hospital volunteers provide social and practical support by visiting people in their own homes and assisting with things like collecting prescriptions and basic shopping, preparing a light snack, helping people to engage with activities in their local area or maybe just chatting over a cup of tea.",
+	},
+	{
+		uuid: "845386ff-9581-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 3,
+		opportunityTitle: "Assessor - Clients",
+		charityName: "Freedom Power Chairs",
+		imgName: "FPC2.jpg",
+		desc: "Visiting clients to conduct assessments, post phone discussion.",
+	},
+	{
+		uuid: "0c8c3b1c-8c20-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 3,
+		opportunityTitle: "Befriending an older person in the community.",
+		charityName: "Time to Talk Befriending",
+		imgName: "ttb_befriending_older_people.jpeg",
+		desc: "Based on similar interests and hobbies befriending matches between older people and volunteers are made to help overcome feelings of loneliness. Many older people in our community spend days, weeks and sometimes months without anyone else to talk to.",
+	},
+	{
+		uuid: "710627d9-9586-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 3,
+		opportunityTitle: "Workshop Manager",
+		charityName: "Freedom Power Chairs",
+		imgName: "workshop2.jpg",
+		desc: "Oversight of all activities in the workshop. Delegated in part to supervisors. We have so far been unable to obtain funding to make this a paid role.",
+	},
+	{
+		uuid: "0c8c3b1c-8c20-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 4,
+		opportunityTitle: "Befriending an older person in the community.",
+		charityName: "Time to Talk Befriending",
+		imgName: "ttb_befriending_older_people.jpeg",
+		desc: "Based on similar interests and hobbies befriending matches between older people and volunteers are made to help overcome feelings of loneliness. Many older people in our community spend days, weeks and sometimes months without anyone else to talk to.",
+	},
+	{
+		uuid: "25d459b7-8c18-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 4,
+		opportunityTitle: "Gardening volunteer",
+		charityName: "Guild Care",
+		imgName: "gardening.jpg",
+		desc: "Assisting Guild Care’s gardener in the grounds of our Care Homes. Will involve light gardening duties, weeding, sweeping, cutting back and as importantly sharing your ideas. ",
+	},
+	{
+		uuid: "845386ff-9581-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 4,
+		opportunityTitle: "Assessor - Clients",
+		charityName: "Freedom Power Chairs",
+		imgName: "FPC2.jpg",
+		desc: "Visiting clients to conduct assessments, post phone discussion.",
+	},
+	{
+		uuid: "9bd6f5d6-8c17-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 4,
+		opportunityTitle: "Home from Hospital Volunteers",
+		charityName: "Guild Care",
+		imgName: "Guild_care_home_and_hosptial_volunteers.jpeg",
+		desc: "This is a completely free service to any older person who lives alone and is due to be discharged from hospital. Our wonderful Home from Hospital volunteers provide social and practical support by visiting people in their own homes and assisting with things like collecting prescriptions and basic shopping, preparing a light snack, helping people to engage with activities in their local area or maybe just chatting over a cup of tea.",
+	},
+	{
+		uuid: "5ad1b3b8-8ca4-11eb-afb8-dadd5bd8c1d2",
+		categoryIndex: 4,
+		opportunityTitle: "Admin – Assistant to the Trustees",
+		charityName: "Freedom Power Chairs",
+		imgName: "trustees.jpg",
+		desc: "Maintaining action lists, agendas and minutes.",
+	},
+];
