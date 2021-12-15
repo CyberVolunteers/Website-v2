@@ -171,13 +171,17 @@
 .top-navigation-area .reel .cat-reel > h3.active {
 	color: #ea6c39 !important;
 }
-.top-navigation-area .reel .cat-reel > h3.active::after {
+.cat-text-container {
+	position: relative;
+	display: inline-block;
+}
+.top-navigation-area .reel .cat-reel > h3.active div.selected-option-underline {
 	position: absolute;
 	bottom: 0;
 	left: 50%;
-	transform: translateX(-50%);
+	transform: translate(-50%, 6px);
 	height: 3px;
-	width: 60%;
+	width: 100%;
 	background-color: #ea6c39;
 	content: "";
 }

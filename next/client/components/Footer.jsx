@@ -33,13 +33,13 @@ function Footer() {
 							</a>
 						</Link>
 					</li>
-					<li>
+					{/* <li>
 						<Link href="/contactUs" passHref>
 							<a>
 								<p>Contact us</p>
 							</a>
 						</Link>
-					</li>
+					</li> */}
 				</ul>
 
 				<ul>

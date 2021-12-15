@@ -59,7 +59,7 @@ export default function Home(): ReactElement {
 	const catsNumToSkip = 1;
 
 	return (
-		<div>
+		<div style={{ overflow: "hidden" }}>
 			<Head title="Cybervolunteers" />
 
 			<div className="main-page">
@@ -142,7 +142,10 @@ export default function Home(): ReactElement {
 											}}
 											ref={i === 0 ? firstCatRef : undefined}
 										>
-											{name}
+											<div className="cat-text-container">
+												<p>{name}</p>
+												<div className="selected-option-underline"></div>
+											</div>
 										</h3>
 									))}
 								</Carousel>

@@ -6,7 +6,6 @@ import { updateCsrf } from "../server/csrf";
 import Head from "../client/components/Head";
 import { orgFieldNamesToShow } from "../serverAndClient/displayNames";
 import React from "react";
-import { Signup } from "../client/components/Signup";
 
 export default function OrganisationSignup(
 	props: InferGetServerSidePropsType<typeof getServerSideProps>

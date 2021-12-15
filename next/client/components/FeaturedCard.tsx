@@ -5,19 +5,27 @@ import React from "react";
 import styles from "../styles/featuredCard.module.css";
 
 function FeaturedCard({
-	imagePath: img,
+	imagePath,
 	title,
 	organisationName,
 	desc,
 	currentVolunteers,
 	requestedVolunteers,
 	uuid,
+}: {
+	imagePath: string;
+	title: string;
+	organisationName: string;
+	desc: string;
+	currentVolunteers?: number;
+	requestedVolunteers?: number;
+	uuid: string;
 }) {
 	return (
 		<div className={`${styles["FeaturedCard"]} w-1000`}>
 			<div className={`img-container`}>
 				<Image
-					src={img}
+					src={imagePath}
 					// width={100}
 					// height={100}
 					sizes={"40vw"}
@@ -39,18 +47,22 @@ function FeaturedCard({
 					</Link>
 				</p>
 
-				<div className={`${styles["meter-total"]}`}>
-					<div
-						className={`${styles["meter"]}`}
-						style={{
-							width: (currentVolunteers / requestedVolunteers) * 100 + "%", //TODO: set this
-						}}
-					></div>
-				</div>
-
-				<span className={`${styles["volunteers-progress-bar"]}`}>
-					{currentVolunteers}/{requestedVolunteers} volunteers
-				</span>
+				{currentVolunteers !== undefined &&
+				requestedVolunteers !== undefined ? (
+					<>
+						<div className={`${styles["meter-total"]}`}>
+							<div
+								className={`${styles["meter"]}`}
+								style={{
+									width: (currentVolunteers / requestedVolunteers) * 100 + "%", //TODO: set this
+								}}
+							></div>
+						</div>
+						<span className={`${styles["volunteers-progress-bar"]}`}>
+							{currentVolunteers}/{requestedVolunteers} volunteers
+						</span>
+					</>
+				) : null}
 
 				<Link href={`/listing?uuid=${uuid}`} passHref>
 					<a className={`${styles["volunteer-now"]}`}>

@@ -5,19 +5,27 @@ import React from "react";
 import styles from "../styles/card.module.css";
 
 function Card({
-	imagePath: img,
+	imagePath,
 	title,
 	organisationName,
 	desc,
 	currentVolunteers,
 	requestedVolunteers,
 	uuid,
+}: {
+	imagePath: string;
+	title: string;
+	organisationName: string;
+	desc: string;
+	currentVolunteers?: number;
+	requestedVolunteers?: number;
+	uuid: string;
 }) {
 	return (
 		<div className={`${styles["Card"]}`}>
 			<div className={`${styles["card-image-container"]} img-container`}>
 				<Image
-					src={img}
+					src={imagePath}
 					// width={100}
 					// height={100}
 					sizes={"30vw"}
@@ -38,13 +46,23 @@ function Card({
 					</Link>
 				</p>
 
-				{/* <div className={`${styles["meter-total"]}`}>
-					<div className={`${styles["meter"]}`} style={{ width: currentVolunteers / requestedVolunteers * 100 + "%" }}></div>
-				</div>
+				{currentVolunteers !== undefined &&
+				requestedVolunteers !== undefined ? (
+					<>
+						<div className={`${styles["meter-total"]}`}>
+							<div
+								className={`${styles["meter"]}`}
+								style={{
+									width: (currentVolunteers / requestedVolunteers) * 100 + "%",
+								}}
+							></div>
+						</div>
 
-				<span className={`${styles["volunteers-progress-bar"]}`}>
-					{currentVolunteers}/{requestedVolunteers} volunteers
-				</span> */}
+						<span className={`${styles["volunteers-progress-bar"]}`}>
+							{currentVolunteers}/{requestedVolunteers} volunteers
+						</span>
+					</>
+				) : null}
 
 				<div className={`${styles["submittion-area"]} dflex-align-center`}>
 					<Link href={`/listing?uuid=${uuid}`} passHref>

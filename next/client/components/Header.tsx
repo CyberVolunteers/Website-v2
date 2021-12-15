@@ -116,13 +116,13 @@ function Header() {
 							</a>
 						</Link>
 					</li>
-					<li>
+					{/* <li>
 						<Link href="/contactUs" passHref>
 							<a>
 								<p>Contact us</p>
 							</a>
 						</Link>
-					</li>
+					</li> */}
 				</aside>
 			) : null}
 
@@ -161,12 +161,16 @@ function Header() {
 							className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}
 						>
 							{isAfterRehydration ? ( // because it resizes automatically, we need to disable it to prevent flicker
-								<div className={`${styles["head"]} dflex-align-center`}>
-									<p>About</p>
-									<ArrowDropDownIcon />
+								<div
+									style={{ cursor: "pointer" }}
+									className={`${styles["head"]} dflex-align-center`}
+								>
+									<p>About us</p>
+									{/* <p>About</p> */}
+									{/* <ArrowDropDownIcon /> */}
 								</div>
 							) : null}
-							<ul className={`${styles["body"]}`}>
+							{/* <ul className={`${styles["body"]}`}>
 								<li>
 									<Link href="/aboutUs" passHref>
 										<a>
@@ -181,7 +185,7 @@ function Header() {
 										</a>
 									</Link>
 								</li>
-							</ul>
+							</ul> */}
 						</li>
 
 						{signUpOrMyAccountEl}
