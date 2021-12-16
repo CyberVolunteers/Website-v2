@@ -21,6 +21,7 @@ import isEmail from "validator/lib/isEmail";
 import { months } from "../client/utils/const";
 import Image from "next/image";
 import { isEmailFree } from "../server/auth/data";
+import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 
 const minSearchCooldownMillis = 700;
 
@@ -994,7 +995,7 @@ function SecondPage({
 			{/* <div className="country-select select-box">
 									<FormControl className="dropdown-form-control">
 										<InputLabel
-											htmlFor="age-native-simple"
+											htmlFor="country-select"
 											style={{ pointerEvents: "none" }}
 										>
 											Country/Region
@@ -1056,7 +1057,7 @@ function SecondPage({
 						)}`}
 					>
 						<InputLabel
-							htmlFor="age-native-simple"
+							htmlFor="month-select"
 							style={{ pointerEvents: "none" }}
 						>
 							Month
@@ -1114,22 +1115,6 @@ function SecondPage({
 			</CustomButton>
 		</>
 	);
-}
-
-function addVisitedField(
-	field: string,
-	visitedFields: string[],
-	setVisitedFields: React.Dispatch<React.SetStateAction<string[]>>
-) {
-	if (visitedFields.includes(field)) return;
-	setVisitedFields(visitedFields.concat([field]));
-
-	// finally, change the actual value
-	visitedFields.push(field);
-}
-
-function getFieldClasses(field: string, visitedFields: string[]) {
-	return visitedFields.includes(field) ? "highlight-black" : "";
 }
 
 function TermsOfServiceNote({

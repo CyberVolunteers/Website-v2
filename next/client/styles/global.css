@@ -1,9 +1,15 @@
+@font-face {
+	font-family: PostGrotesk;
+	src: url(/PostGrotesk-Medium.woff2);
+}
+
 html,
 body {
 	padding: 0;
 	margin: 0;
 	background-color: #ffffff;
 	font-family: PostGrotesk, Arial, Helvetica, sans-serif;
+	letter-spacing: -0.042rem;
 }
 
 .w-1000 {

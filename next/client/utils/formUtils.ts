@@ -1,38 +1,15 @@
-import { Flattened } from "combined-validator";
-
-export function addError(
-	overallErrors: {
-		[key: string]: string;
-	},
-	setOverallErrors: React.Dispatch<
-		React.SetStateAction<{
-			[key: string]: string;
-		}>
-	>,
-	name: string,
-	e: string
-) {
-	const overallErrorsCopy = Object.assign({}, overallErrors);
-	overallErrorsCopy[name] = e;
-	setOverallErrors(overallErrorsCopy);
+export function getFieldClasses(field: string, visitedFields: string[]) {
+	return visitedFields.includes(field) ? "highlight-black" : "";
 }
 
-export function setFieldOrder(
-	fields: Flattened,
-	order: string[],
-	isAtTheEnd: boolean = false
+export function addVisitedField(
+	field: string,
+	visitedFields: string[],
+	setVisitedFields: React.Dispatch<React.SetStateAction<string[]>>
 ) {
-	const copy = Object.assign({}, fields);
-	const collected = {} as {
-		[key: string]: any;
-	};
+	if (visitedFields.includes(field)) return;
+	setVisitedFields(visitedFields.concat([field]));
 
-	order.forEach((k) => {
-		if (copy[k] === undefined) return;
-		collected[k] = copy[k];
-		delete copy[k];
-	});
-
-	if (isAtTheEnd) return { ...copy, ...collected };
-	else return { ...collected, ...copy };
+	// finally, change the actual value
+	visitedFields.push(field);
 }
