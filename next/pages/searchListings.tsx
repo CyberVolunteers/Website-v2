@@ -42,6 +42,14 @@ type Listing = {
 
 const MAX_LISTINGS_PER_PAGE = 6;
 
+const preventEvent = (e: {
+	preventDefault: () => void;
+	stopPropagation: () => void;
+}) => {
+	e.preventDefault();
+	e.stopPropagation();
+};
+
 function SearchListings() {
 	const listings: Listing[] = [
 		{
@@ -304,8 +312,15 @@ function Filter() {
 	const selectedMaxHours = interpolate(maxHoursHandlePos);
 
 	const [hoursRangeToDisplay, setHoursRangeToDisplay] = useState(
-		null as null | [number, number]
+		null as null | [number, number] | "flexible"
 	);
+	const [areHoursFlexible, setAreHoursFlexible] = useState(false);
+
+	const isSearchEmpty =
+		location === "" &&
+		categoryOptions.length === 0 &&
+		hoursRangeToDisplay === null &&
+		keywords.length === 0;
 
 	useEffect(() => {
 		setHoursRangeToDisplay([
@@ -321,12 +336,12 @@ function Filter() {
 					<input
 						className={styles["filter-textbox"]}
 						type="text"
-						placeholder="Location Postcode/Address"
+						placeholder="Enter Location"
 						value={location}
 						onChange={(e) => setLocation(e.target.value)}
 					></input>
 				</div>
-				<CustomDropdown title="Cause area">
+				<CustomDropdown title="Cause Area">
 					{categoryNames.map((category, i) => (
 						<div key={i}>
 							<div
@@ -349,26 +364,59 @@ function Filter() {
 					))}
 				</CustomDropdown>
 				<CustomDropdown title="Weekly Hours">
-					<div className={styles["slider-bar"]}>
-						<div
-							className={styles["slider-bar-filled-in"]}
-							style={{
-								left: `${minHoursHandlePos}px`,
-								width: `${maxHoursHandlePos - minHoursHandlePos}px`,
+					{Array.isArray(hoursRangeToDisplay) ? (
+						<div className={styles["slider-bar-labels"]}>
+							<div className={styles["slider-bar-min-label"]}>
+								{hoursRangeToDisplay[0]} hours
+							</div>
+							<div className={styles["slider-bar-max-label"]}>
+								{hoursRangeToDisplay[1]} hours
+							</div>
+						</div>
+					) : null}
+					{hoursRangeToDisplay === "flexible" ? null : (
+						<div className={styles["slider-bar"]}>
+							<div
+								onDragStart={preventEvent}
+								onDrop={preventEvent}
+								className={styles["slider-bar-filled-in"]}
+								style={{
+									left: `${minHoursHandlePos}px`,
+									width: `${maxHoursHandlePos - minHoursHandlePos}px`,
+								}}
+							></div>
+							<Handle
+								min={0}
+								max={maxHoursHandlePos}
+								initVal={0}
+								setPos={setMinHoursHandlePos}
+							/>
+							<Handle
+								min={minHoursHandlePos}
+								max={barWidth}
+								initVal={barWidth}
+								setPos={setMaxHoursHandlePos}
+							/>
+						</div>
+					)}
+					<div className={styles["flexible-hours-container"]}>
+						<input
+							type="checkbox"
+							name="flexible-hours"
+							defaultChecked={areHoursFlexible}
+							onChange={() => {
+								setAreHoursFlexible(!areHoursFlexible);
+								if (areHoursFlexible) {
+									setHoursRangeToDisplay([
+										Math.round(selectedMinHours),
+										Math.round(selectedMaxHours),
+									]);
+								} else {
+									setHoursRangeToDisplay("flexible");
+								}
 							}}
-						></div>
-						<Handle
-							min={0}
-							max={maxHoursHandlePos}
-							initVal={0}
-							setPos={setMinHoursHandlePos}
 						/>
-						<Handle
-							min={minHoursHandlePos}
-							max={barWidth}
-							initVal={barWidth}
-							setPos={setMaxHoursHandlePos}
-						/>
+						<label htmlFor="flexible-hours">Flexible Hours</label>
 					</div>
 				</CustomDropdown>
 				<div
@@ -379,7 +427,7 @@ function Filter() {
 					<input
 						className={styles["filter-textbox"]}
 						type="text"
-						placeholder="Keywords"
+						placeholder="Search by Keyword"
 						value={currentKeyword}
 						onKeyPress={(e) => {
 							if (e.key === "Enter") {
@@ -398,7 +446,11 @@ function Filter() {
 					/>
 				</div>
 			</div>
-			<div className={styles["filter-option-boxes"]}>
+			<div
+				className={`${styles["filter-option-boxes"]} ${
+					isSearchEmpty ? "" : styles["not-empty"]
+				}`}
+			>
 				<SelectionOptionsSet
 					selectionOptions={location === "" ? [] : [location]}
 					setSelectionOptions={() => setLocation("")}
@@ -411,6 +463,8 @@ function Filter() {
 					selectionOptions={
 						hoursRangeToDisplay === null
 							? []
+							: hoursRangeToDisplay === "flexible"
+							? ["Flexible hours"]
 							: hoursRangeToDisplay[0] === hoursRangeToDisplay[1]
 							? [`${hoursRangeToDisplay[0]} hours per week`]
 							: [
@@ -423,6 +477,19 @@ function Filter() {
 					selectionOptions={keywords}
 					setSelectionOptions={deleteFromList(setKeywords)}
 				/>
+				{isSearchEmpty ? null : (
+					<div
+						className={styles["clear-all"]}
+						onClick={() => {
+							setLocation("");
+							setCategoryOptions([]);
+							setHoursRangeToDisplay(null);
+							setKeywords([]);
+						}}
+					>
+						Clear All
+					</div>
+				)}
 			</div>
 		</div>
 	);
@@ -483,6 +550,8 @@ function Handle({
 
 	return (
 		<div
+			onDragStart={preventEvent}
+			onDrop={preventEvent}
 			onPointerDown={(e) => {
 				if (selfRef.current) {
 					setMousePos(e.clientX);
