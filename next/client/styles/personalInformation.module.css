@@ -1,0 +1,42 @@
+.top_area {
+	border-bottom: 1px solid #d8d8d9;
+	padding-bottom: 1rem;
+}
+.first_para {
+	margin-top: 10px;
+	text-align: center;
+}
+
+.first_para a {
+	color: #f75524;
+}
+.sidebar_nav {
+	position: absolute;
+	top: 150px;
+	left: 50%;
+	transform: translateX(-50%);
+	width: 1050px;
+	z-index: 1;
+}
+.sidebar_nav li {
+	margin-bottom: 1rem;
+}
+.sidebar_nav li a {
+	color: #f75524;
+}
+.sidebar_nav .active {
+	color: #ddd;
+}
+.active {
+}
+@media screen and (max-width: 1100px) {
+	.sidebar_nav {
+		display: none;
+	}
+}
+@media screen and (max-width: 550px) {
+	.last_wrapper,
+	.first_para {
+		font-size: 16px;
+	}
+}

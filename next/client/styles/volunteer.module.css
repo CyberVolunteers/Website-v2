@@ -1,0 +1,45 @@
+.voulenteer {
+	border-bottom: 1px solid #d8d8d9;
+	padding-bottom: 2rem;
+}
+.sub_heading {
+	font-weight: 400;
+
+	font-size: 1.5rem;
+
+	text-align: center;
+}
+.buttonWrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 60%;
+	margin: 1.5rem auto 0px auto;
+}
+@media screen and (max-width: 650px) {
+	.buttonWrapper {
+		justify-content: center;
+		width: 100%;
+	}
+	.buttonWrapper > *:first-child {
+		margin-right: 10px;
+	}
+}
+
+@media screen and (max-width: 380px) {
+	.sub_heading {
+		font-size: 1.2rem;
+	}
+}
+@media screen and (max-width: 380px) {
+	.buttonWrapper {
+		flex-direction: column;
+	}
+	.buttonWrapper > * {
+		width: 200px !important;
+	}
+	.buttonWrapper > *:first-child {
+		margin-right: 0px;
+		margin-bottom: 10px;
+	}
+}

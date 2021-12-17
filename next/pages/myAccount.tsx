@@ -1,268 +1,208 @@
-import Link from "next/link";
-import { ReactElement, useState } from "react";
-import {
-	useIsAfterRehydration,
-	useViewProtection,
-} from "../client/utils/otherHooks";
-import {
-	getAccountInfo,
-	updateLoginState,
-	useViewerType,
-} from "../client/utils/userState";
-import Head from "../client/components/Head";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import { getSession } from "../server/auth/auth-cookie";
+import Head from "../client/components/Head";
+import { getSession, SessionObject } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
-import { isLoggedIn, isVerifiedOrg } from "../server/auth/data";
-import {
-	orgFieldNamesToShow,
-	userFieldNamesToShow,
-} from "../serverAndClient/displayNames";
-import { flatten, Flattened } from "combined-validator";
-import {
-	orgDataUpdateSpec,
-	userDataUpdateSpec,
-	users,
-	organisations,
-} from "../serverAndClient/publicFieldConstants";
-import React from "react";
-import EditableField from "../client/components/EditableField";
-import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
-import { updateCsrf } from "../server/csrf";
-import { csrfFetch } from "../client/utils/csrf";
-import { updateOverallErrorsForRequests } from "../client/utils/misc";
-import { CircularProgress } from "@material-ui/core";
-import { PerElementValidatorCallbacks } from "../client/components/FormComponent";
-import isEmail from "validator/lib/isEmail";
 
-export function createEmailChangingFunction(
-	overallErrors: { [key: string]: any },
-	setOverallErrors: React.Dispatch<
-		React.SetStateAction<{
-			[key: string]: any;
-		}>
-	>,
-	setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
-	csrfToken: string
-) {
-	return async function (name: string, value: any) {
-		setIsLoading(true);
+import { LocalHeader } from "../client/components/LocalHeader";
+import { localHeaderItems } from "../client/utils/const";
 
-		const res = await csrfFetch(csrfToken, "/api/changeEmail", {
-			method: "POST",
-			credentials: "same-origin", // only send cookies for same-origin requests
-			headers: {
-				"content-type": "application/json",
-				accept: "application/json",
-			},
-			body: JSON.stringify({ email: value }),
-		});
+import { HelperMessage } from "../client/components/HelperMessage";
+import { PersonalInfoSection } from "../client/components/PersonalInfoSection";
+import { Volunteer } from "../client/components/Volunteer";
+import { SignOut } from "../client/components/SignOut";
 
-		if (
-			!(await updateOverallErrorsForRequests(
-				res,
-				"changeEmail",
-				overallErrors,
-				setOverallErrors
-			))
-		)
-			return setIsLoading(false);
+import { BasicInfo } from "../client/components/BasicInfo";
+import { SkillsAndInterests } from "../client/components/SkillsAndInterests";
+import { Email } from "../client/components/Email";
+import { Password } from "../client/components/Password";
 
-		setIsLoading(false);
+import { VolunteerCause } from "../client/components/VolunteerCause";
 
-		// refresh login status
-		updateLoginState();
+import Button from "../client/components/Button";
 
-		// the component will update and hit the viewer type protection screen
-	};
-}
+import generalAccountStyles from "../client/styles/generalAccount.module.css";
+import personalInformationStyles from "../client/styles/personalInformation.module.css";
+import volunteeringStatsStyles from "../client/styles/volunteeringStats.module.css";
+
+import { MouseEventHandler, ReactElement, useState } from "react";
 
 export default function MyAccount({
-	accountData: initAccountData,
-	editableFields,
-	fieldNames,
-	csrfToken,
-	allFields,
+	accountData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	useViewProtection(["org", "user"]);
+	// TODO: technically, since we get the fields from the server, view protection isn't needed
 
-	const [isLoading, setIsLoading] = useState(false);
-	const [fields, setFields] = useState(initAccountData);
+	// useViewProtection(["org", "user"]);
 
-	const [overallErrors, setOverallErrors] = useState(
-		{} as { [key: string]: any }
+	// const userType = useViewerType();
+	// const isOrg = getAccountInfo()?.isOrg;
+
+	// const isAfterRehydration = useIsAfterRehydration();
+
+	const [activeSection, setActiveSection] = useState(
+		"Volunteering Stats" as
+			| "General"
+			| "Personal Information"
+			| "Volunteering Stats"
 	);
 
-	const changeEmail = createEmailChangingFunction(
-		overallErrors,
-		setOverallErrors,
-		setIsLoading,
-		csrfToken
-	);
-
-	const isOrg = getAccountInfo()?.isOrg;
-
-	const userType = useViewerType();
-	const isAfterRehydration = useIsAfterRehydration();
-
-	async function sendEditRequest(k: string, v: any) {
-		const url = `/api/update${isOrg ? "Org" : "User"}Data`;
-		const data = {} as { [key: string]: any };
-		data[k] = v;
-
-		setIsLoading(true);
-
-		const res = await csrfFetch(csrfToken, url, {
-			method: "POST",
-			credentials: "same-origin", // only send cookies for same-origin requests
-			headers: {
-				"content-type": "application/json",
-				accept: "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-
-		if (
-			!(await updateOverallErrorsForRequests(
-				res,
-				"myAccountUpdateData",
-				overallErrors,
-				setOverallErrors
-			))
-		)
-			return setIsLoading(false);
-
-		setIsLoading(false);
-
-		// set the new value through a copy
-		const fieldsCopy = Object.assign({}, fields);
-		fieldsCopy[k] = v;
-		setFields(fieldsCopy);
-	}
-
-	const perElementValidationCallbacks: PerElementValidatorCallbacks =
-		getSignupPerElementValidationCallbacks(overallErrors, setOverallErrors, {
-			allowedEmailAddresses: [fields.email],
-		});
-
-	perElementValidationCallbacks.contactEmails = (v: string) => isEmail(v);
+	const [personalInfoActive, setPersonalInfoActive] =
+		useState("basic_info_link");
+	const HandlePersonalInfoLink: MouseEventHandler<HTMLAnchorElement> = (e) => {
+		const targetId = (e.target as any).id;
+		targetId == "basic_info_link" && setPersonalInfoActive("basic_info_link");
+		targetId == "Skills_link" && setPersonalInfoActive("Skills_link");
+		targetId == "Email_link" && setPersonalInfoActive("Email_link");
+		targetId == "Password_link" && setPersonalInfoActive("Password_link");
+	};
 
 	return (
-		<div>
+		<>
 			<Head title="My account - cybervolunteers" />
+			<LocalHeader list={localHeaderItems} active={activeSection} />
 
-			<p>Hello and welcome to my secure website</p>
+			{activeSection === "General" ? (
+				<div className={generalAccountStyles._container}>
+					<h1 className={generalAccountStyles.main_heading}>
+						Welcome Atif Asim
+					</h1>
+					<HelperMessage />
+					<Volunteer />
+					<PersonalInfoSection />
+					<SignOut />
+				</div>
+			) : activeSection === "Personal Information" ? (
+				<div className={generalAccountStyles._container}>
+					<nav className={personalInformationStyles.sidebar_nav}>
+						<li>
+							<a
+								href="#basic_info"
+								className={`${
+									personalInfoActive == "basic_info_link" &&
+									personalInformationStyles.active
+								}`}
+								id="basic_info_link"
+								onClick={HandlePersonalInfoLink}
+							>
+								Basic Info
+							</a>
+						</li>{" "}
+						<li>
+							<a
+								href="#Skills"
+								id="Skills_link"
+								onClick={HandlePersonalInfoLink}
+								className={`${
+									personalInfoActive == "Skills_link" &&
+									personalInformationStyles.active
+								}`}
+							>
+								Your Skills and Interests
+							</a>
+						</li>{" "}
+						<li>
+							<a
+								href="#Email"
+								id="Email_link"
+								onClick={(e) => HandlePersonalInfoLink}
+								className={`${
+									personalInfoActive == "Email_link" &&
+									personalInformationStyles.active
+								}`}
+							>
+								Email
+							</a>
+						</li>{" "}
+						<li>
+							<a
+								href="#Password"
+								id="Password_link"
+								onClick={HandlePersonalInfoLink}
+								className={`${
+									personalInfoActive == "Password_link" &&
+									personalInformationStyles.active
+								}`}
+							>
+								Password
+							</a>
+						</li>
+					</nav>
+					<div className={personalInformationStyles.top_area}>
+						<h1
+							className={`${generalAccountStyles.main_heading} ${personalInformationStyles.main_heading}`}
+						>
+							Personal Information
+						</h1>
+						<p className={personalInformationStyles.first_para}>
+							You are missing information in the following sections:{" "}
+							<a href="#">Basic info,</a> <a href="#">Your Skills</a>{" "}
+							<a href="#">Interests.</a>
+						</p>
+					</div>
 
-			{Object.entries(overallErrors).map(([k, v]) => (
-				<h1 key={k}>{v}</h1>
-			))}
+					<BasicInfo />
+					<SkillsAndInterests />
+					<Email />
+					<Password />
+				</div>
+			) : activeSection === "Volunteering Stats" ? (
+				<div className={generalAccountStyles._container}>
+					<h1
+						className={`${generalAccountStyles.main_heading} ${volunteeringStatsStyles.main_heading}`}
+					>
+						Welcome Atif Asim
+					</h1>
 
-			{/* Render common stuff normally */}
-			{Object.entries(allFields ?? {}).map(([k, fieldDescription]) => {
-				const v = k in fields ? fields[k] : null;
-				return (
-					<EditableField
-						key={k}
-						name={k}
-						value={v}
-						presentableNames={fieldNames}
-						editableFields={editableFields}
-						sendEditRequest={k === "email" ? changeEmail : sendEditRequest} //TODO: a popup saying that it will force you to re-confirm the email
-						perElementValidationCallbacks={perElementValidationCallbacks}
-					></EditableField>
-				);
-			})}
+					<p className={volunteeringStatsStyles.first_para}>
+						You have volunteered <b>3</b> times.
+					</p>
 
-			{isLoading ? <CircularProgress /> : null}
+					<VolunteerCause />
 
-			{(() => {
-				//only render the stuff that differs on client-side to not run into issues with rehydration: https://www.joshwcomeau.com/react/the-perils-of-rehydration/
-				if (!isAfterRehydration) return null;
+					<div className={volunteeringStatsStyles.last_wrapper}>
+						<p className={volunteeringStatsStyles.last_para}>
+							You have volunteered for <b>2</b> charities.
+						</p>
 
-				switch (userType) {
-					case "org":
-						return (
-							<div>
-								<Link href="/manageListings" passHref>
-									<a>
-										<p>Manage listings</p>
-									</a>
-								</Link>
-							</div>
-						);
-					case "user":
-						return (
-							<div>
-								<Link href="/searchListings" passHref>
-									<a>
-										<p>Find new listings</p>
-									</a>
-								</Link>
-							</div>
-						);
-					default:
-						return <p>Please log in to view this</p>;
-				}
-			})()}
-
-			{/* Etc */}
-
-			<Link href="/changePassword" passHref>
-				<a>
-					<p>Change my password</p>
-				</a>
-			</Link>
-			<Link href="/logout" passHref>
-				<a>
-					<p>Log out</p>
-				</a>
-			</Link>
-		</div>
+						<Button style={{ width: 210, fontSize: "16px", marginTop: 20 }}>
+							Find an opportunity
+						</Button>
+					</div>
+				</div>
+			) : null}
+		</>
 	);
 
 	// TODO: a button to change the password
 }
 
-type AccountDataType = {
-	[key: string]: any;
-};
-
 export const getServerSideProps: GetServerSideProps<{
-	accountData: AccountDataType;
-	editableFields: Flattened;
-	allFields: Flattened;
-	fieldNames: { [key: string]: string };
-	csrfToken: string;
+	accountData: SessionObject;
 }> = async (context: any) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
-	let fields: AccountDataType = {};
-	let editableFields: Flattened = {};
-	let allFields: Flattened = {};
-	let fieldNames: { [key: string]: string } = {};
-	if (isLoggedIn(session)) {
-		const isRequestByAnOrg = isVerifiedOrg(session);
-		fieldNames = isRequestByAnOrg ? orgFieldNamesToShow : userFieldNamesToShow;
+	// let fields: AccountDataType = {};
 
-		editableFields = isRequestByAnOrg
-			? flatten(orgDataUpdateSpec)
-			: flatten(userDataUpdateSpec);
+	// if (isLoggedIn(session)) {
+	// 	const isRequestByAnOrg = isVerifiedOrg(session);
+	// 	fieldNames = isRequestByAnOrg ? orgFieldNamesToShow : userFieldNamesToShow;
 
-		allFields = isRequestByAnOrg ? flatten(organisations) : flatten(users);
+	// 	editableFields = isRequestByAnOrg
+	// 		? flatten(orgDataUpdateSpec)
+	// 		: flatten(userDataUpdateSpec);
 
-		delete allFields.password;
+	// 	allFields = isRequestByAnOrg ? flatten(organisations) : flatten(users);
 
-		fields = Object.fromEntries(
-			Object.entries(session).filter(([k, v]) => k in allFields)
-		); // only show the ones which were selected
-	}
+	// 	delete allFields.password;
+
+	// 	fields = Object.fromEntries(
+	// 		Object.entries(session).filter(([k, v]) => k in allFields)
+	// 	); // only show the ones which were selected
+	// }
+
+	// TODO: clean it and leave only the required fields - for security!
 
 	return {
 		props: {
-			accountData: fields,
-			editableFields,
-			fieldNames,
-			allFields,
-			csrfToken: await updateCsrf(context),
+			accountData: session,
 		}, // will be passed to the page component as props
 	};
 };

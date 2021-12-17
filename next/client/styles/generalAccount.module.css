@@ -1,0 +1,29 @@
+._container {
+	width: 620px;
+
+	margin: 1.5rem auto;
+}
+._container > * + * {
+	position: relative;
+	z-index: 2;
+}
+.main_heading {
+	font-weight: 400;
+
+	font-size: 1.8rem;
+
+	text-align: center;
+}
+@media screen and (max-width: 650px) {
+	._container {
+		width: 95%;
+	}
+}
+@media screen and (max-width: 550px) {
+	.main_heading {
+		font-size: 1.4rem;
+	}
+	.main_para {
+		font-size: 16px;
+	}
+}

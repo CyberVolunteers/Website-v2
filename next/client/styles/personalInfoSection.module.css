@@ -1,0 +1,71 @@
+.PersonalInfo {
+	padding: 1.6rem 2.9rem 2rem 2.9rem;
+	border-bottom: 1px solid #d8d8d9;
+}
+.sub_heading {
+	font-weight: 400;
+
+	font-size: 1.5rem;
+
+	text-align: center;
+}
+.helper_message {
+	font-size: 15px;
+	text-align: center !important;
+	margin-top: 10px;
+
+	font-weight: 400;
+}
+
+.highlighted_text {
+	color: #f75524;
+	text-decoration: none;
+}
+
+.info_message {
+	text-align: left;
+	display: block;
+	margin-top: 1rem;
+	font-weight: 600;
+}
+.button_wrapper {
+	display: flex;
+	justify-content: center;
+}
+.fieldWrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	padding: 0.8rem 0rem;
+	border-bottom: 1px solid #d8d8d9;
+}
+.fieldWrapperlabel {
+	text-align: left;
+
+	font-size: 16px;
+	display: block;
+}
+.fieldWrapperinput {
+	border: none;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	font-size: 16px;
+	position: relative;
+	outline: none;
+}
+
+@media screen and (max-width: 550px) {
+	.PersonalInfo {
+		padding: 1.6rem 0rem 2rem 0rem;
+		border-bottom: 1px solid #d8d8d9;
+	}
+}
+@media screen and (max-width: 380px) {
+	.fieldWrapperlabel,
+	.fieldWrapperinput {
+		font-size: 13px;
+	}
+	.sub_heading {
+		font-size: 1.2rem;
+	}
+}

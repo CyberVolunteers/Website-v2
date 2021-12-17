@@ -1,0 +1,23 @@
+.SignOut {
+	border-bottom: 1px solid #d8d8d9;
+	padding: 1.6rem 0rem 2rem 0rem;
+}
+.sub_heading {
+	font-weight: 400;
+
+	font-size: 1.5rem;
+
+	text-align: center;
+}
+.buttonWrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+
+	margin: 1.5rem auto 0px auto;
+}
+@media screen and (max-width: 380px) {
+	.sub_heading {
+		font-size: 1.2rem;
+	}
+}

@@ -1,0 +1,22 @@
+.main_heading {
+	border-bottom: 1px solid #d8d8d9;
+	padding-bottom: 1rem;
+}
+.first_para {
+	border-bottom: 1px solid #d8d8d9;
+	padding: 1rem 0rem;
+	text-align: center;
+	font-size: 1.5rem;
+}
+.last_wrapper {
+	border-bottom: 1px solid #d8d8d9;
+	padding: 1rem 0rem;
+	text-align: center;
+	font-size: 1.5rem;
+}
+@media screen and (max-width: 550px) {
+	.last_wrapper,
+	.first_para {
+		font-size: 16px;
+	}
+}

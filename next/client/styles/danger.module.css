@@ -1,0 +1,13 @@
+.Danger {
+	display: flex;
+	align-items: center;
+
+	background-color: #ff4747;
+	border-radius: 10px;
+	padding: 0.5rem;
+}
+.text {
+	text-align: center;
+	color: #fff;
+	font-size: 16px;
+}

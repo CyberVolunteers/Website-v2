@@ -7,19 +7,23 @@ function Button({
 	href,
 	disabled,
 	onClick,
+	outline,
+	className,
 }: React.PropsWithChildren<{
 	style?: React.CSSProperties;
 	href?: string;
 	disabled?: boolean;
 	onClick?: () => void;
+	outline?: boolean;
+	className?: string;
 }>) {
+	const underlyingClassName = `${styles.button} ${
+		disabled ? styles.disabled : ""
+	} ${outline === true && styles.outline} ${className ?? ""}`;
 	if (href !== undefined)
 		return (
 			<Link href={href}>
-				<div
-					style={style}
-					className={`${styles.button} ${disabled ? styles.disabled : ""}`}
-				>
+				<div style={style} className={underlyingClassName}>
 					<>{children}</>
 				</div>
 			</Link>
@@ -28,7 +32,7 @@ function Button({
 		return (
 			<button
 				style={style}
-				className={`${styles.button}  ${disabled ? styles.disabled : ""}`}
+				className={underlyingClassName}
 				onClick={onClick}
 				type="submit"
 			>

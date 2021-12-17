@@ -1,0 +1,52 @@
+.first_para {
+	text-align: center;
+	font-size: 1.5rem;
+}
+.VolunteerCause {
+	padding: 1rem 0rem;
+	border-bottom: 1px solid #d8d8d9;
+}
+.do_or_dont {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	justify-items: center;
+	margin-top: 1rem;
+}
+.do_or_dont > * > *:first-child {
+	font-weight: 600;
+	margin-bottom: 1.2rem;
+	font-size: 16px;
+}
+.do_or_dont > * > * + * {
+	margin-top: 0.4rem;
+	font-size: 14px;
+}
+
+.buttonWrapper {
+	padding-top: 2rem;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.listItem {
+	display: flex;
+	align-items: center;
+}
+.imageWrapper {
+	min-width: 50px;
+}
+.listItem p {
+	padding-bottom: 2px;
+	margin-left: 0px;
+}
+@media screen and (max-width: 550px) {
+	.first_para {
+		font-size: 16px;
+	}
+	.do_or_dont > * > *:first-child {
+		font-size: 13px;
+	}
+	.do_or_dont {
+		grid-gap: 10px;
+	}
+}

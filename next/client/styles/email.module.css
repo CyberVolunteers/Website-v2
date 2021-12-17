@@ -1,0 +1,90 @@
+.heading_2 {
+	font-size: 20px;
+	text-align: center;
+	font-weight: 500;
+}
+.BasicInfo {
+	padding: 1rem 0rem;
+	border-bottom: 1px solid #d8d8d9;
+}
+.inputWrappers {
+	display: grid;
+	grid-template-columns: repeat(6, 1fr);
+	grid-gap: 20px;
+	margin: 0rem auto;
+	margin-top: 1rem;
+	width: 70%;
+}
+.buttonsWrapper {
+	width: 70%;
+	margin: 0rem auto;
+}
+.inputWrappers > .grid_two {
+	grid-column: span 3;
+}
+.grid_three {
+	grid-column: span 6;
+}
+.grid_one {
+	grid-column: span 2;
+}
+
+.buttonsWrapper {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+	grid-gap: 40px;
+	margin-top: 20px;
+}
+
+.textArea {
+	height: 250px;
+	outline: none;
+	border: 1px solid #727373;
+	padding: 1rem;
+	resize: none;
+	width: 100%;
+
+	border-radius: 5px;
+}
+
+.textArea:focus {
+	border-color: #f75524;
+}
+
+.smallpara {
+	margin-top: 13.5px;
+	font-size: 14px;
+}
+.link {
+	height: 50px;
+	border: 1px solid #666666;
+	background-color: #d8d8d9;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	width: 70%;
+	margin: 0rem auto;
+	padding: 0rem 1rem;
+	border-radius: 5px;
+	margin-top: 1rem;
+}
+.link p:first-child {
+	color: #666666;
+}
+.link p:last-child {
+	color: #1f69d4;
+}
+.link p:last-child > i {
+	padding-top: 2px;
+}
+@media screen and (max-width: 610px) {
+	.link {
+		width: 95%;
+	}
+}
+@media screen and (max-width: 350px) {
+	.link p:first-child,
+	.link p:last-child {
+		font-size: 13px;
+	}
+}
