@@ -73,14 +73,15 @@ function Header() {
 	);
 
 	const signUpOrMyAccountEl = !isAfterRehydration ? null : isLoggedIn ? (
-		<li>
-			<Link href="/myAccount" passHref>
-				<a>
-					<p>My Account</p>
-				</a>
-			</Link>
-		</li>
+		<></>
 	) : (
+		// <li>
+		// 	<Link href="/myAccount" passHref>
+		// 		<a>
+		// 			<p>My Account</p>
+		// 		</a>
+		// 	</Link>
+		// </li>
 		<>
 			<li>
 				<Link href="/login" passHref>

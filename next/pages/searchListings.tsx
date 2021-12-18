@@ -289,6 +289,7 @@ function CustomDropdown({
 }
 
 function Filter() {
+	const [isFirstRedraw, setIsFirstRedraw] = useState(true);
 	const [visitedFields, setVisitedFields] = useState([] as string[]);
 	const [categoryOptions, setCategoryOptions] = useState([] as string[]);
 	const [keywords, setKeywords] = useState([] as string[]);
@@ -323,10 +324,12 @@ function Filter() {
 		keywords.length === 0;
 
 	useEffect(() => {
-		setHoursRangeToDisplay([
-			Math.round(selectedMinHours),
-			Math.round(selectedMaxHours),
-		]);
+		if (!isFirstRedraw)
+			setHoursRangeToDisplay([
+				Math.round(selectedMinHours),
+				Math.round(selectedMaxHours),
+			]);
+		setIsFirstRedraw(false);
 	}, [minHoursHandlePos, maxHoursHandlePos]);
 
 	return (

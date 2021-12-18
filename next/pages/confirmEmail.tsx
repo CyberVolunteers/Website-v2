@@ -32,11 +32,12 @@ export default function EmailConfirmationEmailSent({
 				<>
 					<h1>Your email has been verified successfully.</h1>
 					<div>
-						Feel free to tweak{" "}
+						Feel free to
+						{/* tweak{" "}
 						<Link href="/myAccount" passHref>
 							<a>your account</a>
 						</Link>{" "}
-						or to{" "}
+						or to{" "} */}
 						<Link href="/searchListings" passHref>
 							<a>look at some listings</a>
 						</Link>

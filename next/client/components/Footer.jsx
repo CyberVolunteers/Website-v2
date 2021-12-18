@@ -58,13 +58,13 @@ function Footer() {
 							</a>
 						</Link>
 					</li>
-					<li>
+					{/* <li>
 						<Link href="/myAccount" passHref>
 							<a>
 								<p>My account</p>
 							</a>
 						</Link>
-					</li>
+					</li> */}
 					<li>
 						<Link href="/logout" passHref>
 							<a>

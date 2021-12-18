@@ -19,16 +19,16 @@ function Welcome({
 			<Head title="Welcome - cybervolunteers" />
 
 			<div className={styles.container}>
-				<h1 className={styles.main_heading}>Welcome to Cyber Volunteer</h1>
+				<h1 className={styles.main_heading}>Welcome to Cyber Volunteers</h1>
 				<p className={styles.main_para}>
 					You have created a Cyber Volunteers account. A verification email has
 					been sent to {email ?? "your email address"}
 					{/*TODO: test if this works*/}. Please verify your email to be able to
 					sign up for volunteering opportunities.
 				</p>
-				<Button href="/myAccount" style={{ width: 220 }}>
+				{/* <Button href="/myAccount" style={{ width: 220 }}>
 					GO TO MY ACCOUNT
-				</Button>
+				</Button> */}
 			</div>
 		</div>
 	);
