@@ -17,7 +17,7 @@ function Card({
 			<img src={img_src} alt="" />
 			<p>{text}</p>
 
-			<h4>{title}</h4>
+			<h4 className="bold">{title}</h4>
 			<p>{subtitle}</p>
 		</div>
 	);

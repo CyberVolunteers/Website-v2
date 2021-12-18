@@ -17,7 +17,7 @@ function CustomForm({
 }>) {
 	return (
 		<form className="custom-form" onSubmit={onSubmit}>
-			<p className="header">
+			<p className="header" style={{ fontWeight: "bold" }}>
 				{headingText} <Link href={headingLinkHref}>{headingLinkText}</Link>
 			</p>
 			<p className="helper">{subheadingText}</p>

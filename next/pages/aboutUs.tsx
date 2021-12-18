@@ -33,10 +33,13 @@ export default function AboutUs(): ReactElement {
 					everyone to volunteer and gain valuable skills.
 				</p>
 			</div>
-			<h3 className={styles.subsection_header}>
+			<h3 className={`${styles.subsection_header} bold`}>
 				Thanks to the Organisations Helping to Build Community with Cyber
 				Volunteers
 			</h3>
+
+			<img className={styles.partners_logos} src="/img/supporter_logos.png" />
+
 			<div className="how-it-works-section">
 				<h1>How it works</h1>
 				<p>
@@ -115,7 +118,7 @@ export default function AboutUs(): ReactElement {
 			>
 				<h1
 					style={{ textAlign: "center", color: "#4D4D4D" }}
-					className="landing-heading"
+					className="landing-heading bold"
 				>
 					What our volunteering community thinks
 				</h1>
@@ -148,7 +151,7 @@ export default function AboutUs(): ReactElement {
 
 			{/* volenteer area */}
 			<div className="volenteer-area">
-				<h1>
+				<h1 className="bold">
 					Cyber <br />
 					Volunteer for nonprofits.
 				</h1>

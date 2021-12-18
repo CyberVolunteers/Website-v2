@@ -288,7 +288,7 @@ export default function Home(): ReactElement {
 				{/* how it works */}
 
 				<div className="how-it-works-section">
-					<h1>How it works</h1>
+					<h1 className="bold">How it works</h1>
 					<p>
 						Easily find volunteering opportunities on Cyber Volunteers to
 						support causes that you care about and have a real impact.
@@ -306,7 +306,7 @@ export default function Home(): ReactElement {
 							/>
 
 							<div className="presentation">
-								<h3>Make an Account</h3>
+								<h3 className="bold">Make an Account</h3>
 								<p>Create your personal account to connect with charities.</p>
 							</div>
 						</div>
@@ -322,7 +322,7 @@ export default function Home(): ReactElement {
 							<div className="space-8"></div>
 
 							<div className="presentation">
-								<h3>Find an Opportunity</h3>
+								<h3 className="bold">Find an Opportunity</h3>
 								<p>
 									Browse our opportunities and find a charity to volunteer for.
 								</p>
@@ -331,7 +331,7 @@ export default function Home(): ReactElement {
 						<div className="step">
 							<img className="icon-64" alt="" src="/img/mail_icon.svg"></img>
 							<div className="presentation">
-								<h3>Register your interest</h3>
+								<h3 className="bold">Register your interest</h3>
 								<p>
 									Simply click "Volunteer Now" to notify the charity of your
 									interest.
@@ -348,7 +348,7 @@ export default function Home(): ReactElement {
 							/>
 
 							<div className="presentation">
-								<h3>Volunteer</h3>
+								<h3 className="bold">Volunteer</h3>
 								<p>
 									Volunteer and help support meaningful causes you care about.
 								</p>
@@ -369,7 +369,7 @@ export default function Home(): ReactElement {
 				>
 					<h1
 						style={{ textAlign: "center", color: "#4D4D4D" }}
-						className="landing-heading"
+						className="landing-heading bold"
 					>
 						What our volunteering community thinks
 					</h1>

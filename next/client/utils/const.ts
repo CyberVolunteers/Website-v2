@@ -377,6 +377,8 @@ export const categoryNames = [
 	"Education", // 2
 	"Healthcare", // 3
 	"Elderly", // 4
+	"Race & Ethnicity", // 5
+	"International", // 6
 ];
 
 export const personalInfoSectionFields = [

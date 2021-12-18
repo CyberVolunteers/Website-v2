@@ -1,6 +1,11 @@
 @font-face {
-	font-family: PostGrotesk;
+	font-family: PostGroteskMedium;
 	src: url(/PostGrotesk-Medium.woff2);
+}
+
+@font-face {
+	font-family: PostGroteskLight;
+	src: url(/PostGrotesk-Light.woff2);
 }
 
 html,
@@ -8,8 +13,12 @@ body {
 	padding: 0;
 	margin: 0;
 	background-color: #ffffff;
-	font-family: PostGrotesk, Arial, Helvetica, sans-serif;
+	font-family: PostGroteskLight, Arial, Helvetica, sans-serif;
 	letter-spacing: -0.042rem;
+}
+
+.bold {
+	font-family: PostGroteskMedium, Arial, Helvetica, sans-serif;
 }
 
 .w-1000 {

@@ -13,7 +13,8 @@ const StyleSheet = {
 	},
 	SubTitle: {
 		color: "rgb(117, 108, 108)",
-		fontWeight: "400",
+		fontWeight: "bold",
+		fontSize: "1rem",
 		display: "inline-block",
 		height: "40px",
 		marginBottom: "8px",
@@ -44,7 +45,9 @@ const StyleSheet = {
 	Title: {
 		marginBottom: "8px",
 		minHeight: "3rem",
-		letterSpacing: "-0.045rem",
+	},
+	Desc: {
+		fontWeight: "bold",
 	},
 };
 function IndexCard({
@@ -91,7 +94,7 @@ function IndexCard({
 						paddingTop: "1rem",
 					}}
 				>
-					<h3 className="title" style={StyleSheet.Title}>
+					<h3 className="title bold" style={StyleSheet.Title}>
 						{title}
 					</h3>
 					<p className="subtitle" style={StyleSheet.SubTitle}>
@@ -106,7 +109,7 @@ function IndexCard({
 							style={{ width: `${meternow}%`, ...StyleSheet.MeterCome }}
 						></div>
 					</div> */}
-					<p className="description">
+					<p className="description" style={StyleSheet.Desc}>
 						{desc}
 
 						<a href="#" style={{ color: "#F85220" }}>

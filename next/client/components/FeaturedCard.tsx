@@ -36,7 +36,7 @@ function FeaturedCard({
 			</div>
 
 			<div className={`${styles["presentation"]}`}>
-				<h3 className={`${styles["title"]}`}>{title}</h3>
+				<h3 className={`${styles["title"]} bold`}>{title}</h3>
 				<h4 className={`${styles["organisationName"]}`}>{organisationName}</h4>
 
 				<p className={`${styles["description"]}`}>

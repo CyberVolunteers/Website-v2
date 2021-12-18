@@ -5,7 +5,7 @@
 .header_text {
 	position: absolute;
 	color: #fff;
-	font-size: 3rem;
+	font-size: 4rem;
 
 	text-align: center;
 
@@ -15,6 +15,12 @@
 	top: 50%;
 
 	transform: translate(-50%, -50%);
+}
+.partners_logos {
+	display: block;
+	width: 80%;
+	margin: auto;
+	margin-top: 2rem;
 }
 .header_image {
 	width: 100%;
@@ -31,7 +37,7 @@ div.desc_block {
 }
 
 .subsection_header {
-	font-size: 1.5rem;
+	font-size: 2rem;
 	margin-top: 2rem;
 	text-align: center;
 }

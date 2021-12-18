@@ -115,7 +115,7 @@ function SearchListings() {
 			<div className={styles["main-content"]}>
 				{showFilter ? <Filter></Filter> : null}
 				<div className={styles["featured-card-wrapper"]}>
-					<h1 className="w-1000">
+					<h1 className="w-1000 bold">
 						Featured: Volunteering Opportunity in {"<category>"}
 					</h1>
 					<p className="w-1000">TITLE</p>
