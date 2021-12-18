@@ -20,7 +20,7 @@ export const VolunteerCause = () => {
 							{" "}
 							<div className={styles.imageWrapper}>
 								<img
-									className={styles.cause_icon}
+									className="cause_icon"
 									src={`/img/cause${el}.svg`}
 									alt=""
 								/>
@@ -37,7 +37,7 @@ export const VolunteerCause = () => {
 								{" "}
 								<div className={styles.imageWrapper}>
 									<img
-										className={styles.cause_icon}
+										className="cause_icon"
 										src={`/img/cause${i}.svg`}
 										alt=""
 									/>

@@ -1,3 +1,6 @@
+import { faHeart } from "@fortawesome/free-regular-svg-icons";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { style } from "@mui/system";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
 import { ReactElement } from "react";
 
@@ -31,27 +34,29 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 						<div className={styles["info-box"]}>
 							<div className={styles["fixed-f"]}>
 								<div className={styles["icon-b"]}>
-									<div className={`${duplicateStyle("row")} icon-row`}>
+									<div
+										className={`${duplicateStyle("row")} ${styles["icon-row"]}`}
+									>
 										<div className={duplicateStyle("col")}>
 											<a
 												href="#"
 												className={`${styles.link} ${styles.facebook}`}
 											>
-												<i className="fas fa-users"></i>
+												<img src="/img/cause0.svg" className="cause_icon" />
 												<span>Group</span>
 											</a>
 											<a
 												href="#"
 												className={`${styles.link} ${styles.facebook}`}
 											>
-												<i className="fas fa-graduation-cap"></i>
+												<img src="/img/cause1.svg" className="cause_icon" />
 												<span>Graduate</span>
 											</a>
 											<a
 												href="#"
 												className={`${styles.link} ${styles.facebook}`}
 											>
-												<i className="fas fa-leaf"></i>
+												<img src="/img/cause2.svg" className="cause_icon" />
 												<span>Leaf</span>
 											</a>
 										</div>
@@ -60,9 +65,9 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 												href="#"
 												className={`${styles.link} ${styles.facebook} ${styles["user-icon"]}`}
 											>
-												<i className="far fa-heart"></i>
+												<FontAwesomeIcon icon={faHeart} />
+												<span>Save to Favourites</span>
 											</a>
-											<span>Save to Favourites</span>
 										</div>
 									</div>
 									<h5 className={duplicateStyle("h5")}>When</h5>

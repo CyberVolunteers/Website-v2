@@ -168,15 +168,7 @@
 .icon-b .row {
 	margin-bottom: 20px !important;
 }
-.icon-b .col span i {
-	color: white;
-	background-color: #bfb9b9;
-	padding: 6px 5px;
-	margin-right: 3px;
-	height: 30px;
-	width: 30px !important;
-	border-radius: 50%;
-}
+
 .user-icon {
 	color: #ff5a38 !important;
 	background-color: transparent !important;
@@ -231,14 +223,7 @@
 .chbs-main .chbs-form-field textarea {
 	box-shadow: none !important;
 }
-.icon-row a i {
-	font-size: 14px;
-}
-.user-icon i {
-	font-size: 27px !important;
-}
 .icon-row a {
-	background: #c2c2c2;
 	color: #fff;
 	border-radius: 100%;
 	display: inline-block;
@@ -254,8 +239,13 @@
 	-moz-transition: all 0.5s;
 	transition: all 0.5s;
 }
-.facebook:hover {
-	color: #ff5a38 !important;
+.icon-row a:hover {
+	background-color: #ff5a38;
+}
+.icon-row img {
+	position: absolute;
+	top: 0;
+	left: 0;
 }
 .link span {
 	background: #eeeeee;
@@ -270,6 +260,9 @@
 	opacity: 0;
 	-webkit-transition: all 0.4s;
 	transition: all 0.4s;
+
+	/* Make sure that the span does not trigger "hover" of the ancestor elements */
+	pointer-events: none;
 }
 
 .link span:before {
@@ -284,10 +277,8 @@
 	left: 45px;
 }
 .link:hover span {
-	bottom: 50px;
+	bottom: 38px;
 	visibility: visible;
 	opacity: 1;
 	z-index: 999 !important;
 }
-
-/* hover over the icons now to see the tooltips! */

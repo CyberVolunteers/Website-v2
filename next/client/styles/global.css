@@ -99,3 +99,9 @@ select:-webkit-autofill {
 	display: flex;
 	justify-content: center;
 }
+
+.cause_icon {
+	width: 30px;
+	filter: invert(89%) sepia(0%) saturate(1580%) hue-rotate(144deg)
+		brightness(91%) contrast(85%);
+}
