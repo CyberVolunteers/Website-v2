@@ -19,7 +19,11 @@ export const VolunteerCause = () => {
 						<div key={el} className={styles.listItem}>
 							{" "}
 							<div className={styles.imageWrapper}>
-								<img src={`/img/cause${el}.png`} alt="" />
+								<img
+									className={styles.cause_icon}
+									src={`/img/cause${el}.svg`}
+									alt=""
+								/>
 							</div>
 							<p>{categoryNames[el]}</p>
 						</div>
@@ -32,7 +36,11 @@ export const VolunteerCause = () => {
 							<div className={styles.listItem}>
 								{" "}
 								<div className={styles.imageWrapper}>
-									<img src={`/img/cause${i}.png`} alt="" />
+									<img
+										className={styles.cause_icon}
+										src={`/img/cause${i}.svg`}
+										alt=""
+									/>
 								</div>
 								<p>{el}</p>
 							</div>

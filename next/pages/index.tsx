@@ -21,13 +21,14 @@ import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 import { faHandsHelping } from "@fortawesome/free-solid-svg-icons";
 import {
 	CarouselListingData,
-	categoryNames,
+	categoryNames as rawCategoryNames,
 	indexPageListings,
 } from "../client/utils/const";
 
 const MAX_CHAR_NUM_IN_DESC = 100;
 
 export default function Home(): ReactElement {
+	const categoryNamesToShow = rawCategoryNames.slice(0, 5);
 	// if (useIsAfterRehydration()) HandleSliderMovement();
 	const [categoryIndex, setCategoryIndex] = useState(0);
 	const applicableListings = indexPageListings.filter(
@@ -126,10 +127,10 @@ export default function Home(): ReactElement {
 									setFirstVisibleElement={setFirstVisibleCat}
 									firstVisibleElement={firstVisibleCat}
 									firstElementRef={firstCatRef}
-									numberOfElements={categoryNames.length}
+									numberOfElements={categoryNamesToShow.length}
 									setHasReelHitTheEnd={setHasCatReelHitTheEnd}
 								>
-									{categoryNames.map((name, i) => (
+									{categoryNamesToShow.map((name, i) => (
 										<h3
 											className={`${
 												categoryIndex === i ? "active" : ""
@@ -250,8 +251,8 @@ export default function Home(): ReactElement {
 											>
 												<Link href="#">
 													{categoryIndex === 4
-														? `View all listings about ${categoryNames[categoryIndex]}` // Make sure nothing weird happens
-														: `View all ${categoryNames[categoryIndex]} listings`}
+														? `View all listings about ${categoryNamesToShow[categoryIndex]}` // Make sure nothing weird happens
+														: `View all ${categoryNamesToShow[categoryIndex]} listings`}
 												</Link>
 											</div>
 										)}
