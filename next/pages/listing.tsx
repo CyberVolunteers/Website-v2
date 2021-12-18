@@ -1,355 +1,251 @@
-import Image from "next/image";
-import { Button, capitalize, CircularProgress } from "@material-ui/core";
-import { GetServerSideProps, InferGetServerSidePropsType } from "next";
-import React, { useState } from "react";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
 import { ReactElement } from "react";
+
 import Head from "../client/components/Head";
-import { getMongo } from "../server/mongo";
-import { Listing } from "../server/mongo/mongoModels";
-import { toStrippedObject } from "../server/mongo/util";
-import {
-	undoCamelCase,
-	updateOverallErrorsForRequests,
-} from "../client/utils/misc";
-import {
-	useIsAfterRehydration,
-	useViewProtection,
-} from "../client/utils/otherHooks";
-import { updateCsrf } from "../server/csrf";
-import { getSession } from "../server/auth/auth-cookie";
-import { isVerifiedOrg, isVerifiedUser } from "../server/auth/data";
-import { ListingJoinPrompt } from "../client/components/ListingJoinPrompt";
-import { getAccountInfo } from "../client/utils/userState";
-import EditableField from "../client/components/EditableField";
-import { listingFieldNamesToShow } from "../serverAndClient/displayNames";
-import { listings } from "../serverAndClient/publicFieldConstants";
-import { getSignupPerElementValidationCallbacks } from "../client/components/Signup";
-import { flatten } from "combined-validator";
-import { getPresentableName } from "../client/components/FormComponent";
-import { csrfFetch } from "../client/utils/csrf";
+import styles from "../client/styles/listing.module.css";
 
-export default function ListingPage({
-	listing,
-	csrfToken,
-	isOwnerOrg,
-	hasAppliedForListing,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	useViewProtection(["org", "user"]);
-
-	const fieldsToShowOverall = isOwnerOrg
-		? fieldsToShowCommon.concat(fieldsToShowOwnerOnly)
-		: fieldsToShowCommon;
-
-	const isAfterHydration = useIsAfterRehydration();
-
-	const isOrg = getAccountInfo()?.isOrg;
-
-	const [fields, setFields] = useState(listing as { [key: string]: any });
-
-	const [showVolunteerPopup, setShowVolunteerPopup] = useState(false);
-
-	const [isLoading, setIsLoading] = useState(false);
-
-	const [overallErrors, setOverallErrors] = useState(
-		{} as { [key: string]: any }
-	);
-
-	async function sendEditRequest(k: string, v: any) {
-		const data = { uuid: listing.uuid } as { [key: string]: any };
-		data[k] = v;
-		if (v === null) return; // do not submit data with errors
-
-		setIsLoading(true);
-
-		const res = await csrfFetch(csrfToken, "/api/updateListingData", {
-			method: "POST",
-			credentials: "same-origin", // only send cookies for same-origin requests
-			headers: {
-				"content-type": "application/json",
-				accept: "application/json",
-			},
-			body: JSON.stringify(data),
-		});
-
-		if (
-			!(await updateOverallErrorsForRequests(
-				res,
-				"listingUpdateData",
-				overallErrors,
-				setOverallErrors
-			))
-		)
-			return setIsLoading(false);
-
-		setIsLoading(false);
-
-		// set the new value through a copy
-		const fieldsCopy = Object.assign({}, fields);
-		fieldsCopy[k] = v;
-		setFields(fieldsCopy);
-	}
+export default function ListingPage({}: InferGetServerSidePropsType<
+	typeof getServerSideProps
+>): ReactElement {
+	// useViewProtection(["org", "user"]);
 
 	return (
-		<div>
-			<Head title={`${capitalize(listing.title)} - cybervolunteers`} />
-			<h1>{capitalize(listing.title)}</h1>
+		<>
+			{/* TODO: add the title of the listing here  */}
+			<Head title="Listing - cybervolunteers" />
 
-			<div
-				className={"img-container"}
-				style={{
-					width: "100%",
-					height: "250px",
-				}}
-			>
-				<Image
-					src={listing.imagePath}
-					// width={100}
-					// height={100}
-					sizes={"30vw"}
-					layout="fill"
-					objectPosition="center top"
-					objectFit="contain"
-					alt="Listing image"
-				/>
+			<div className={duplicateStyle("container")}>
+				<div className={`${duplicateStyle("row")} reverse`}>
+					<div className={duplicateStyle("col-md-6")}>
+						<h2 className={styles["Opportunity-text"]}>
+							Title of the Opportunity
+						</h2>
+						<h2 className={styles["org-text"]}>Name of Org</h2>
+						<img
+							width="100%"
+							className={styles["player-img"]}
+							src="/img/listing-placeholder-image.jpg"
+						/>
+					</div>
+					<div className={duplicateStyle("col-md-6")}>
+						<div className={styles["info-box"]}>
+							<div className={styles["fixed-f"]}>
+								<div className={styles["icon-b"]}>
+									<div className={`${duplicateStyle("row")} icon-row`}>
+										<div className={duplicateStyle("col")}>
+											<a
+												href="#"
+												className={`${styles.link} ${styles.facebook}`}
+											>
+												<i className="fas fa-users"></i>
+												<span>Group</span>
+											</a>
+											<a
+												href="#"
+												className={`${styles.link} ${styles.facebook}`}
+											>
+												<i className="fas fa-graduation-cap"></i>
+												<span>Graduate</span>
+											</a>
+											<a
+												href="#"
+												className={`${styles.link} ${styles.facebook}`}
+											>
+												<i className="fas fa-leaf"></i>
+												<span>Leaf</span>
+											</a>
+										</div>
+										<div className={duplicateStyle("col")}>
+											<a
+												href="#"
+												className={`${styles.link} ${styles.facebook} ${styles["user-icon"]}`}
+											>
+												<i className="far fa-heart"></i>
+											</a>
+											<span>Save to Favourites</span>
+										</div>
+									</div>
+									<h5 className={duplicateStyle("h5")}>When</h5>
+									<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
+										Mon 22 Nov, 2021 - Tue 23 Nov, 2021
+										<br />
+										09:15 AM - 03:15 PM
+									</p>
+									<h5 className={duplicateStyle("h5")}>Where</h5>
+									<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
+										This opportunity is virtual and has no fixed location
+									</p>
+									<h5 className={duplicateStyle("h5")}>Requirements</h5>
+									<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
+										2-8 hours per week
+										<br />
+										Driving License
+										<br />
+										Criminal Record Check
+									</p>
+									<h5 className={duplicateStyle("h5")}>Good For</h5>
+									<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
+										Kids, Teens, Groups size 6
+									</p>
+									<a href="#" className={`${styles["link"]}`}>
+										<button className={`${styles["Opportunities-button2"]}`}>
+											I want to help
+										</button>
+									</a>
+									<h5 className={duplicateStyle("h52")}>8 places left</h5>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
 			</div>
 
-			{Object.entries(overallErrors).map(([k, v]) => (
-				<h1 key={k}>{v}</h1>
-			))}
+			<div className={`${duplicateStyle("row")} ${styles["gray-bg"]}`}>
+				<div className={duplicateStyle("container")}>
+					<div className={duplicateStyle("row")}>
+						<div className={duplicateStyle("col-md-6")}>
+							<p className={styles.paragraph}>
+								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+								enim ad minim veniam, quis nostrud exercitation ullamco laboris
+								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+								nulla pariatur.
+								<br />
+								<br />
+								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+								enim ad minim veniam, quis nostrud exercitation ullamco laboris
+								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+								nulla pariatur.
+							</p>
+						</div>
+						<div className={duplicateStyle("col-md-6")}></div>
+					</div>
+				</div>
+			</div>
 
-			{fieldsToShowOverall.map((k) => {
-				const v = fields[k];
-				return (
-					<EditableField
-						key={k}
-						name={k}
-						value={translateToString(k, v)}
-						presentableNames={listingFieldNamesToShow}
-						editableFields={flatten(listings)}
-						sendEditRequest={sendEditRequest}
-						perElementValidationCallbacks={getSignupPerElementValidationCallbacks(
-							overallErrors,
-							setOverallErrors
-						)} //TODO: change this
-						isLocked={!isOwnerOrg}
-					></EditableField>
-				);
-			})}
+			<div className={duplicateStyle("container")}>
+				<div className={duplicateStyle("row")}>
+					<div className={duplicateStyle("col-md-6")}>
+						<h2 className={duplicateStyle("Opportunity-text")}>Requirements</h2>
+						<p className={styles.paragraph}>
+							Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+							eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+							enim ad minim veniam, quis nostrud exercitation ullamco laboris
+							nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in
+							reprehenderit in voluptate velit esse cillum dolore eu fugiat
+							nulla pariatur.
+						</p>
+					</div>
+					<div className={duplicateStyle("col-md-6")}></div>
+				</div>
+			</div>
+			<div className={`${duplicateStyle("row")} styles["gray-bg"]`}>
+				<div className={duplicateStyle("container")}>
+					<div className={duplicateStyle("row")}>
+						<div className={duplicateStyle("col-md-6")}>
+							<h2 className={styles["Opportunity-text"]}>
+								When and time Commitments
+							</h2>
+							<p className={styles.paragraph}>
+								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+								enim ad minim veniam, quis nostrud exercitation ullamco laboris
+								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+								nulla pariatur.
+							</p>
+						</div>
+						<div className={duplicateStyle("col-md-6")}></div>
+					</div>
+				</div>
+			</div>
 
-			{/* display on the client */}
-			{!isAfterHydration ? null : (
-				<>
-					{isOrg ? (
-						<>
-							{isOwnerOrg ? null : (
-								<p>
-									We are sorry, but this listing does not belong to your
-									organisation and you can not edit it.
-								</p>
-							)}
-						</>
-					) : (
-						<>
-							{/* It is a user */}
-							{hasAppliedForListing ? (
-								<>
-									<p>You have already applied to this listing!</p>
-								</>
-							) : (
-								<>
-									<Button
-										onClick={() => setShowVolunteerPopup(!showVolunteerPopup)}
-									>
-										<p>want to help</p>
-									</Button>
-
-									{/* The popup shown after the user clicks on "i want to help" button */}
-									{showVolunteerPopup ? (
-										<ListingJoinPrompt
-											csrfToken={csrfToken}
-											listing={listing}
-											overallErrors={overallErrors}
-											setOverallErrors={setOverallErrors}
-										></ListingJoinPrompt>
-									) : null}
-								</>
-							)}
-						</>
-					)}
-				</>
-			)}
-
-			{isLoading ? <CircularProgress /> : null}
-		</div>
+			<div className={duplicateStyle("container")}>
+				<div className={duplicateStyle("row")}>
+					<div className={duplicateStyle("col-md-6")}>
+						<h2 className={styles["Opportunity-text"]}>
+							Where the Opportunity is
+						</h2>
+						<br />
+						<iframe
+							src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18540.207568468537!2d-3.610813671498856!3d54.48894543498361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4863313ff232fc17%3A0xa0cf9a168926150!2sSt%20Bees%2C%20Saint%20Bees%2C%20UK!5e0!3m2!1sen!2s!4v1638394978184!5m2!1sen!2s"
+							width="100%"
+							height="400px"
+							style={{ border: "0" }}
+							allowFullScreen={true}
+							loading="lazy"
+						></iframe>
+						<p className={styles.paragraph}>
+							Cumbr/ia1st St Bees Scout GroupCA27 0DS
+						</p>
+					</div>
+					<div className={duplicateStyle("col-md-6")}></div>
+				</div>
+			</div>
+			<div className={`${duplicateStyle("row")} styles["gray-bg"]`}>
+				<div className={duplicateStyle("container")}>
+					<div className={duplicateStyle("row")}>
+						<div className={duplicateStyle("col-md-6")}>
+							<h2 className={styles["Opportunity-text"]}>About Org</h2>
+							<p className={styles.paragraph}>
+								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+								enim ad minim veniam, quis nostrud exercitation ullamco laboris
+								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+								nulla pariatur.
+								<br />
+								<br />
+								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
+								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
+								enim ad minim veniam, quis nostrud exercitation ullamco laboris
+								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
+								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
+								nulla pariatur.
+							</p>
+							<a href="#" className={styles.link}>
+								<button className={styles["Opportunities-button"]}>
+									More Opportunities from Org
+								</button>
+							</a>
+							<br />
+							<h5>Where they are</h5>
+							<iframe
+								src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18540.207568468537!2d-3.610813671498856!3d54.48894543498361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4863313ff232fc17%3A0xa0cf9a168926150!2sSt%20Bees%2C%20Saint%20Bees%2C%20UK!5e0!3m2!1sen!2s!4v1638394978184!5m2!1sen!2s"
+								width="100%"
+								height="400px"
+								style={{ border: "0" }}
+								allowFullScreen={true}
+								loading="lazy"
+							></iframe>
+							<p className={styles.paragraph}>
+								Cumbr/ia1st St Bees Scout GroupCA27 0DS
+							</p>
+						</div>
+						<div className={duplicateStyle("col-md-6")}></div>
+					</div>
+				</div>
+			</div>
+			<footer className={styles["footer-b"]}>
+				<a href="#" className={styles.link}>
+					<button className={styles["Opportunities-button3"]}>
+						I want to help
+					</button>
+				</a>
+			</footer>
+		</>
 	);
 }
 
-function getTargetAudienceString(targetAudience: { [key: string]: boolean }) {
-	const targetAudienceNameArray = Object.keys(targetAudience).filter(
-		(k) => (targetAudience as any)[k] === true
-	);
-	if (
-		targetAudienceNameArray.length === 0 ||
-		targetAudienceNameArray.length === Object.keys(targetAudience).length
-	)
-		// if anyone or no-one, select everyone
-		return "Anyone";
-	if (targetAudienceNameArray.length === 1)
-		return undoCamelCase(targetAudienceNameArray[0]);
-	// get all but the last one
-	const lastVal = targetAudienceNameArray.pop() as string;
-	return `${targetAudienceNameArray
-		.map(undoCamelCase)
-		.join(", ")} and ${undoCamelCase(lastVal)}`;
+function duplicateStyle(cl: string) {
+	return `${styles[cl]} ${cl}`;
 }
 
-function getLocationString(location: {
-	place: string;
-	street: string;
-	city: string;
-	county: string;
-	isOnline: boolean;
-}) {
-	if (location.isOnline === true) return "online";
-	const { place, street, city, county } = location;
-	return [place, street, city, county].join(", ");
-}
-
-//TODO: capitalize?
-function translateToString(k: string, input: any) {
-	switch (typeof input) {
-		case "string":
-			return input;
-		case "number":
-			return "" + input;
-		case "boolean":
-			return input ? "yes" : "no";
-	}
-
-	switch (k) {
-		case "targetAudience":
-			return getTargetAudienceString(input);
-		case "location":
-			return getLocationString(input);
-		case "requiredData":
-			return input
-				.map((value: any) => getPresentableName(value, listingFieldNamesToShow))
-				.join(", ");
-	}
-
-	return "" + input;
-}
-
-const allowedFields = [
-	"imagePath",
-	"uuid",
-	"currentNumVolunteers",
-	"requestedNumVolunteers",
-	"requiredData",
-	"orgName",
-	"category",
-	"title",
-	"desc",
-	"duration",
-	"time",
-	"skills",
-	"requirements",
-	"targetAudience",
-	"location",
-	"isFlexible",
-	"minHoursPerWeek",
-	"maxHoursPerWeek",
-];
-
-const fieldsToShowCommon = [
-	"currentNumVolunteers",
-	"requestedNumVolunteers",
-	"category",
-	"title",
-	"desc",
-	"duration",
-	"time",
-	"skills",
-	"requirements",
-	"targetAudience",
-	"location",
-	"isFlexible",
-	"minHoursPerWeek",
-	"maxHoursPerWeek",
-];
-
-const fieldsToShowOwnerOnly = ["requiredData"];
-
-export type ListingPageListingData = {
-	imagePath: string;
-	uuid: string;
-	currentNumVolunteers: number;
-	requestedNumVolunteers: number;
-	requiredData: string[];
-	orgName: string;
-	title: string;
-	desc: string;
-	duration: string;
-	time: string;
-	skills: string;
-	requirements: string;
-	targetAudience: {
-		under16: boolean;
-		between16And18: boolean;
-		between18And55: boolean;
-		over55: boolean;
-	};
-	location: {
-		place: string;
-		street: string;
-		city: string;
-		county: string;
-		isOnline: boolean;
-	};
-	isFlexible: boolean;
-	minHoursPerWeek: number;
-	maxHoursPerWeek: number;
-};
-
-export const getServerSideProps: GetServerSideProps<{
-	listing: ListingPageListingData;
-	csrfToken: string;
-	isOwnerOrg: boolean;
-	hasAppliedForListing: boolean;
-}> = async (context) => {
-	const uuid = context.query.uuid;
-	if (typeof uuid !== "string")
-		return {
-			notFound: true,
-			props: {},
-		};
-
-	const session = await getSession(context.req as any);
-
-	await getMongo(); // connect
-	let listing = await Listing.findOne({ uuid }).populate("organisation");
-
-	listing.orgName = listing.organisation.orgName;
-	const isOwnerOrg =
-		isVerifiedOrg(session) && session?._id === listing.organisation._id + ""; // have to convert because the value on the left is an ObjectId
-
-	const hasAppliedForListing =
-		isVerifiedUser(session) &&
-		listing.users.some((v: string) => "" + v === session?._id); // same here
-
-	listing = toStrippedObject(listing);
-
-	// loop through the keys and delete them if they are not needed
-	Object.entries(listing).forEach(([k, v]) => {
-		if (!allowedFields.includes(k)) delete listing[k];
-	});
-
+export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
 	return {
-		props: {
-			listing,
-			csrfToken: await updateCsrf(context),
-			isOwnerOrg,
-			hasAppliedForListing,
-		}, // will be passed to the page component as props
+		props: {}, // will be passed to the page component as props
 	};
 };

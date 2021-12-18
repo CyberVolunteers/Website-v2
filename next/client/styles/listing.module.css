@@ -1,0 +1,293 @@
+.Opportunity-text {
+	color: #ff5a38;
+	font-weight: 500 !important;
+	font-size: 1.7rem !important;
+	text-align: center;
+}
+.org-text {
+	text-align: center;
+	margin-top: 20px;
+	font-size: 1.4rem !important;
+}
+.player-img {
+	border-radius: 20px;
+	margin-top: 20px;
+}
+.gray-bg {
+	background-color: #f5f5f5;
+}
+.row {
+	margin: 35px 0px;
+}
+.paragraph {
+	color: black;
+}
+
+.Opportunities-button {
+	background-color: #ff5a38 !important;
+	width: 300px;
+	padding: 12px 0px;
+	text-align: center;
+	border-style: none;
+	border-radius: 15px;
+	color: white;
+	margin: auto;
+	cursor: pointer;
+	display: block;
+	margin-top: 40px;
+}
+.Opportunities-button3 {
+	background-color: #ff5a38 !important;
+	width: 300px !important;
+	padding: 12px 0px;
+	text-align: center;
+	border-style: none;
+	border-radius: 15px;
+	color: white;
+	margin: auto;
+	cursor: pointer;
+	display: block;
+}
+.Opportunities-button2:hover {
+	background-color: #f75231 !important;
+}
+.Opportunities-button3:hover {
+	background-color: #f75231 !important;
+}
+.Opportunities-button:hover {
+	background-color: #f75231 !important;
+}
+.Opportunities-button2 {
+	background-color: #ff5a38 !important;
+	width: 100% !important;
+	padding: 12px 0px;
+	text-align: center;
+	border-style: none;
+	border-radius: 15px;
+	color: white;
+	margin: auto;
+	cursor: pointer;
+	display: block;
+	margin-top: 40px;
+}
+.link {
+	text-decoration: none !important;
+	cursor: pointer;
+}
+.info-box {
+	width: 350px;
+	margin: auto;
+}
+.fixed-f {
+	margin: 30px 0px;
+	width: 350px;
+	padding: 10px 0px;
+	background-color: white;
+	box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+	transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+	border-radius: 10px;
+}
+@media (min-width: 769px) {
+	.fixed-f {
+		padding: 0px !important;
+		background-color: white;
+		box-shadow: 0px 0px 5px 5px rgba(0, 0, 0, 0.1),
+			0px 0px 5px 5px rgba(0, 0, 0, 0.01);
+		transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+		position: fixed;
+		border-radius: 10px;
+	}
+	.footer-b {
+		display: none !important;
+	}
+}
+@media (max-width: 768px) {
+	.row {
+		display: block !important;
+		margin: 0px !important;
+	}
+	.container {
+		padding: 0px !important;
+	}
+
+	.Opportunities-button {
+		width: 100% !important;
+	}
+	.Opportunities-button2 {
+		width: 100% !important;
+		display: none !important;
+	}
+	.Opportunities-button3 {
+		width: 100% !important;
+	}
+	.footer-b {
+		padding: 20px !important;
+	}
+	.col-md-6 {
+		max-width: 100% !important;
+	}
+	.info-box {
+		width: 100% !important;
+	}
+	.fixed-f {
+		width: 100% !important;
+	}
+	.row {
+		padding: 15px 5px !important;
+	}
+	.icon-row {
+		padding: 0px !important;
+		margin: 35px 0px !important;
+	}
+	.col {
+		padding: 0px !important;
+	}
+	.user-icon {
+		margin-top: -35px !important;
+	}
+}
+.user-icon {
+	float: right !important;
+	margin-top: -7px;
+}
+.icon-b {
+	margin: 0px 15px !important;
+	margin-top: -20px !important;
+}
+.h5 {
+	color: #ff5a38 !important;
+	font-weight: 400 !important;
+	font-size: 18px !important;
+}
+.h52 {
+	color: #ff5a38 !important;
+	font-weight: 400 !important;
+	font-size: 14px !important;
+	padding-top: 10px !important;
+}
+.icon-b .row {
+	margin-bottom: 20px !important;
+}
+.icon-b .col span i {
+	color: white;
+	background-color: #bfb9b9;
+	padding: 6px 5px;
+	margin-right: 3px;
+	height: 30px;
+	width: 30px !important;
+	border-radius: 50%;
+}
+.user-icon {
+	color: #ff5a38 !important;
+	background-color: transparent !important;
+	font-size: 25px;
+}
+.footer-b {
+	position: fixed;
+	bottom: 0;
+	background-color: white;
+	border-top: 1px solid lightgray;
+	padding: 20px 0px 20px 0px;
+	width: 100%;
+}
+.mon-text {
+	line-height: 23px;
+	font-size: 13px;
+	margin: 15px 0px;
+	margin-top: -5px !important;
+	padding: 0px !important;
+}
+
+.page-id-3584 .chbs-main .chbs-form-field {
+	padding: 23px 0px !important;
+}
+.page-id-3584 .chbs-button {
+	border-radius: 10px !important;
+}
+.page-id-3584 .chbs-vehicle-content-price {
+	float: left !important;
+}
+.chbs-main
+	.chbs-main-content-navigation-button
+	.chbs-button.chbs-button-step-prev {
+	border-radius: 10px !important;
+}
+@media only screen and (max-width: 900px) {
+	.page-id-3584 .chbs-button {
+		padding: 14px 32px !important;
+	}
+}
+.page-id-3584 .chbs-main .chbs-summary .chbs-summary-header > h4 {
+	text-align: left !important;
+}
+.page-id-3584 .chbs-main .chbs-summary .chbs-summary-field {
+	text-align: left !important;
+}
+.page-id-3584 .chbs-main .chbs-form-label-group {
+	text-align: left !important;
+}
+.page-id-3584 .chbs-main .chbs-form-field input,
+.chbs-main .chbs-form-field select,
+.chbs-main .chbs-form-field textarea {
+	box-shadow: none !important;
+}
+.icon-row a i {
+	font-size: 14px;
+}
+.user-icon i {
+	font-size: 27px !important;
+}
+.icon-row a {
+	background: #c2c2c2;
+	color: #fff;
+	border-radius: 100%;
+	display: inline-block;
+	text-align: center;
+	text-decoration: none;
+	position: relative;
+	width: 30px;
+	height: 30px;
+	margin-left: 2px;
+	margin-right: 2px;
+	padding-top: 2px;
+	-webkit-transition: all 0.5s;
+	-moz-transition: all 0.5s;
+	transition: all 0.5s;
+}
+.facebook:hover {
+	color: #ff5a38 !important;
+}
+.link span {
+	background: #eeeeee;
+	color: gray;
+	font-size: 10.5px;
+	position: absolute;
+	bottom: 0;
+	left: -35px;
+	right: -35px;
+	padding: 5px 7px;
+	visibility: hidden;
+	opacity: 0;
+	-webkit-transition: all 0.4s;
+	transition: all 0.4s;
+}
+
+.link span:before {
+	content: "";
+	width: 0;
+	height: 0;
+	border-left: 7px solid transparent;
+	border-right: 7px solid transparent;
+	border-top: 7px solid #eeeeee;
+	position: absolute;
+	bottom: -7px;
+	left: 45px;
+}
+.link:hover span {
+	bottom: 50px;
+	visibility: visible;
+	opacity: 1;
+	z-index: 999 !important;
+}
+
+/* hover over the icons now to see the tooltips! */
