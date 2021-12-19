@@ -4,12 +4,6 @@ import isURL from "validator/lib/isURL";
 
 export type ValidationMap = { [key: string]: (v: string) => boolean };
 
-export const signupValidation: ValidationMap = {
-	email: isEmail,
-	phoneNumber: isMobilePhone,
-	websiteUrl: isURL,
-};
-
 /**
  * Checks that all keys that are both in the object and the validation map obey the rules of the validation map
  * @param vals an input object (not all keys have to be in the validation map)

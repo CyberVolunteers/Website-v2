@@ -55,12 +55,19 @@ export default function UserSignup({
 	const [isFirstPageDataValid, setIsFirstPageDataValid] = useState(false);
 	const [isSecondPageDataValid, setIsSecondPageDataValid] = useState(false);
 
+	const [requestErrorMessage, setRequestErrorMessage] = useState("");
+
 	const [pageNum, setPageNum] = useState(0);
 
 	async function handleMovingToNextPage() {
 		if (!isFirstPageDataValid) return;
-		if (pageNum === 0) return setPageNum(1);
+		if (pageNum === 0) {
+			setRequestErrorMessage("");
+			return setPageNum(1);
+		}
 		if (!isSecondPageDataValid) return;
+
+		setRequestErrorMessage("");
 
 		const dayNum = parseInt(secondPageData.day);
 		const yearNum = parseInt(secondPageData.year);
@@ -71,13 +78,15 @@ export default function UserSignup({
 		const birthDate = new Date(yearNum, monthNum, dayNum);
 
 		const userData = {
-			birthDate: birthDate.toISOString(),
 			firstName: firstPageData.firstName,
 			lastName: firstPageData.lastName,
 			email: firstPageData.email,
 			password: firstPageData.password,
 			address1: secondPageData.addressLine1,
+			address2: secondPageData.addressLine2,
+			city: secondPageData.city,
 			postcode: secondPageData.postcode.replaceAll(/[^0-9a-zA-Z]/g, ""),
+			birthDate: birthDate.toISOString(),
 		};
 
 		const res = await csrfFetch(csrfToken, `/api/signupUser`, {
@@ -89,7 +98,7 @@ export default function UserSignup({
 			},
 			body: JSON.stringify(userData),
 		});
-		// TODO: show an error
+		if (res.status >= 400) setRequestErrorMessage(`Error: ${await res.text()}`);
 	}
 
 	return (
@@ -125,6 +134,7 @@ export default function UserSignup({
 									isFirstPageDataValid,
 									setIsFirstPageDataValid,
 									handleMovingToNextPage,
+									setRequestErrorMessage,
 								}}
 							/>
 						) : (
@@ -133,9 +143,18 @@ export default function UserSignup({
 									isSecondPageDataValid,
 									setSecondPageData,
 									setIsSecondPageDataValid,
+									setRequestErrorMessage,
 								}}
 							/>
 						)}
+						<span
+							className="helping-text email-helper"
+							style={{
+								marginBottom: requestErrorMessage === "" ? "0px" : "20px",
+							}}
+						>
+							{requestErrorMessage}
+						</span>
 					</CustomForm>
 				</div>
 			</div>
@@ -148,11 +167,13 @@ function AddressMenu({
 	setPostcode,
 	setAddressLine1,
 	setCity,
+	setRequestErrorMessage,
 }: {
 	setIsSimpleAddressInputShown: React.Dispatch<React.SetStateAction<boolean>>;
 	setPostcode: React.Dispatch<React.SetStateAction<string>>;
 	setAddressLine1: React.Dispatch<React.SetStateAction<string>>;
 	setCity: React.Dispatch<React.SetStateAction<string>>;
+	setRequestErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	const [addressStageNum, setAddressStageNum] = useState(0);
 
@@ -184,22 +205,38 @@ function AddressMenu({
 		await wait(minSearchCooldownMillis);
 		// if there have been no more requests, proceed
 		if (window.lastAddressSuggestionsUpdatorId !== thisUpdatorId) return;
-		const results: {
-			description: string;
-			place_id: string;
-			structured_formatting: {
-				secondary_text: string;
-			};
-		}[] = await getPlaceIdentifierSuggestions(rawAddress);
 
-		const newSuggestions = results.map((el) => ({
-			postcode: "",
-			address: el.description,
-			city: el.structured_formatting.secondary_text,
-			place_id: el.place_id,
-		}));
+		try {
+			const results: {
+				description: string;
+				place_id: string;
+				structured_formatting: {
+					secondary_text: string;
+				};
+			}[] = await getPlaceIdentifierSuggestions(rawAddress);
 
-		setAddressSuggestions(newSuggestions);
+			console.log(results);
+
+			const newSuggestions = results.map((el) => {
+				const descriptionParts = el.description.split(",");
+				console.log(descriptionParts);
+				return {
+					postcode: "",
+					address: el.description,
+					city: (
+						descriptionParts[descriptionParts.length - 2] ??
+						el.structured_formatting.secondary_text
+					).trim(),
+					place_id: el.place_id,
+				};
+			});
+
+			setAddressSuggestions(newSuggestions);
+		} catch {
+			setRequestErrorMessage(
+				"Something went wrong when getting address suggestions. Please enter them manually."
+			);
+		}
 	}
 
 	const showAddressSuggestions = rawAddress.length > 0;
@@ -348,6 +385,10 @@ function AddressMenu({
 															place_id: suggestion.place_id,
 														}),
 													});
+													if (res.status >= 400)
+														setRequestErrorMessage(
+															"Something went wrong when getting a postcode. Please enter it manually."
+														);
 													const newPostcode = (await res.json()).results ?? "";
 													setPostcode(newPostcode);
 												})();
@@ -431,6 +472,7 @@ function FirstPage({
 	firstPageData,
 	setFirstPageData,
 	setIsFirstPageDataValid,
+	setRequestErrorMessage,
 	isFirstPageDataValid,
 }: {
 	handleMovingToNextPage: () => void;
@@ -451,6 +493,8 @@ function FirstPage({
 		email: string;
 	};
 	setIsFirstPageDataValid: React.Dispatch<React.SetStateAction<boolean>>;
+	setRequestErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+
 	isFirstPageDataValid: boolean;
 }) {
 	const [firstName, setFirstName] = useState("");
@@ -599,6 +643,14 @@ function FirstPage({
 									},
 								}
 							);
+							console.log(res);
+
+							// TODO: proper logging in this and similar situations
+
+							if (res.status >= 400)
+								setRequestErrorMessage(
+									"Something went wrong when checking if the email is already used."
+								);
 
 							if ((await res.json()) !== true)
 								return setEmailErrorMessage("This email is already used");
@@ -766,6 +818,7 @@ function SecondPage({
 	isSecondPageDataValid,
 	setSecondPageData,
 	setIsSecondPageDataValid,
+	setRequestErrorMessage,
 }: {
 	isSecondPageDataValid: boolean;
 	setIsSecondPageDataValid: React.Dispatch<React.SetStateAction<boolean>>;
@@ -781,6 +834,7 @@ function SecondPage({
 			hasUserAcceptedPolicies: boolean;
 		}>
 	>;
+	setRequestErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 }) {
 	const [addressLine1, setAddressLine1] = useState("");
 	const [addressLine2, setAddressLine2] = useState("");
@@ -868,6 +922,7 @@ function SecondPage({
 								setPostcode,
 								setIsSimpleAddressInputShown,
 								setCity,
+								setRequestErrorMessage,
 							}}
 						/>
 						<div
@@ -1180,49 +1235,17 @@ function TermsOfServiceNote({
 async function getPlaceIdentifierSuggestions(
 	placeIdentifierFragment: string
 ): Promise<[]> {
-	// // treating it as a postcode:
-	// placeIdentifierFragment = placeIdentifierFragment.toUpperCase().replaceAll(/[\W_]/g, "");
-	// // if too long, truncate
-	// if (placeIdentifierFragment.length > 7)
-	// 	placeIdentifierFragment = placeIdentifierFragment.substr(0, 7);
-	// // pre-fill a full postcode
-	// let postcodesToCheck = [placeIdentifierFragment];
-	// // if the length is 7, it has to be complete
-	// if (placeIdentifierFragment.length < 7) {
-	// 	const res = await fetch(
-	// 		`https://api.postcodes.io/postcodes/${placeIdentifierFragment}/autocomplete`
-	// 	);
-	// 	if (res.status !== 200) return null; //TODO: show an error
-	// 	const parsedRes = await res.json();
-	// 	if (parsedRes.result === null) return [];
-	// 	postcodesToCheck = parsedRes.result;
-	// }
-
-	// if (postcodesToCheck.length > 10) {
-	// 	postcodesToCheck = postcodesToCheck.slice(0, 10);
-	// }
-
-	// // get more information on those postcodes
-	// const res = await (
-	// 	await fetch(`/api/bulkGetPostcodeInfo`, {
-	// 		method: "POST",
-	// 		body: JSON.stringify({
-	// 			query: postcodesToCheck,
-	// 		}),
-	// 	})
-	// ).json();
-
 	// get more information on those postcodes
-	const res = await (
-		await fetch(`/api/getAddressInfo`, {
-			method: "POST",
-			body: JSON.stringify({
-				query: placeIdentifierFragment,
-			}),
-		})
-	).json();
+	const res = await fetch(`/api/getAddressSuggestions`, {
+		method: "POST",
+		body: JSON.stringify({
+			query: placeIdentifierFragment,
+		}),
+	});
 
-	return res.results;
+	if (res.status >= 400) throw new Error();
+
+	return (await res.json()).results;
 }
 
 function generateErrorResetter(

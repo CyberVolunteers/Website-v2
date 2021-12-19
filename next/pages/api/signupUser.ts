@@ -1,18 +1,20 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { login, signupUser } from "../../server/auth/data";
+import { isResult, login, signupUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { users } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { stringify } from "ajv";
-import { doAllRulesApply, signupValidation } from "../../server/validation";
+import { doAllRulesApply } from "../../server/validation";
 import {
 	clearServersideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
 import { schemaHasRules } from "ajv/dist/compile/util";
+import isEmail from "validator/lib/isEmail";
+import { postcodeRE } from "../../client/utils/const";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -22,24 +24,73 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		console.log(req.body);
+		let {
+			firstName,
+			lastName,
+			email,
+			password,
+			address1,
+			address2,
+			postcode,
+			city,
+			birthDate: birthDateString,
+		} = req.body as {
+			firstName: string;
+			lastName: string;
+			email: string;
+			password: string;
+			address1: string;
+			postcode: string;
+			city: string;
+			birthDate: string;
+			address2?: string;
+		};
+		const birthDate = new Date(birthDateString);
+		postcode = postcode.toUpperCase();
+		// NOTE: does not check the location
 
-		if (!doAllRulesApply(req.body, signupValidation))
+		// Fields:
+		/* 
+		firstName
+		lastName
+		Email
+		Password
+		address1
+		address2?
+
+		postcode
+		town
+		Date
+		
+		 */
+		if (
+			[firstName, lastName, email, password, address1, postcode, city].includes(
+				""
+			)
+		)
 			return res
 				.status(400)
-				.send(
-					"This data does not seem correct. Could you please double-check it?"
-				);
+				.send("Some data is missing. Could you please double-check it?");
+
+		if (!postcodeRE.test(postcode))
+			return res
+				.status(400)
+				.send("The postcode seems wrong. Could you please double-check it?");
+
+		if (!isEmail(email))
+			return res
+				.status(400)
+				.send("The email seems wrong. Could you please double-check it?");
 
 		const signupResult = await signupUser(req.body);
 
-		if (signupResult === false) {
+		if (isResult(signupResult)) {
 			logger.info("server.signupUser:Signup failed");
 			return res
 				.status(400)
-				.send(
-					"This did not seem to work. Can you please double-check that this email is not used?"
-				);
+				.send(`This did not seem to work: ${signupResult}.`);
+		} else {
+			console.log(signupResult.result);
 		}
 
 		// log in the poor soul
@@ -62,11 +113,30 @@ export default async function signUp(
 		},
 		{
 			POST: ajv.compileParser(
-				(() => {
-					const schema = createAjvJTDSchema(users);
-					console.log(schema);
-					return schema;
-				})()
+				createAjvJTDSchema({
+					required: {
+						string: {
+							firstName: { maxLength: 30 },
+							lastName: { maxLength: 30 },
+							email: { maxLength: 320, client_specialEdit: true },
+							password: { client_specialEdit: true },
+							address1: { maxLength: 100 },
+							postcode: { maxLength: 8 },
+
+							city: { maxLength: 85 },
+							// assuming it is UK for now
+							// country: { maxLength: 56 },
+						},
+						date: {
+							birthDate: {},
+						},
+					},
+					optional: {
+						string: {
+							address2: { maxLength: 100 },
+						},
+					},
+				})
 			),
 		}
 	)(req, res);

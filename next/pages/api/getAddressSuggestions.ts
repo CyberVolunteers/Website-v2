@@ -38,7 +38,7 @@ const handlers: HandlerCollection = {
 	},
 };
 
-export default async function getAddressInfo(
+export default async function getAddressSuggestions(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {

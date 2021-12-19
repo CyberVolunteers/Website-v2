@@ -121,12 +121,39 @@ export function extractData(data: any, email: string | null) {
 	return data;
 }
 
+export type SignupResult<T> =
+	| {
+			errorMessage: string;
+	  }
+	| { result: T };
+
+export function isResult<T>(
+	res: SignupResult<T>
+): res is { errorMessage: string } {
+	return "errorMessage" in res;
+}
+
+export type User = {
+	adminLevel: number;
+	isEmailVerified: boolean;
+	firstName: string;
+	lastName: string;
+	email: string;
+	address1: string;
+	address2?: string;
+	city: string;
+	postcode: string;
+	birthDate: Date;
+	passwordHash: string;
+};
+
 /**
  * Creates an account for the user and returns its data
  * @param _params data for the new user
- * @returns
  */
-export async function signupUser(_params: { [key: string]: any }) {
+export async function signupUser(_params: {
+	[key: string]: any;
+}): Promise<SignupResult<User>> {
 	// make a copy
 	const params = Object.assign({}, _params);
 	const passwordHash = await hash(params.password);
@@ -137,11 +164,13 @@ export async function signupUser(_params: { [key: string]: any }) {
 	if ((await isEmailFree(params.email)) === false) {
 		logger.info("server.auth.session:Email used for user");
 
-		return false;
+		return { errorMessage: "This email is already used." };
 	}
 
 	const user = await newUser.save();
-	return extractData(user, null);
+	return {
+		result: extractData(user, null),
+	};
 }
 
 /**

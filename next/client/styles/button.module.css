@@ -5,13 +5,15 @@
 	border: none;
 	outline: none;
 	cursor: pointer;
-	border: 1px solid #fa562b;
 	border-radius: 2px;
 	border-bottom-width: 2px !important;
 	font-size: 17px;
 	padding-left: 1rem;
 	padding-right: 1rem;
 	transition: 0.3s ease all;
+}
+.button:not(.disabled) {
+	border: 1px solid #fa562b;
 }
 .button:hover {
 	background-color: #e9552f;

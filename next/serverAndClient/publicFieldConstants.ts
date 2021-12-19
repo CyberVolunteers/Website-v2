@@ -18,7 +18,7 @@ export const users: FieldConstraintsCollection = {
 			address1: { maxLength: 100 },
 			postcode: { maxLength: 8 },
 
-			// city: { maxLength: 85 },
+			city: { maxLength: 85 },
 			// assuming it is UK for now
 			// country: { maxLength: 56 },
 		},
