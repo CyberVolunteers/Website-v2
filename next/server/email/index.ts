@@ -4,6 +4,8 @@ import { protocolAndHost } from "../../serverAndClient/staticDetails";
 import { sendEmail } from "./nodemailer";
 import { addTempKey, RedisUUIDStores } from "./redis";
 
+// https://www.geeksforgeeks.org/email-template-using-html-and-css/
+
 /**
  * Inserts a uuid into the email template and sends it to an email address, remembering the uuid
  * @param email the email address to send the email to
@@ -28,7 +30,6 @@ export async function sendEmailWithUUID(
 	});
 	await addTempKey(email, uuid, store);
 }
-
 
 export async function sendEmailConfirmationEmail(email: string) {
 	await sendEmailWithUUID(

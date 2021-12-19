@@ -62,7 +62,6 @@ export const SkillsAndInterests = () => {
 						cols={30}
 						rows={10}
 						onChange={(e) => {
-							console.log(e.target.value);
 							if (e.target.value != "") {
 								setTextAreaActive(true);
 							} else {

@@ -13,24 +13,24 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import CustomForm from "../client/components/CustomForm";
-import CustomButton from "../client/components/Button";
+import Button from "../client/components/Button";
 
 import { csrfFetch } from "../client/utils/csrf";
 import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
-import { months } from "../client/utils/const";
+import { months, postcodeRE } from "../client/utils/const";
 import Image from "next/image";
 import { isEmailFree } from "../server/auth/data";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
+import { useRouter } from "next/router";
 
 const minSearchCooldownMillis = 700;
-
-const postcodeRegex =
-	/^[a-zA-Z]{1,2}([0-9]{1,2}|[0-9][a-zA-Z])\s*[0-9][a-zA-Z]{2}$/;
 
 export default function UserSignup({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const router = useRouter();
+
 	const [firstPageData, setFirstPageData] = useState(
 		{} as {
 			firstName: string;
@@ -98,7 +98,9 @@ export default function UserSignup({
 			},
 			body: JSON.stringify(userData),
 		});
-		if (res.status >= 400) setRequestErrorMessage(`Error: ${await res.text()}`);
+		if (res.status >= 400)
+			return setRequestErrorMessage(`Error: ${await res.text()}`);
+		router.push("/welcome");
 	}
 
 	return (
@@ -215,11 +217,8 @@ function AddressMenu({
 				};
 			}[] = await getPlaceIdentifierSuggestions(rawAddress);
 
-			console.log(results);
-
 			const newSuggestions = results.map((el) => {
 				const descriptionParts = el.description.split(",");
-				console.log(descriptionParts);
 				return {
 					postcode: "",
 					address: el.description,
@@ -233,7 +232,7 @@ function AddressMenu({
 
 			setAddressSuggestions(newSuggestions);
 		} catch {
-			setRequestErrorMessage(
+			return setRequestErrorMessage(
 				"Something went wrong when getting address suggestions. Please enter them manually."
 			);
 		}
@@ -386,7 +385,7 @@ function AddressMenu({
 														}),
 													});
 													if (res.status >= 400)
-														setRequestErrorMessage(
+														return setRequestErrorMessage(
 															"Something went wrong when getting a postcode. Please enter it manually."
 														);
 													const newPostcode = (await res.json()).results ?? "";
@@ -454,7 +453,7 @@ function AddressMenu({
 										cursor: "pointer",
 									}}
 									// Because onClick does not fire for a couple milliseconds and the element gets deleted
-									onMouseDown={() => setIsSimpleAddressInputShown(true)}
+									onMouseDown={() => setIsSimpleAddressInputShown(false)}
 								>
 									Enter address manually
 								</span>
@@ -643,16 +642,17 @@ function FirstPage({
 									},
 								}
 							);
-							console.log(res);
 
 							// TODO: proper logging in this and similar situations
 
 							if (res.status >= 400)
-								setRequestErrorMessage(
+								return setRequestErrorMessage(
 									"Something went wrong when checking if the email is already used."
 								);
 
-							if ((await res.json()) !== true)
+							const isUsed = (await res.json()) !== true;
+
+							if (isUsed)
 								return setEmailErrorMessage("This email is already used");
 						})();
 					}}
@@ -878,7 +878,7 @@ function SecondPage({
 				hasUserAcceptedPolicies &&
 				dayErrorMessage === "" &&
 				yearErrorMessage === "" &&
-				postcodeRegex.test(postcode)
+				postcodeRE.test(postcode)
 		);
 	}, [
 		...allFieldVals,
@@ -1009,7 +1009,7 @@ function SecondPage({
 												visitedFields,
 												setVisitedFields
 											);
-											if (!postcodeRegex.test(e.target.value))
+											if (!postcodeRE.test(e.target.value))
 												setPostcodeErrorMessage(
 													"Please enter a valid postcode"
 												);
@@ -1165,9 +1165,9 @@ function SecondPage({
 				{...{ hasUserAcceptedPolicies, setHasUserAcceptedPolicies }}
 			/>
 
-			<CustomButton disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
+			<Button disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
 				CREATE ACCOUNT
-			</CustomButton>
+			</Button>
 		</>
 	);
 }

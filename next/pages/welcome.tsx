@@ -13,7 +13,7 @@ function Welcome({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	// TODO: fix the bug with viewProtection not detecting the correct user type (e.g. after a failed login)
 	// TODO: fix flashing on viewProtection redirect
-	useViewProtection(["unverified_org", "unverified_user"]);
+	// useViewProtection(["unverified_org", "unverified_user"]);
 	return (
 		<div>
 			<Head title="Welcome - cybervolunteers" />
@@ -26,9 +26,9 @@ function Welcome({
 					{/*TODO: test if this works*/}. Please verify your email to be able to
 					sign up for volunteering opportunities.
 				</p>
-				{/* <Button href="/myAccount" style={{ width: 220 }}>
+				<Button href="/myAccount" style={{ width: 220 }}>
 					GO TO MY ACCOUNT
-				</Button> */}
+				</Button>
 			</div>
 		</div>
 	);

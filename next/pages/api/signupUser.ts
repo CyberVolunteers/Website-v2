@@ -15,6 +15,7 @@ import {
 import { schemaHasRules } from "ajv/dist/compile/util";
 import isEmail from "validator/lib/isEmail";
 import { postcodeRE } from "../../client/utils/const";
+import { sendEmailConfirmationEmail } from "../../server/email";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -89,9 +90,10 @@ const handlers: HandlerCollection = {
 			return res
 				.status(400)
 				.send(`This did not seem to work: ${signupResult}.`);
-		} else {
-			console.log(signupResult.result);
 		}
+
+		// send an email verification link
+		await sendEmailConfirmationEmail(email);
 
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist
