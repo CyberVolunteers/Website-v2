@@ -22,27 +22,32 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 
 			<div className={styles.page_container}>
 				<div className={styles.content}>
-					<div className={duplicateStyle("container")}>
-						<div className={`${duplicateStyle("row")} reverse`}>
-							<h2 className={styles["Opportunity-text"]}>
+					<div className={styles.container}>
+						<div className={styles.row}>
+							<h2
+								className={styles["Opportunity-text"]}
+								style={{ fontWeight: "bold !important" }}
+							>
 								Title of the Opportunity
 							</h2>
-							<h2 className={styles["org-text"]}>Name of Org</h2>
+							<h2
+								className={styles["org-text"]}
+								style={{ fontWeight: "bold !important" }}
+							>
+								Name of Org
+							</h2>
 							<img
 								width="100%"
 								className={styles["player-img"]}
 								src="/img/listing-placeholder-image.jpg"
 							/>
-							{/* <div className={duplicateStyle("col-md-6")}>
-						<InfoBox />
-					</div> */}
 						</div>
 						{isSmallScreenVersion ? <InfoBox /> : null}
 					</div>
 
-					<div className={`${duplicateStyle("row")} ${styles["gray-bg"]}`}>
-						<div className={duplicateStyle("container")}>
-							<div className={duplicateStyle("row")}>
+					<div className={styles.row}>
+						<div className={styles.container}>
+							<div className={styles.row}>
 								<p className={styles.paragraph}>
 									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
 									do eiusmod tempor incididunt ut labore et dolore magna aliqua.
@@ -61,11 +66,15 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 								</p>
 							</div>
 						</div>
+						<div className={styles.gray_bg}></div>
 					</div>
 
-					<div className={duplicateStyle("container")}>
-						<div className={duplicateStyle("row")}>
-							<h2 className={duplicateStyle("Opportunity-text")}>
+					<div className={styles.container}>
+						<div className={styles.row}>
+							<h2
+								className={styles["Opportunity-text"]}
+								style={{ fontWeight: "bold !important" }}
+							>
 								Requirements
 							</h2>
 							<p className={styles.paragraph}>
@@ -78,10 +87,13 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 							</p>
 						</div>
 					</div>
-					<div className={`${duplicateStyle("row")} styles["gray-bg"]`}>
-						<div className={duplicateStyle("container")}>
-							<div className={duplicateStyle("row")}>
-								<h2 className={styles["Opportunity-text"]}>
+					<div className={styles.row}>
+						<div className={styles.container}>
+							<div className={styles.row}>
+								<h2
+									className={styles["Opportunity-text"]}
+									style={{ fontWeight: "bold !important" }}
+								>
 									When and time Commitments
 								</h2>
 								<p className={styles.paragraph}>
@@ -94,10 +106,11 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 								</p>
 							</div>
 						</div>
+						<div className={styles.gray_bg}></div>
 					</div>
 
-					<div className={duplicateStyle("container")}>
-						<div className={duplicateStyle("row")}>
+					{/* <div className={styles.container}>
+						<div className={styles.row}>
 							<h2 className={styles["Opportunity-text"]}>
 								Where the Opportunity is
 							</h2>
@@ -114,12 +127,17 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 								Cumbr/ia1st St Bees Scout GroupCA27 0DS
 							</p>
 						</div>
-					</div>
-					<div className={`${duplicateStyle("row")} styles["gray-bg"]`}>
-						<div className={duplicateStyle("container")}>
-							<div className={duplicateStyle("row")}>
+					</div> */}
+					<div className={styles.row}>
+						<div className={styles.container}>
+							<div className={styles.row}>
 								<div>
-									<h2 className={styles["Opportunity-text"]}>About Org</h2>
+									<h2
+										className={styles["Opportunity-text"]}
+										style={{ fontWeight: "bold !important" }}
+									>
+										About Org
+									</h2>
 									<p className={styles.paragraph}>
 										Lorem ipsum dolor sit amet, consectetur adipisicing elit,
 										sed do eiusmod tempor incididunt ut labore et dolore magna
@@ -143,7 +161,7 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 									</a>
 								</div>
 								<br />
-								<div className="w-100">
+								{/* <div className="w-100">
 									<h5>Where they are</h5>
 									<iframe
 										src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d18540.207568468537!2d-3.610813671498856!3d54.48894543498361!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4863313ff232fc17%3A0xa0cf9a168926150!2sSt%20Bees%2C%20Saint%20Bees%2C%20UK!5e0!3m2!1sen!2s!4v1638394978184!5m2!1sen!2s"
@@ -156,7 +174,7 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 									<p className={styles.paragraph}>
 										Cumbr/ia1st St Bees Scout GroupCA27 0DS
 									</p>
-								</div>
+								</div> */}
 							</div>
 						</div>
 					</div>
@@ -179,22 +197,31 @@ function InfoBox() {
 		<div className={styles["info-box"]}>
 			<div className={styles["fixed-f"]}>
 				<div className={styles["icon-b"]}>
-					<div className={`${duplicateStyle("row")} ${styles["icon-row"]}`}>
-						<div className={duplicateStyle("col")}>
+					<div className={`${styles.row} ${styles["icon-row"]}`}>
+						<div className={styles.col}>
 							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img src="/img/cause0.svg" className="cause_icon" />
+								<img
+									src="/img/cause0.svg"
+									className={duplicateStyle("cause_icon")}
+								/>
 								<span>Group</span>
 							</a>
 							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img src="/img/cause1.svg" className="cause_icon" />
+								<img
+									src="/img/cause1.svg"
+									className={duplicateStyle("cause_icon")}
+								/>
 								<span>Graduate</span>
 							</a>
 							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img src="/img/cause2.svg" className="cause_icon" />
+								<img
+									src="/img/cause2.svg"
+									className={duplicateStyle("cause_icon")}
+								/>
 								<span>Leaf</span>
 							</a>
 						</div>
-						<div className={duplicateStyle("col")}>
+						<div className={styles.col}>
 							<a
 								href="#"
 								className={`${styles.link} ${styles.facebook} ${styles["user-icon"]}`}
@@ -204,17 +231,17 @@ function InfoBox() {
 							</a>
 						</div>
 					</div>
-					<h5 className={duplicateStyle("h5")}>When</h5>
+					<h5 className={styles.h5}>When</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						Mon 22 Nov, 2021 - Tue 23 Nov, 2021
 						<br />
 						09:15 AM - 03:15 PM
 					</p>
-					<h5 className={duplicateStyle("h5")}>Where</h5>
+					<h5 className={styles.h5}>Where</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						This opportunity is virtual and has no fixed location
 					</p>
-					<h5 className={duplicateStyle("h5")}>Requirements</h5>
+					<h5 className={styles.h5}>Requirements</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						2-8 hours per week
 						<br />
@@ -222,7 +249,7 @@ function InfoBox() {
 						<br />
 						Criminal Record Check
 					</p>
-					<h5 className={duplicateStyle("h5")}>Good For</h5>
+					<h5 className={styles.h5}>Good For</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						Kids, Teens, Groups size 6
 					</p>
@@ -231,7 +258,7 @@ function InfoBox() {
 							I want to help
 						</button>
 					</a>
-					<h5 className={duplicateStyle("h52")}>8 places left</h5>
+					<h5 className={styles.h52}>8 places left</h5>
 				</div>
 			</div>
 		</div>
