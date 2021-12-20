@@ -1,11 +1,14 @@
 import React, { useState } from "react";
 import { Danger } from "./Danger";
 import styles from "../styles/helperMessage.module.css";
-export const HelperMessage = () => {
+export const HelperMessage = ({ email }: { email: string }) => {
 	const [clicked, setClicked] = useState(false);
 	return (
 		<div className={styles.help_container}>
-			<Danger text="Our email is not yet verified, please check <email address> for a verification email. Your email must be verified to sign up for volunteering opportunities." />
+			<Danger
+				text={`Your email is not yet verified, please check ${email} for a verification
+email. Your email must be verified to sign up for volunteering opportunities.`}
+			/>
 			<p className={styles.helper_message}>
 				Didn’t receive a verification email? We can send you
 				<span

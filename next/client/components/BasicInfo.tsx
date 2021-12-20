@@ -8,6 +8,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import { InputLabel } from "@material-ui/core";
 import Button from "./Button";
 import { countryCodes, months } from "../utils/const";
+import { UserClient } from "../../server/auth/data";
 const useStyles = makeStyles((theme) => ({
 	formControl: {
 		margin: theme.spacing(1),
@@ -17,20 +18,37 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: theme.spacing(2),
 	},
 }));
-export const BasicInfo = () => {
+export const BasicInfo = ({ data }: { data: UserClient }) => {
+	const birthDate = new Date(data.birthDate);
+	const [firstName, setFirstName] = useState(data.firstName);
+	const [lastName, setLastName] = useState(data.lastName);
+	// const [gender, setGender] = useState("");
+	const [address1, setAddress1] = useState(data.address1);
+	const [address2, setAddress2] = useState(data.address2 ?? "");
+	const [postcode, setPostcode] = useState(data.postcode);
+	const [city, setCity] = useState(data.city);
+	const [day, setDay] = useState(birthDate.getDate());
+	// NOTE: see the note below
+	const [month, setMonth] = useState(100);
+	const [year, setYear] = useState(birthDate.getFullYear());
+	// NOTE: this is a fix for the label not "rising" with pre-set values.
+	useEffect(() => {
+		setMonth(birthDate.getMonth());
+	}, []);
+
 	const classes = useStyles();
-	const [countryState, setcountry] = useState(
-		[] as { code: string; name: string }[]
-	);
+	// const [countryState, setcountry] = useState(
+	// 	[] as { code: string; name: string }[]
+	// );
 	const [monthsState, setmonths] = useState([] as string[]);
 	useEffect(() => {
 		setmonths(Object.keys(months));
-		setcountry(countryCodes);
+		// setcountry(countryCodes);
 		EventHandle();
 
 		window.sessionStorage.removeItem("gender");
 		window.sessionStorage.removeItem("month");
-		window.sessionStorage.removeItem("country");
+		// window.sessionStorage.removeItem("country");
 
 		window.addEventListener("load", (e) => {
 			if (window.innerWidth < 500) {
@@ -71,17 +89,16 @@ export const BasicInfo = () => {
 	> = (e) => {
 		let Label = (e?.target?.parentNode as any).previousElementSibling;
 		let BorderElement = e.target.parentNode;
-
 		Label.style.color = "#000";
 		(BorderElement as any).style.border = "1px solid #000 ";
 	};
-	const HandleSelectOnFocus: React.FocusEventHandler<
+	const MarkActive: React.FocusEventHandler<
 		HTMLInputElement | HTMLTextAreaElement
 	> = (e) => {
 		let Label = (e?.target?.parentNode as any).previousElementSibling;
-
 		Label.setAttribute("id", "active");
 	};
+
 	return (
 		<div className={`${styles.BasicInfo} basic_info`} id="basic_info">
 			<h2 className={styles.heading_2}>Basic Info</h2>
@@ -91,7 +108,11 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="First Name*"
-						onChange={HandleAllCheck}
+						value={firstName}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setFirstName(e.target.value);
+						}}
 					/>
 					<small className={styles.helperMessage}>Invalid First name</small>
 				</div>
@@ -102,7 +123,11 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="Last Name*"
-						onChange={HandleAllCheck}
+						value={lastName}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setLastName(e.target.value);
+						}}
 					/>
 					<small className={styles.helperMessage}>Invalid Last name</small>
 				</div>
@@ -128,7 +153,7 @@ export const BasicInfo = () => {
 								}}
 								id="country-select"
 								onBlur={HandleSelectOnBlur}
-								onFocus={HandleSelectOnFocus}
+								onFocus={MarkActive}
 							>
 								<option selected value="" style={{ display: "none" }}></option>
 
@@ -142,7 +167,11 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="Address line 1*"
-						onChange={HandleAllCheck}
+						value={address1}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setAddress1(e.target.value);
+						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Address line 1</small>
 				</div>
@@ -150,7 +179,11 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="Address line 2*"
-						onChange={HandleAllCheck}
+						value={address2}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setAddress2(e.target.value);
+						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Address line 2</small>
 				</div>
@@ -158,7 +191,11 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="Postcode*"
-						onChange={HandleAllCheck}
+						value={postcode}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setPostcode(e.target.value);
+						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Postcode</small>
 				</div>
@@ -166,12 +203,16 @@ export const BasicInfo = () => {
 					<FloatingInput
 						type="text"
 						label="Town/City*"
-						onChange={HandleAllCheck}
+						value={city}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setCity(e.target.value);
+						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Town/City</small>
 				</div>
 				<div className={styles.grid_three}>
-					<div className="country-select select-box" style={{ marginTop: -15 }}>
+					{/* <div className="country-select select-box" style={{ marginTop: -15 }}>
 						<FormControl className={classes.formControl}>
 							<InputLabel
 								htmlFor="age-native-simple"
@@ -199,10 +240,18 @@ export const BasicInfo = () => {
 								))}
 							</Select>
 						</FormControl>
-					</div>
+					</div> */}
 				</div>
 				<div className={`${styles.grid_one} seven_input`}>
-					<FloatingInput type="text" label="Day*" onChange={HandleAllCheck} />{" "}
+					<FloatingInput
+						type="text"
+						label="Day*"
+						value={"" + day}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setDay(parseInt(e.target.value.replace(/\D/g, "")));
+						}}
+					/>{" "}
 					<small className={styles.helperMessage}>Invalid Day</small>
 				</div>
 				<div className={styles.grid_one}>
@@ -215,6 +264,8 @@ export const BasicInfo = () => {
 							id="month_select_control"
 						>
 							<InputLabel
+								// make it appear as if it has been selected
+								id="active"
 								htmlFor="age-native-simple"
 								style={{ pointerEvents: "none" }}
 							>
@@ -227,15 +278,17 @@ export const BasicInfo = () => {
 									BorderElement.style.border = "1px solid #000 ";
 									// TODO: does this even do anything useful?
 									window.sessionStorage.setItem("month", true);
-									HandleAllCheck();
+									HandleAllCheck(e);
+									setMonth(e.target.value as number);
 								}}
 								id="month-select"
 								onBlur={HandleSelectOnBlur}
-								onFocus={HandleSelectOnFocus}
+								onFocus={MarkActive}
+								value={month}
 							>
-								<option selected value="" style={{ display: "none" }}></option>
+								{/* <option value="" style={{ display: "none" }}></option> */}
 								{monthsState.map((month, i) => (
-									<option key={i} value={month}>
+									<option key={i} value={i}>
 										{month}
 									</option>
 								))}
@@ -244,7 +297,15 @@ export const BasicInfo = () => {
 					</div>
 				</div>
 				<div className={`${styles.grid_one} eight_input`}>
-					<FloatingInput type="text" label="Year*" onChange={HandleAllCheck} />{" "}
+					<FloatingInput
+						type="text"
+						label="Year*"
+						value={"" + year}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							setYear(parseInt(e.target.value.replace(/\D/g, "")));
+						}}
+					/>{" "}
 					<small className={styles.helperMessage}>Invalid Year</small>
 				</div>{" "}
 				<div className={`${styles.grid_three} nine_input`}>

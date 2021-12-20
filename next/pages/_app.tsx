@@ -16,6 +16,7 @@ import "../client/styles/communityCards.css";
 import "../client/styles/customForm.css";
 import "../client/styles/login.css";
 import "../client/styles/userSignup.css";
+import "../client/styles/selectBox.css";
 
 const { publicRuntimeConfig } = getConfig();
 

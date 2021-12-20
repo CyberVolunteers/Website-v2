@@ -105,3 +105,43 @@ select:-webkit-autofill {
 	filter: invert(89%) sepia(0%) saturate(1580%) hue-rotate(144deg)
 		brightness(91%) contrast(85%);
 }
+
+.basic_info label + .MuiInput-formControl {
+	margin-top: 31px !important;
+}
+
+/*
+.select-box .MuiFormControl-root label {
+	top: 8px !important;
+}
+.skill_save_one,
+.skill_save_two {
+	pointer-events: none !important;
+}
+
+.skill_save_one.active,
+.skill_save_two.active {
+	pointer-events: all !important;
+	background-color: #f75524 !important;
+	color: #fff !important;
+	border: none;
+	border-bottom: 1px solid #df3f0e !important;
+	box-shadow: 0 0.125rem #df3f0e !important;
+}
+
+.skill_save_one:hover,
+.skill_save_two:hover {
+	color: #fff !important;
+	background-color: #df3f0e !important;
+}
+
+@media screen and (max-width: 350px) {
+	.select-box label {
+		z-index: 2 !important;
+	}
+	.MuiSelect-icon {
+		z-index: 3 !important;
+		background-color: #fff;
+		right: 2px !important;
+	}
+} */

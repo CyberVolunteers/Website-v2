@@ -9,7 +9,7 @@ import { logger } from "../../server/logger";
 import { stringify } from "ajv";
 import { doAllRulesApply } from "../../server/validation";
 import {
-	clearServersideSession,
+	clearServerSideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
 import { schemaHasRules } from "ajv/dist/compile/util";
@@ -83,13 +83,23 @@ const handlers: HandlerCollection = {
 				.status(400)
 				.send("The email seems wrong. Could you please double-check it?");
 
-		const signupResult = await signupUser(req.body);
+		const signupResult = await signupUser({
+			firstName,
+			lastName,
+			email,
+			password,
+			address1,
+			address2,
+			postcode,
+			city,
+			birthDate,
+		});
 
 		if (isResult(signupResult)) {
 			logger.info("server.signupUser:Signup failed");
 			return res
 				.status(400)
-				.send(`This did not seem to work: ${signupResult}.`);
+				.send(`This did not seem to work: ${signupResult.errorMessage}.`);
 		}
 
 		// send an email verification link
@@ -97,8 +107,8 @@ const handlers: HandlerCollection = {
 
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist
-		clearServersideSession(req);
-		await updateSession(req, res, signupResult);
+		clearServerSideSession(req);
+		await updateSession(req, res, signupResult.result);
 
 		return res.end();
 	},

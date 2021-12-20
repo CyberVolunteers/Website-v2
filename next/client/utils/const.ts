@@ -385,69 +385,18 @@ export const categoryNames = [
 	"International", // 6
 ];
 
-export const personalInfoSectionFields = [
-	{
-		left: "Name*",
-		right: "Atif Asim",
-	},
-	{
-		left: "Birthday*",
-		right: "18 Oct 2021",
-	},
-	{
-		left: "Email*",
-		right: "some@gmail.com",
-	},
-	{
-		left: "Password",
-		right: "••••••••",
-	},
-	{
-		left: "Address*",
-		right: "Pakistan Turkey Afganishtan etc",
-	},
-	{
-		left: "Gender",
-		right: "Male",
-	},
-	{
-		left: "Name*",
-		right: "Atif Asim",
-	},
-	{
-		left: "Phone Number",
-		right: "000000000",
-	},
-	{
-		left: "Occupation",
-		right: "some",
-	},
-	{
-		left: "Skills and interests",
-		right: "Web Developer, programming and computer",
-	},
-	{
-		left: "Languages",
-		right: "Urdu",
-	},
-];
+export type LocalHeaderItem =
+	| undefined
+	| "General"
+	| "Personal Information"
+	| "Volunteering Stats";
+export const localHeaderItems: LocalHeaderItem[] = [
+	undefined,
+	"General",
+	"Personal Information",
 
-export const localHeaderItems = [
-	{
-		value: "dropdown",
-	},
-	{
-		value: "General",
-		redirection: "/GeneralAccount",
-	},
-	{
-		value: "Personal Information",
-		redirection: "/PersonalInformation",
-	},
-	{
-		value: "Volunteering Stats",
-		redirection: "/VolunteeringStats",
-	},
+	// "Volunteering Stats",
+	//
 ];
 
 export type CarouselListingData = {

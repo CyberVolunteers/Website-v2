@@ -13,7 +13,7 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import CustomForm from "../client/components/CustomForm";
-import Button from "../client/components/Button";
+import CustomButton from "../client/components/Button";
 
 import { csrfFetch } from "../client/utils/csrf";
 import zxcvbn from "zxcvbn";
@@ -26,6 +26,8 @@ import { useRouter } from "next/router";
 
 const minSearchCooldownMillis = 700;
 
+// TODO: make sure no text fields persist after a refresh
+// TODO: a loading spinner
 export default function UserSignup({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -85,7 +87,7 @@ export default function UserSignup({
 			address1: secondPageData.addressLine1,
 			address2: secondPageData.addressLine2,
 			city: secondPageData.city,
-			postcode: secondPageData.postcode.replaceAll(/[^0-9a-zA-Z]/g, ""),
+			postcode: cleanPostcode(secondPageData.postcode),
 			birthDate: birthDate.toISOString(),
 		};
 
@@ -557,6 +559,9 @@ function FirstPage({
 				// can use error message for passwords because those are updated whenever the passwords change
 				passwordErrorMessage === "" &&
 				password2ErrorMessage === "" &&
+				firstNameErrorMessage === "" &&
+				secondNameErrorMessage === "" &&
+				emailErrorMessage === "" &&
 				isEmail(email)
 		);
 	}, [...allFieldVals, passwordErrorMessage, password2ErrorMessage, email]);
@@ -878,7 +883,7 @@ function SecondPage({
 				hasUserAcceptedPolicies &&
 				dayErrorMessage === "" &&
 				yearErrorMessage === "" &&
-				postcodeRE.test(postcode)
+				postcodeRE.test(cleanPostcode(postcode))
 		);
 	}, [
 		...allFieldVals,
@@ -1009,7 +1014,7 @@ function SecondPage({
 												visitedFields,
 												setVisitedFields
 											);
-											if (!postcodeRE.test(e.target.value))
+											if (!postcodeRE.test(cleanPostcode(e.target.value)))
 												setPostcodeErrorMessage(
 													"Please enter a valid postcode"
 												);
@@ -1113,7 +1118,7 @@ function SecondPage({
 					>
 						<InputLabel
 							htmlFor="month-select"
-							style={{ pointerEvents: "none" }}
+							style={{ pointerEvents: "none", marginTop: "-15px" }}
 						>
 							Month
 						</InputLabel>
@@ -1165,9 +1170,9 @@ function SecondPage({
 				{...{ hasUserAcceptedPolicies, setHasUserAcceptedPolicies }}
 			/>
 
-			<Button disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
+			<CustomButton disabled={!isSecondPageDataValid} style={{ width: "100%" }}>
 				CREATE ACCOUNT
-			</Button>
+			</CustomButton>
 		</>
 	);
 }
@@ -1270,4 +1275,8 @@ async function wait(time: number): Promise<void> {
 			res();
 		}, time);
 	});
+}
+
+function cleanPostcode(p: string) {
+	return p.replaceAll(/[^0-9a-zA-Z]/g, "");
 }

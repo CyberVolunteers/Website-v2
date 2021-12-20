@@ -55,7 +55,9 @@ export const HandleAllCheck = (e) => {
 		window.sessionStorage.getItem("country") != null
 	) {
 		document.querySelector(".skill_save_one").classList.add("active");
+		return true;
 	} else {
 		document.querySelector(".skill_save_one").classList.remove("active");
+		return false;
 	}
 };

@@ -10,7 +10,7 @@ import { sendEmail } from "../../server/email/nodemailer";
 import { notificationsEmail } from "../../serverAndClient/staticDetails";
 import { doAllRulesApply, signupValidation } from "../../server/validation";
 import {
-	clearServersideSession,
+	clearServerSideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
 
@@ -50,7 +50,7 @@ const handlers: HandlerCollection = {
 
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist
-		clearServersideSession(req);
+		clearServerSideSession(req);
 		await updateSession(req, res, signupResult);
 
 		return res.end();

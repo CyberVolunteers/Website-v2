@@ -1,8 +1,63 @@
 import React, { useEffect } from "react";
-import { personalInfoSectionFields } from "../utils/const";
 import Button from "./Button";
 import styles from "../styles/personalInfoSection.module.css";
-export const PersonalInfoSection = () => {
+import { UserClient } from "../../server/auth/data";
+import { months } from "../utils/const";
+export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
+	const {
+		firstName,
+		lastName,
+		address1,
+		address2,
+		birthDate: birthDateString,
+		email,
+	} = data;
+	const birthDate = new Date(birthDateString);
+	const personalInfoSectionFields = [
+		{
+			left: "Name*",
+			right: `${firstName} ${lastName}`,
+		},
+		{
+			left: "Birthday*",
+			right: `${birthDate.getDate()} ${
+				Object.values(months)[birthDate.getMonth()]
+			} ${birthDate.getFullYear()}`,
+		},
+		{
+			left: "Email*",
+			right: email,
+		},
+		{
+			left: "Password",
+			right: "••••••••",
+		},
+		{
+			left: "Address*",
+			right: `${address1} ${address2 === undefined ? "" : ", " + address2}`,
+		},
+		{
+			left: "Gender",
+			right: "<Not specified>",
+		},
+		{
+			left: "Phone Number",
+			right: "<Not specified>",
+		},
+		{
+			left: "Occupation",
+			right: "<Not specified>",
+		},
+		{
+			left: "Skills and interests",
+			right: "<Not specified>",
+		},
+		{
+			left: "Languages",
+			right: "<Not specified>",
+		},
+	];
+
 	// TODO: why does that even work?
 	const AddAddintional = (EachRight: Element & { offsetWidth: number }) => {
 		if (EachRight.offsetWidth < EachRight.scrollWidth) {

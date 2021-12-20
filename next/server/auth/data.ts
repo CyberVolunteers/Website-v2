@@ -133,7 +133,10 @@ export function isResult<T>(
 	return "errorMessage" in res;
 }
 
-export type User = {
+export type UserServer = UserClient & {
+	passwordHash: string;
+};
+export type UserClient = {
 	adminLevel: number;
 	isEmailVerified: boolean;
 	firstName: string;
@@ -143,8 +146,9 @@ export type User = {
 	address2?: string;
 	city: string;
 	postcode: string;
-	birthDate: Date;
-	passwordHash: string;
+	birthDate: string;
+
+	isOrg: false;
 };
 
 /**
@@ -152,11 +156,30 @@ export type User = {
  * @param _params data for the new user
  */
 export async function signupUser(_params: {
-	[key: string]: any;
-}): Promise<SignupResult<User>> {
+	firstName: string;
+	lastName: string;
+	email: string;
+	password: string;
+	address1: string;
+	postcode: string;
+	city: string;
+	birthDate: Date;
+	address2?: string;
+}): Promise<SignupResult<UserServer>> {
 	// make a copy
-	const params = Object.assign({}, _params);
-	const passwordHash = await hash(params.password);
+	const params = Object.assign({}, _params) as {
+		firstName: string;
+		lastName: string;
+		email: string;
+		password?: string;
+		address1: string;
+		postcode: string;
+		city: string;
+		birthDate: Date;
+		address2?: string;
+		passwordHash?: string;
+	};
+	const passwordHash = await hash(params.password ?? "");
 	delete params.password;
 	params.passwordHash = passwordHash;
 	const newUser = new User(params);
@@ -168,8 +191,11 @@ export async function signupUser(_params: {
 	}
 
 	const user = await newUser.save();
+	const result = extractData(user, null);
+	result.isOrg = false;
+	result.birthDate = params.birthDate.toISOString();
 	return {
-		result: extractData(user, null),
+		result,
 	};
 }
 
@@ -427,6 +453,13 @@ export function isVerified(session: any) {
 	);
 }
 
+export function getUserType(session: any) {
+	const isUser = isLoggedIn(session) && session?.isOrg === false;
+	return {
+		isUser,
+		isVerifiedUser: isUser && session?.isEmailVerified === true,
+	};
+}
 /**
  * Checks if the account is a verified organisation
  * @param session
@@ -447,11 +480,7 @@ export function isVerifiedOrg(session: any) {
  * @returns
  */
 export function isVerifiedUser(session: any) {
-	return (
-		isLoggedIn(session) &&
-		session?.isEmailVerified === true &&
-		session?.isOrg === false
-	);
+	return getUserType(session).isVerifiedUser;
 }
 
 /**

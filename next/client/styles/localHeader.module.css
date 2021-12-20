@@ -9,13 +9,14 @@
 .LocalHeader > ul li:first-child {
 	display: none;
 }
-.item_link a {
+.item_link div {
 	color: #fff;
 	margin-right: 5rem;
 	display: flex;
 	justify-content: space-between;
+	cursor: pointer;
 }
-.item_link.active a {
+.item_link.active div {
 	font-weight: 600;
 	text-decoration: underline;
 }
@@ -23,12 +24,12 @@
 	margin-top: 3.9px;
 }
 @media screen and (max-width: 650px) {
-	.item_link a {
+	.item_link div {
 		margin-right: 2rem;
 	}
 }
 @media screen and (max-width: 460px) {
-	.item_link a {
+	.item_link div {
 		margin: 0px !important;
 	}
 	.LocalHeader > ul li:first-child {
@@ -41,12 +42,12 @@
 	ul .li {
 		width: 100%;
 	}
-	ul .item_link a {
+	ul .item_link div {
 		padding: 1rem 0rem;
 
 		text-align: left;
 	}
-	ul li:first-child .item_link a {
+	ul li:first-child .item_link div {
 		padding-top: 0rem;
 	}
 }

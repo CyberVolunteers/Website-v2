@@ -4,12 +4,14 @@ export const FloatingInput = ({
 	type,
 	label,
 	onChange,
+	value,
 }: {
 	type: string;
 	label: string;
 	onChange?: React.ChangeEventHandler<HTMLInputElement>;
+	value?: string;
 }) => {
-	const [active, setactive] = useState(false);
+	const [active, setactive] = useState(value !== undefined && value !== "");
 	const HandleBlurPosition: React.FocusEventHandler<HTMLInputElement> = (e) => {
 		e.target.value != "" ? setactive(true) : setactive(false);
 	};
@@ -18,6 +20,7 @@ export const FloatingInput = ({
 			<input
 				type={type}
 				className={`${styles.input} ${active && styles.activeinput} `}
+				value={value}
 				onChange={onChange}
 				onBlur={HandleBlurPosition}
 			/>{" "}

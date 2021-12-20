@@ -61,7 +61,7 @@ export async function getSession(
  * deletes the cookie data along with the cached session data
  * @param req request to clear
  */
-export async function clearServersideSession(req: ExtendedNextApiRequest) {
+export async function clearServerSideSession(req: ExtendedNextApiRequest) {
 	req.session = undefined;
 	if (typeof req.cookies === "object" && req.cookies !== null)
 		req.cookies[sessionCookieName] = "invalid cookie string";
@@ -111,6 +111,7 @@ export async function updateSession(
 	_data?: SessionObject,
 	_csrf?: CsrfObject
 ) {
+	// TODO: check for the shape of data
 	//NOTE: keeping "null"
 	const data = _data === undefined ? {} : _data;
 	const csrf = _csrf === undefined ? {} : _csrf;

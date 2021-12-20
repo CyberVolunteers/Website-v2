@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import Head from "../client/components/Head";
-import { getSession, SessionObject } from "../server/auth/auth-cookie";
+import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 
 import { LocalHeader } from "../client/components/LocalHeader";
@@ -25,6 +25,8 @@ import personalInformationStyles from "../client/styles/personalInformation.modu
 import volunteeringStatsStyles from "../client/styles/volunteeringStats.module.css";
 
 import { MouseEventHandler, ReactElement, useState } from "react";
+import { getUserType, UserClient } from "../server/auth/data";
+import { useIsAfterRehydration } from "../client/utils/otherHooks";
 
 export default function MyAccount({
 	accountData,
@@ -36,13 +38,10 @@ export default function MyAccount({
 	// const userType = useViewerType();
 	// const isOrg = getAccountInfo()?.isOrg;
 
-	// const isAfterRehydration = useIsAfterRehydration();
+	const isAfterRehydration = useIsAfterRehydration();
 
 	const [activeSection, setActiveSection] = useState(
-		"Volunteering Stats" as
-			| "General"
-			| "Personal Information"
-			| "Volunteering Stats"
+		"General" as "General" | "Personal Information" | "Volunteering Stats"
 	);
 
 	const [personalInfoActive, setPersonalInfoActive] =
@@ -55,19 +54,20 @@ export default function MyAccount({
 		targetId == "Password_link" && setPersonalInfoActive("Password_link");
 	};
 
-	return (
-		<>
-			<Head title="My account - cybervolunteers" />
-			<LocalHeader list={localHeaderItems} active={activeSection} />
-
-			{activeSection === "General" ? (
+	// TODO: fail if the account data is not found
+	let shownSection: JSX.Element | null = null;
+	if (isAfterRehydration && accountData !== null) {
+		shownSection =
+			activeSection === "General" ? (
 				<div className={generalAccountStyles._container}>
 					<h1 className={generalAccountStyles.main_heading}>
 						Welcome Atif Asim
 					</h1>
-					<HelperMessage />
+					{accountData.isEmailVerified ? null : (
+						<HelperMessage email={accountData.email} />
+					)}
 					<Volunteer />
-					<PersonalInfoSection />
+					<PersonalInfoSection data={accountData} />
 					<SignOut />
 				</div>
 			) : activeSection === "Personal Information" ? (
@@ -139,7 +139,7 @@ export default function MyAccount({
 						</p>
 					</div>
 
-					<BasicInfo />
+					<BasicInfo data={accountData} />
 					<SkillsAndInterests />
 					<Email />
 					<Password />
@@ -168,7 +168,19 @@ export default function MyAccount({
 						</Button>
 					</div>
 				</div>
-			) : null}
+			) : null;
+	}
+
+	return (
+		<>
+			<Head title="My account - cybervolunteers" />
+			<LocalHeader
+				list={localHeaderItems}
+				active={activeSection}
+				setActiveSection={setActiveSection}
+			/>
+			{/* TODO: show an error message if not showing anything here, i.e. there was no data sent */}
+			{shownSection}
 		</>
 	);
 
@@ -176,9 +188,35 @@ export default function MyAccount({
 }
 
 export const getServerSideProps: GetServerSideProps<{
-	accountData: SessionObject;
+	accountData: UserClient | null;
 }> = async (context: any) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
+	if (typeof session !== "object" || session === null)
+		return {
+			props: {
+				accountData: null,
+			},
+		};
+	const { isUser, isVerifiedUser } = getUserType(session);
+
+	// copy things over
+	const accountData: UserClient = {
+		firstName: session.firstName,
+		lastName: session.lastName,
+		city: session.city,
+		email: session.email,
+		adminLevel: session.adminLevel,
+		birthDate: session.birthDate,
+		address1: session.address1,
+
+		postcode: session.postcode,
+
+		isEmailVerified: session.isEmailVerified,
+
+		// isVerified: isVerifiedUser,
+		isOrg: false,
+	};
+
 	// let fields: AccountDataType = {};
 
 	// if (isLoggedIn(session)) {
@@ -202,7 +240,7 @@ export const getServerSideProps: GetServerSideProps<{
 
 	return {
 		props: {
-			accountData: session,
+			accountData,
 		}, // will be passed to the page component as props
 	};
 };
