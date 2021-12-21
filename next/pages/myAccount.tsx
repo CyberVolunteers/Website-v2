@@ -24,13 +24,23 @@ import generalAccountStyles from "../client/styles/generalAccount.module.css";
 import personalInformationStyles from "../client/styles/personalInformation.module.css";
 import volunteeringStatsStyles from "../client/styles/volunteeringStats.module.css";
 
-import { MouseEventHandler, ReactElement, useState } from "react";
+import {
+	Dispatch,
+	MouseEventHandler,
+	ReactElement,
+	SetStateAction,
+	useState,
+} from "react";
 import { getUserType, UserClient } from "../server/auth/data";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
+import { updateCsrf } from "../server/csrf";
+import { csrfFetch } from "../client/utils/csrf";
 
 export default function MyAccount({
-	accountData,
+	accountData: _accountData,
+	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const [accountData, setAccountData] = useState(_accountData);
 	// TODO: technically, since we get the fields from the server, view protection isn't needed
 
 	// useViewProtection(["org", "user"]);
@@ -48,6 +58,7 @@ export default function MyAccount({
 		useState("basic_info_link");
 	const HandlePersonalInfoLink: MouseEventHandler<HTMLAnchorElement> = (e) => {
 		const targetId = (e.target as any).id;
+		console.log(targetId);
 		targetId == "basic_info_link" && setPersonalInfoActive("basic_info_link");
 		targetId == "Skills_link" && setPersonalInfoActive("Skills_link");
 		targetId == "Email_link" && setPersonalInfoActive("Email_link");
@@ -61,14 +72,17 @@ export default function MyAccount({
 			activeSection === "General" ? (
 				<div className={generalAccountStyles._container}>
 					<h1 className={generalAccountStyles.main_heading}>
-						Welcome Atif Asim
+						Welcome {accountData.firstName} {accountData.lastName}
 					</h1>
 					{accountData.isEmailVerified ? null : (
 						<HelperMessage email={accountData.email} />
 					)}
-					<Volunteer />
-					<PersonalInfoSection data={accountData} />
-					<SignOut />
+					<Volunteer participationNumber={accountData.participationNumber} />
+					<PersonalInfoSection
+						setActiveSection={setActiveSection}
+						data={accountData}
+					/>
+					<SignOut csrfToken={csrfToken} />
 				</div>
 			) : activeSection === "Personal Information" ? (
 				<div className={generalAccountStyles._container}>
@@ -103,7 +117,7 @@ export default function MyAccount({
 							<a
 								href="#Email"
 								id="Email_link"
-								onClick={(e) => HandlePersonalInfoLink}
+								onClick={HandlePersonalInfoLink}
 								className={`${
 									personalInfoActive == "Email_link" &&
 									personalInformationStyles.active
@@ -134,14 +148,22 @@ export default function MyAccount({
 						</h1>
 						<p className={personalInformationStyles.first_para}>
 							You are missing information in the following sections:{" "}
-							<a href="#">Basic info,</a> <a href="#">Your Skills</a>{" "}
-							<a href="#">Interests.</a>
+							<a href="#basic_info">Basic info,</a>{" "}
+							<a href="#Skills">Your Skills and Interests.</a>
 						</p>
 					</div>
 
-					<BasicInfo data={accountData} />
-					<SkillsAndInterests />
-					<Email />
+					<BasicInfo
+						setData={setAccountData as Dispatch<SetStateAction<UserClient>>}
+						csrfToken={csrfToken}
+						data={accountData}
+					/>
+					<SkillsAndInterests
+						data={accountData}
+						setData={setAccountData as Dispatch<SetStateAction<UserClient>>}
+						csrfToken={csrfToken}
+					/>
+					<Email email={accountData.email} />
 					<Password />
 				</div>
 			) : activeSection === "Volunteering Stats" ? (
@@ -189,16 +211,24 @@ export default function MyAccount({
 
 export const getServerSideProps: GetServerSideProps<{
 	accountData: UserClient | null;
+	csrfToken: string;
 }> = async (context: any) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 	if (typeof session !== "object" || session === null)
 		return {
 			props: {
 				accountData: null,
+				csrfToken: await updateCsrf(context),
 			},
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
-
+	if (!isVerifiedUser)
+		return {
+			props: {
+				accountData: null,
+				csrfToken: await updateCsrf(context),
+			},
+		};
 	// copy things over
 	const accountData: UserClient = {
 		firstName: session.firstName,
@@ -209,7 +239,17 @@ export const getServerSideProps: GetServerSideProps<{
 		birthDate: session.birthDate,
 		address1: session.address1,
 
+		participationNumber: session.participationNumber,
+
 		postcode: session.postcode,
+
+		address2: session.address2 ?? "",
+		gender: session.gender ?? "",
+		languages: session.languages ?? "",
+		// nationality: session.nationality ?? "",
+		occupation: session.occupation ?? "",
+		phoneNumber: session.phoneNumber ?? "",
+		skillsAndInterests: session.skillsAndInterests ?? "",
 
 		isEmailVerified: session.isEmailVerified,
 
@@ -241,6 +281,7 @@ export const getServerSideProps: GetServerSideProps<{
 	return {
 		props: {
 			accountData,
+			csrfToken: await updateCsrf(context),
 		}, // will be passed to the page component as props
 	};
 };

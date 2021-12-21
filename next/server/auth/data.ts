@@ -148,6 +148,15 @@ export type UserClient = {
 	postcode: string;
 	birthDate: string;
 
+	gender?: string;
+	occupation?: string;
+	languages?: string;
+	skillsAndInterests?: string;
+	// nationality?: string;
+	phoneNumber?: string;
+
+	participationNumber: number;
+
 	isOrg: false;
 };
 
@@ -182,7 +191,7 @@ export async function signupUser(_params: {
 	const passwordHash = await hash(params.password ?? "");
 	delete params.password;
 	params.passwordHash = passwordHash;
-	const newUser = new User(params);
+	const newUser = new User({ ...params, participationNumber: 0 });
 
 	if ((await isEmailFree(params.email)) === false) {
 		logger.info("server.auth.session:Email used for user");

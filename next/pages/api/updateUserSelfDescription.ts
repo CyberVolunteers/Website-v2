@@ -7,7 +7,10 @@ import { userDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
 import { ExtendedNextApiRequest, HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { doAllRulesApply, signupValidation } from "../../server/validation";
+import { doAllRulesApply } from "../../server/validation";
+import { postcodeRE } from "../../client/utils/const";
+import isEmail from "validator/lib/isEmail";
+import isMobilePhone from "validator/lib/isMobilePhone";
 
 export * from "../../server/defaultEndpointConfig";
 
@@ -17,25 +20,24 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
+		let { occupation, languages, skillsAndInterests } = req.body as {
+			occupation: string;
+			languages: string;
+			skillsAndInterests: string;
+		};
+
 		const session = await getSession(req);
-
-		if (!doAllRulesApply(req.body, signupValidation))
-			return res
-				.status(400)
-				.send(
-					"This data does not seem correct. Could you please double-check it?"
-				);
-
 		logger.info(
-			"server.updateUserData: updating %s with %s",
+			"server.updateUserSelfDescription: updating %s with %s",
 			session,
 			req.body
 		);
-
-		if (!isVerifiedUser(session))
-			return res.status(400).send("You need to be a user to do this");
-
-		const newDoc = await updateUserData(req.body, session.email);
+		const newData = {
+			occupation,
+			languages,
+			skillsAndInterests,
+		};
+		const newDoc = await updateUserData(newData, session?.email ?? "");
 
 		if (newDoc === null)
 			return res
@@ -44,7 +46,7 @@ const handlers: HandlerCollection = {
 
 		await updateSession(req, res, newDoc);
 
-		return res.end();
+		return res.json(newData);
 	},
 };
 
@@ -58,7 +60,17 @@ export default async function updateData(
 			useCsrf: true,
 		},
 		{
-			POST: ajv.compileParser(createAjvJTDSchema(userDataUpdateSpec)),
+			POST: ajv.compileParser(
+				createAjvJTDSchema({
+					required: {
+						string: {
+							occupation: { maxLength: 200 },
+							languages: { maxLength: 200 },
+							skillsAndInterests: { maxLength: 1000 },
+						},
+					},
+				})
+			),
 		}
 	)(req, res);
 }

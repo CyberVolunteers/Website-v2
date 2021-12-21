@@ -1,9 +1,17 @@
-import React, { useEffect } from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import Button from "./Button";
 import styles from "../styles/personalInfoSection.module.css";
 import { UserClient } from "../../server/auth/data";
 import { months } from "../utils/const";
-export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
+export const PersonalInfoSection = ({
+	data,
+	setActiveSection,
+}: {
+	data: UserClient;
+	setActiveSection: Dispatch<
+		SetStateAction<"General" | "Personal Information" | "Volunteering Stats">
+	>;
+}) => {
 	const {
 		firstName,
 		lastName,
@@ -11,6 +19,11 @@ export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
 		address2,
 		birthDate: birthDateString,
 		email,
+		gender,
+		phoneNumber,
+		occupation,
+		skillsAndInterests,
+		languages,
 	} = data;
 	const birthDate = new Date(birthDateString);
 	const personalInfoSectionFields = [
@@ -38,23 +51,42 @@ export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
 		},
 		{
 			left: "Gender",
-			right: "<Not specified>",
+			right:
+				gender === "m"
+					? "Male"
+					: gender === "f"
+					? "Female"
+					: gender === "o"
+					? "Other"
+					: "<Not specified>",
 		},
 		{
 			left: "Phone Number",
-			right: "<Not specified>",
+			right:
+				phoneNumber === undefined || phoneNumber === ""
+					? "<Not specified>"
+					: phoneNumber,
 		},
 		{
 			left: "Occupation",
-			right: "<Not specified>",
+			right:
+				occupation === undefined || occupation === ""
+					? "<Not specified>"
+					: occupation,
 		},
 		{
 			left: "Skills and interests",
-			right: "<Not specified>",
+			right:
+				skillsAndInterests === undefined || skillsAndInterests === ""
+					? "<Not specified>"
+					: skillsAndInterests,
 		},
 		{
 			left: "Languages",
-			right: "<Not specified>",
+			right:
+				languages === undefined || languages === ""
+					? "<Not specified>"
+					: languages,
 		},
 	];
 
@@ -85,7 +117,11 @@ export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
 			<p className={styles.helper_message}>
 				Your personal information is incomplete. Tell charities more about
 				yourself by completing your{" "}
-				<a href="#" className={styles.highlighted_text}>
+				<a
+					href="#"
+					className={styles.highlighted_text}
+					onClick={() => setActiveSection("Personal Information")}
+				>
 					account information.
 				</a>
 			</p>{" "}
@@ -107,6 +143,7 @@ export const PersonalInfoSection = ({ data }: { data: UserClient }) => {
 						borderColor: "#484848",
 					}}
 					outline={true}
+					onClick={() => setActiveSection("Personal Information")}
 				>
 					Edit Personal Info
 				</Button>

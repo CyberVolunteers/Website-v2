@@ -16,7 +16,7 @@ export const Password = () => {
 			<div className={styles.link}>
 				<Link href="#">
 					<>
-						<p>Current Password</p>
+						<p>••••••••</p>
 
 						<p>
 							Change Password <i className="fas fa-angle-right"></i>

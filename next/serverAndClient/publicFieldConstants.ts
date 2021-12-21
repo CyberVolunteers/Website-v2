@@ -22,6 +22,9 @@ export const users: FieldConstraintsCollection = {
 			// assuming it is UK for now
 			// country: { maxLength: 56 },
 		},
+		number: {
+			participationNumber: {},
+		},
 		date: {
 			birthDate: {},
 		},
@@ -32,7 +35,7 @@ export const users: FieldConstraintsCollection = {
 			occupation: { maxLength: 200 },
 			languages: { maxLength: 200 },
 			skillsAndInterests: { maxLength: 1000 },
-			nationality: { maxLength: 60 },
+			// nationality: { maxLength: 60 },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
 

@@ -2,7 +2,7 @@ import React from "react";
 import styles from "../styles/email.module.css";
 import Link from "next/link";
 
-export const Email = () => {
+export const Email = ({ email }: { email: string }) => {
 	return (
 		<div className={styles.BasicInfo} id="Email">
 			<h2 className={styles.heading_2}>Email</h2>
@@ -15,7 +15,7 @@ export const Email = () => {
 			<div className={styles.link}>
 				<Link href="#">
 					<>
-						<p>Email</p>
+						<p>{email}</p>
 
 						<p>
 							Change Email <i className="fas fa-angle-right"></i>

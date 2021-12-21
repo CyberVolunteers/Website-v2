@@ -1,7 +1,10 @@
 import React from "react";
 import Button from "./Button";
 import styles from "../styles/signOut.module.css";
-export const SignOut = () => {
+import { useRouter } from "next/router";
+import { csrfFetch } from "../utils/csrf";
+export const SignOut = ({ csrfToken }: { csrfToken: string }) => {
+	const router = useRouter();
 	return (
 		<div className={styles.SignOut}>
 			<h2 className={styles.sub_heading}>Sign Out</h2>
@@ -13,6 +16,19 @@ export const SignOut = () => {
 						borderColor: "#484848",
 					}}
 					outline={true}
+					onClick={async () => {
+						// TODO: maybe have an ability to show an error?
+						await csrfFetch(csrfToken, "/api/logout", {
+							method: "POST",
+							credentials: "same-origin", // only send cookies for same-origin requests
+							headers: {
+								"content-type": "application/json",
+								accept: "application/json",
+							},
+						});
+
+						router.push("/");
+					}}
 				>
 					Sign Out
 				</Button>

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import styles from "../styles/basicInfo.module.css";
 import { FloatingInput } from "./FloatingInput";
 import { EventHandle, HandleAllCheck } from "../js/handleInputs";
@@ -9,6 +9,7 @@ import { InputLabel } from "@material-ui/core";
 import Button from "./Button";
 import { countryCodes, months } from "../utils/const";
 import { UserClient } from "../../server/auth/data";
+import { csrfFetch } from "../utils/csrf";
 const useStyles = makeStyles((theme) => ({
 	formControl: {
 		margin: theme.spacing(1),
@@ -18,23 +19,98 @@ const useStyles = makeStyles((theme) => ({
 		marginTop: theme.spacing(2),
 	},
 }));
-export const BasicInfo = ({ data }: { data: UserClient }) => {
+type Gender = "" | "m" | "f" | "o";
+export const BasicInfo = ({
+	data,
+	setData,
+	csrfToken,
+}: {
+	data: UserClient;
+	setData: Dispatch<SetStateAction<UserClient>>;
+	csrfToken: string;
+}) => {
+	const [errorMessage, setErrorMessage] = useState("");
+
 	const birthDate = new Date(data.birthDate);
 	const [firstName, setFirstName] = useState(data.firstName);
 	const [lastName, setLastName] = useState(data.lastName);
-	// const [gender, setGender] = useState("");
 	const [address1, setAddress1] = useState(data.address1);
 	const [address2, setAddress2] = useState(data.address2 ?? "");
 	const [postcode, setPostcode] = useState(data.postcode);
 	const [city, setCity] = useState(data.city);
-	const [day, setDay] = useState(birthDate.getDate());
+	const [day, setDay] = useState("" + birthDate.getDate());
 	// NOTE: see the note below
 	const [month, setMonth] = useState(100);
-	const [year, setYear] = useState(birthDate.getFullYear());
+	const [year, setYear] = useState("" + birthDate.getFullYear());
+	const [gender, setGender] = useState("" as Gender);
+	const [phone, setPhone] = useState(data.phoneNumber ?? "");
 	// NOTE: this is a fix for the label not "rising" with pre-set values.
 	useEffect(() => {
 		setMonth(birthDate.getMonth());
+		setGender((data.gender as Gender) ?? "");
 	}, []);
+
+	useEffect(() => {
+		setErrorMessage("");
+	}, [
+		firstName,
+		lastName,
+		address1,
+		address2,
+		postcode,
+		postcode,
+		city,
+		day,
+		month,
+		year,
+		phone,
+		gender,
+	]);
+
+	function resetValues() {
+		setFirstName(data.firstName);
+		setLastName(data.lastName);
+		setAddress1(data.address1);
+		setAddress2(data.address2 ?? "");
+		setPostcode(data.postcode);
+		setCity(data.city);
+		setDay("" + birthDate.getDate());
+		setMonth(birthDate.getMonth());
+		setYear("" + birthDate.getFullYear());
+		setGender((data.gender as Gender) ?? "");
+		setPhone(data.phoneNumber ?? "");
+	}
+
+	async function saveChanges() {
+		const birthDate = new Date(parseInt(year), month, parseInt(day));
+		if (birthDate instanceof Date && isNaN(birthDate.valueOf()))
+			return setErrorMessage("Please enter a valid birth date");
+		const res = await csrfFetch(csrfToken, "/api/updateUserBasicDetails", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({
+				firstName,
+				lastName,
+				address1,
+				address2,
+				city,
+				postcode,
+				// TODO: sort out timezones
+				birthDate: birthDate.toISOString(),
+				gender: gender === "" ? undefined : gender,
+				phoneNumber: phone === "" ? undefined : phone,
+			}),
+		});
+		if (res.status >= 400) return setErrorMessage(await res.text());
+
+		const newData = await res.json();
+		// override the changes
+		setData({ ...data, ...newData });
+	}
 
 	const classes = useStyles();
 	// const [countryState, setcountry] = useState(
@@ -46,8 +122,8 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 		// setcountry(countryCodes);
 		EventHandle();
 
-		window.sessionStorage.removeItem("gender");
-		window.sessionStorage.removeItem("month");
+		// window.sessionStorage.removeItem("gender");
+		// window.sessionStorage.removeItem("month");
 		// window.sessionStorage.removeItem("country");
 
 		window.addEventListener("load", (e) => {
@@ -148,17 +224,20 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 								onChange={(e) => {
 									let BorderElement = (e.target as any).parentNode;
 									BorderElement.style.border = "1px solid #000 ";
-									window.sessionStorage.setItem("gender", true);
+									// window.sessionStorage.setItem("gender", true);
 									HandleAllCheck();
+									setGender(e.target.value as Gender);
 								}}
 								id="country-select"
 								onBlur={HandleSelectOnBlur}
 								onFocus={MarkActive}
+								value={gender}
 							>
-								<option selected value="" style={{ display: "none" }}></option>
+								<option value="" style={{ display: "none" }}></option>
 
 								<option value="m">Male</option>
 								<option value="f">Female</option>
+								<option value="o">Other</option>
 							</Select>
 						</FormControl>
 					</div>
@@ -246,10 +325,10 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 					<FloatingInput
 						type="text"
 						label="Day*"
-						value={"" + day}
+						value={day}
 						onChange={(e) => {
 							HandleAllCheck(e);
-							setDay(parseInt(e.target.value.replace(/\D/g, "")));
+							setDay(e.target.value.replace(/\D/g, ""));
 						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Day</small>
@@ -277,7 +356,7 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 									let BorderElement = (e.target as any).parentNode;
 									BorderElement.style.border = "1px solid #000 ";
 									// TODO: does this even do anything useful?
-									window.sessionStorage.setItem("month", true);
+									// window.sessionStorage.setItem("month", true);
 									HandleAllCheck(e);
 									setMonth(e.target.value as number);
 								}}
@@ -300,10 +379,10 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 					<FloatingInput
 						type="text"
 						label="Year*"
-						value={"" + year}
+						value={year}
 						onChange={(e) => {
 							HandleAllCheck(e);
-							setYear(parseInt(e.target.value.replace(/\D/g, "")));
+							setYear(e.target.value.replace(/\D/g, ""));
 						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Year</small>
@@ -312,7 +391,20 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 					<FloatingInput
 						type="text"
 						label="Phone Number"
-						onChange={HandleAllCheck}
+						value={phone}
+						onChange={(e) => {
+							HandleAllCheck(e);
+							const value = e.target.value;
+							const regexWithPlus = /[^\+0-9]/g;
+							const regexWithoutPlus = /[^0-9]/g;
+							if (value.length <= 1)
+								setPhone(value.replaceAll(regexWithPlus, ""));
+							else
+								setPhone(
+									value[0].replaceAll(regexWithPlus, "") +
+										value.substr(1).replaceAll(regexWithoutPlus, "")
+								);
+						}}
 					/>{" "}
 					<small className={styles.helperMessage}>Invalid Phone Number</small>
 				</div>
@@ -326,6 +418,7 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 						borderColor: "#484848",
 					}}
 					outline={true}
+					onClick={() => resetValues()}
 				>
 					Discard Changes
 				</Button>
@@ -336,10 +429,12 @@ export const BasicInfo = ({ data }: { data: UserClient }) => {
 						borderColor: "#484848",
 					}}
 					className="skill_save_one"
+					onClick={() => saveChanges()}
 				>
 					Save Changes
 				</Button>
 			</div>
+			<div className={styles.error_message}>{errorMessage}</div>
 		</div>
 	);
 };

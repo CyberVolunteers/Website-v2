@@ -96,3 +96,9 @@
 		grid-template-columns: 1fr;
 	}
 }
+
+.error_message {
+	margin-top: 1rem;
+	color: red;
+	text-align: center;
+}
