@@ -191,23 +191,14 @@ async function setSession(
  * @param res
  */
 export function removeSession(res: NextApiResponse) {
-	const emptyCookieSettings = {
-		maxAge: -1,
-		path: "/",
-	};
-	const sessionCookie = serialize(
-		sessionCookieName,
-		"",
-		Object.assign({}, sessionCookieOptions, emptyCookieSettings)
-	); // empty objects because the target object is modified
+	const sessionCookie = serialize(sessionCookieName, "", sessionCookieOptions); // empty objects because the target object is modified
 	const accountInfoCookie = serialize(
 		accountInfoCookieName,
 		"",
-		Object.assign({}, accountInfoCookieOptions, emptyCookieSettings)
+		accountInfoCookieOptions
 	);
 
 	// NOTE: leaving the csrf cookie
-
 	logger.info("server.auth.auth-cookie:Destroying session");
 
 	res.setHeader("Set-Cookie", [sessionCookie, accountInfoCookie]);

@@ -29,6 +29,7 @@ function Header() {
 	const windowSize = useWindowSize();
 
 	const windowWidth = windowSize.width ?? 1000; // to make sure that the larger version is displayed otherwise
+	const isLargeVersion = windowWidth > sidebarLimitWidth;
 
 	// If the page needs the "simplistic" header
 	if (pagesWithReducedHeaderAndFooter.includes(router.pathname))
@@ -55,16 +56,15 @@ function Header() {
 		);
 	};
 
-	const actionSlot = !isAfterRehydration ? null : [
-			"org",
-			"unverified_org",
-	  ].includes(userType) ? (
+	const manageListingsEl = (
 		<Link href="/manageListings" passHref>
 			<a>
 				<p>Manage listings</p>
 			</a>
 		</Link>
-	) : (
+	);
+
+	const volunteerEl = (
 		<Link href="/searchListings" passHref>
 			<a>
 				<p>Volunteer</p>
@@ -72,51 +72,66 @@ function Header() {
 		</Link>
 	);
 
-	const signUpOrMyAccountEl = !isAfterRehydration ? null : isLoggedIn ? (
-		<></>
-	) : (
-		// <li>
-		// 	<Link href="/myAccount" passHref>
-		// 		<a>
-		// 			<p>My Account</p>
-		// 		</a>
-		// 	</Link>
-		// </li>
-		<>
-			<li>
-				<Link href="/login" passHref>
-					<a>
-						<p>Sign in</p>
-					</a>
-				</Link>
-			</li>
-			{!isAfterRehydration || windowWidth > sidebarLimitWidth ? ( // only show it on the larger screens (the button on the bottom will be showed otherwise)
-				<li>
-					<Link href="/signupSelect" passHref>
-						<a>
-							<p>Sign up</p>
-						</a>
-					</Link>
-				</li>
-			) : null}
-		</>
+	const myAccountEl = (
+		<Link href="/myAccount" passHref>
+			<a>
+				<p>My Account</p>
+			</a>
+		</Link>
+	);
+
+	const signInEl = (
+		<Link href="/login" passHref>
+			<a>
+				<p>Sign in</p>
+			</a>
+		</Link>
+	);
+
+	const userSignUpEl = (
+		<Link href="/userSignup" passHref>
+			<a>
+				<p>Sign up</p>
+			</a>
+		</Link>
+	);
+
+	const charitySignUpEl = (
+		<Link href="/charitySignup" passHref>
+			<a>
+				<p>Create a charity</p>
+			</a>
+		</Link>
+	);
+
+	const aboutUsEl = (
+		<Link href="/aboutUs" passHref>
+			<a>
+				<p>About Us</p>
+			</a>
+		</Link>
 	);
 
 	return (
 		<>
-			{isAfterRehydration && isSidebarUp && windowWidth <= sidebarLimitWidth ? (
+			{/* The sidebar */}
+			{isAfterRehydration && isSidebarUp && !isLargeVersion ? (
 				<aside className={`${styles["sidebar"]}`}>
-					{signUpOrMyAccountEl}
-
-					<li>{actionSlot}</li>
-
+					{isLoggedIn ? (
+						<li>{myAccountEl}</li>
+					) : (
+						<>
+							<li>{userSignUpEl}</li>
+							<li>{charitySignUpEl}</li>
+						</>
+					)}
 					<li>
-						<Link href="/aboutUs" passHref>
-							<a>
-								<p>About Us</p>
-							</a>
-						</Link>
+						{["org", "unverified_org"].includes(userType)
+							? manageListingsEl
+							: volunteerEl}
 					</li>
+					<li>{aboutUsEl}</li>
+
 					{/* <li>
 						<Link href="/contactUs" passHref>
 							<a>
@@ -136,42 +151,43 @@ function Header() {
 							<img className="pointer" src="/img/logo.svg" alt="Our logo" />
 						</a>
 					</Link>
-
-					<ul className="dflex-align-center">
-						<li className={`${styles["head"]} dflex-align-center`}>
-							{actionSlot}
-						</li>
-					</ul>
-
-					{isAfterRehydration ? ( // because it resizes automatically, we need to disable it to prevent flicker
-						<form onSubmit={onSearch}>
-							<div className={`${styles["input-wrapper"]} dflex-align-center`}>
-								<SearchIcon />
-								<input
-									type="text"
-									placeholder="Search Here..."
-									value={searchKeywords}
-									onChange={(v) => setSearchKeywords(v.currentTarget.value)}
-								/>
-							</div>
-						</form>
-					) : null}
-
-					<ul className="dflex-align-center">
-						<li
-							className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}
-						>
-							{isAfterRehydration ? ( // because it resizes automatically, we need to disable it to prevent flicker
-								<div
-									style={{ cursor: "pointer" }}
-									className={`${styles["head"]} dflex-align-center`}
-								>
-									<p>About us</p>
-									{/* <p>About</p> */}
-									{/* <ArrowDropDownIcon /> */}
-								</div>
+					{isAfterRehydration && (
+						<>
+							{isLargeVersion ? (
+								<ul className="dflex-align-center">
+									<li className={`${styles["head"]} dflex-align-center`}>
+										{["org", "unverified_org"].includes(userType)
+											? manageListingsEl
+											: volunteerEl}
+									</li>
+								</ul>
 							) : null}
-							{/* <ul className={`${styles["body"]}`}>
+							{/* because it resizes automatically, we need to disable it to prevent flicker */}
+							<form onSubmit={onSearch} className={styles.hide}>
+								<div
+									className={`${styles["input-wrapper"]} dflex-align-center`}
+								>
+									<SearchIcon />
+									<input
+										type="text"
+										placeholder="Search Here..."
+										value={searchKeywords}
+										onChange={(v) => setSearchKeywords(v.currentTarget.value)}
+									/>
+								</div>
+							</form>
+							<ul className="dflex-align-center">
+								{/* because it resizes automatically, we need to disable it to prevent flicker */}
+								{/* <div
+										style={{ cursor: "pointer" }}
+										className={`${styles["head"]} dflex-align-center`}
+									>
+										<p>About us</p>
+										<p>About</p>
+										<ArrowDropDownIcon /> 
+									</div> */}
+
+								{/* <ul className={`${styles["body"]}`}>
 								<li>
 									<Link href="/aboutUs" passHref>
 										<a>
@@ -187,27 +203,56 @@ function Header() {
 									</Link>
 								</li>
 							</ul> */}
-						</li>
 
-						{signUpOrMyAccountEl}
-						{/* Only show on small screens and when not on certain pages */}
-						{isAfterRehydration &&
-						windowWidth <= sidebarLimitWidth &&
-						![
-							"/login",
-							"/organisationSignup",
-							"/userSignup",
-							"/signupSelect",
-						].includes(router.pathname) ? (
-							<li className={`${styles["bottomButton"]}`}>
-								<Link href="/login" passHref>
-									<a>
-										<p>Sign in</p>
-									</a>
-								</Link>
-							</li>
-						) : null}
-					</ul>
+								{!isLargeVersion ? null : (
+									<>
+										{isLoggedIn ? (
+											<li>{myAccountEl}</li>
+										) : (
+											<>
+												<li>{signInEl}</li>
+												<li
+													className={`${styles["drop-down"]} ${styles["dropdown-wrapper"]} ${styles["about-wrapper"]}`}
+												>
+													<div
+														style={{ cursor: "pointer" }}
+														className={`${styles["head"]} dflex-align-center`}
+													>
+														<p>Sign Up</p>
+														<ArrowDropDownIcon />
+													</div>
+													<ul className={`${styles["body"]}`}>
+														<li>{userSignUpEl}</li>
+														<li>{charitySignUpEl}</li>
+													</ul>
+												</li>
+											</>
+										)}
+										<li>{aboutUsEl}</li>
+									</>
+								)}
+
+								{/* Only show on small screens and when not on certain pages */}
+								{!isLargeVersion &&
+								!isLoggedIn &&
+								![
+									"/login",
+									"/organisationSignup",
+									"/userSignup",
+									"/signupSelect",
+								].includes(router.pathname) ? (
+									<li className={`${styles["bottomButton"]}`}>
+										{console.log("wtf")}
+										<Link href="/login" passHref>
+											<a>
+												<p>Sign in</p>
+											</a>
+										</Link>
+									</li>
+								) : null}
+							</ul>
+						</>
+					)}
 
 					<div
 						className={`${styles["burger-icon"]}`}

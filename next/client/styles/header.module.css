@@ -2,12 +2,14 @@
 	background-color: #f8f9fa;
 }
 
-.Header .header-content > ul li {
-	padding: 1.5rem 0.5rem;
+.Header .header-content > ul li a p {
+	margin: 1.5rem 0.5rem;
+}
+.Header .header-content > ul li a {
 	display: inline-block;
 }
 
-.Header .header-content ul li:hover {
+.Header .header-content ul li:hover:not(.drop-down) {
 	background-color: #ddd;
 }
 
@@ -24,6 +26,7 @@
 	height: 100%;
 	display: flex;
 }
+
 .Header .header-content .lend-wrapper .body {
 	position: absolute;
 	top: 80%;
@@ -112,10 +115,6 @@
 	width: 200px;
 }
 
-.header-content > ul li {
-	padding: 1.5rem 0.5rem;
-	display: inline-block;
-}
 .header-content ul li:hover {
 	background-color: #ddd;
 }
@@ -156,7 +155,9 @@
 	padding: 0rem !important;
 }
 .header-content .dropdown-wrapper .body li a {
-	padding: 1rem 0.3rem;
+	/* padding: 1rem 0.3rem; */
+	padding: 0rem !important;
+
 	color: #000;
 	display: block;
 	width: 100%;
@@ -204,7 +205,8 @@
 	text-align: left !important;
 }
 .Header ul li.dropdown-wrapper .body li a {
-	padding: 0.7rem 1.5rem !important;
+	display: inline-block;
+	text-align: center;
 }
 .Header ul > * + * {
 	margin-left: 2rem;
@@ -236,8 +238,8 @@
 	.Header .header-content > img {
 		width: 150px;
 	}
-	.Header .header-content > ul li:first-child {
-		display: none;
+	.Header .header-content .hide {
+		display: none !important;
 	}
 	.Header form {
 		margin-right: 0px !important;
@@ -268,7 +270,7 @@
 
 		margin-left: 0rem !important;
 	}
-	.Header .header-content > ul > li:last-child a {
+	.Header .header-content > ul li.bottomButton a {
 		color: #fff !important;
 	}
 	.Header {
@@ -285,17 +287,17 @@
 
 /*simplified header*/
 .simplified-header {
-  height: 5rem;
-  background-color: #f8f9fb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+	height: 5rem;
+	background-color: #f8f9fb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
 }
 .simplified-header-img {
-  width: 230px;
+	width: 230px;
 }
 @media screen and (max-width: 680px) {
-  .simplified-header-img {
-    width: 180px;
-  }
+	.simplified-header-img {
+		width: 180px;
+	}
 }

@@ -35,11 +35,13 @@ import { getUserType, UserClient } from "../server/auth/data";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import { updateCsrf } from "../server/csrf";
 import { csrfFetch } from "../client/utils/csrf";
+import { useRouter } from "next/router";
 
 export default function MyAccount({
 	accountData: _accountData,
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const router = useRouter();
 	const [accountData, setAccountData] = useState(_accountData);
 	// TODO: technically, since we get the fields from the server, view protection isn't needed
 
@@ -58,7 +60,6 @@ export default function MyAccount({
 		useState("basic_info_link");
 	const HandlePersonalInfoLink: MouseEventHandler<HTMLAnchorElement> = (e) => {
 		const targetId = (e.target as any).id;
-		console.log(targetId);
 		targetId == "basic_info_link" && setPersonalInfoActive("basic_info_link");
 		targetId == "Skills_link" && setPersonalInfoActive("Skills_link");
 		targetId == "Email_link" && setPersonalInfoActive("Email_link");
@@ -192,6 +193,7 @@ export default function MyAccount({
 				</div>
 			) : null;
 	}
+	if (isAfterRehydration && accountData === null) router.push("/login");
 
 	return (
 		<>

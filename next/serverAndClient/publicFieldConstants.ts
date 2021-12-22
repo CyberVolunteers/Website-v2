@@ -31,7 +31,7 @@ export const users: FieldConstraintsCollection = {
 	},
 	optional: {
 		string: {
-			gender: { enum: ["male", "female", "other"] },
+			gender: { enum: ["m", "f", "o"] },
 			occupation: { maxLength: 200 },
 			languages: { maxLength: 200 },
 			skillsAndInterests: { maxLength: 1000 },

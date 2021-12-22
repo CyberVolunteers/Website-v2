@@ -51,8 +51,6 @@ export const SkillsAndInterests = ({
 
 		const newData = await res.json();
 		// override the changes
-		console.log(data);
-		console.log({ data, ...newData });
 		setData({ ...data, ...newData });
 	}
 

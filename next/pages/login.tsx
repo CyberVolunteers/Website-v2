@@ -15,6 +15,7 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { error } from "../client/utils/logger";
+import { updateLoginState } from "../client/utils/userState";
 
 export default function Login({
 	csrfToken,
@@ -53,6 +54,7 @@ export default function Login({
 		const errorText = await res.text();
 
 		const firstDigit = ("" + res.status)[0];
+		updateLoginState();
 		if (res.status === 200) return router.push("/searchListings");
 		error(
 			"login",

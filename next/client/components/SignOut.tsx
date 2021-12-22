@@ -3,6 +3,7 @@ import Button from "./Button";
 import styles from "../styles/signOut.module.css";
 import { useRouter } from "next/router";
 import { csrfFetch } from "../utils/csrf";
+import { updateLoginState } from "../utils/userState";
 export const SignOut = ({ csrfToken }: { csrfToken: string }) => {
 	const router = useRouter();
 	return (
@@ -26,6 +27,8 @@ export const SignOut = ({ csrfToken }: { csrfToken: string }) => {
 								accept: "application/json",
 							},
 						});
+
+						updateLoginState();
 
 						router.push("/");
 					}}
