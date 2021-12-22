@@ -34,25 +34,17 @@ export default function ChangePassword({
 	const router = useRouter();
 	const isAfterRehydration = useIsAfterRehydration();
 
-	const [currentPassword, setCurrentPassword] = useState("");
+	const [showPassword, setShowPassword] = useState(false);
+
 	const [newPassword, setNewPassword] = useState("");
 	const [newPassword2, setNewPassword2] = useState("");
 
-	const [showCurrentPassword, setCurrentShowPassword] = useState(false);
-
 	const [errorMessage, setErrorMessage] = useState("");
-	const [currentPasswordErrorMessage, setCurrentPasswordErrorMessage] =
-		useState("");
 	const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
 	const [newPassword2ErrorMessage, setNewPassword2ErrorMessage] = useState("");
 
+	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [passwordStrength, setPasswordStrength] = useState(0);
-
-	function comparePasswords() {
-		if (newPassword !== newPassword2)
-			setNewPassword2ErrorMessage("The two passwords must be equal");
-		else setNewPassword2ErrorMessage("");
-	}
 
 	async function submit() {}
 
@@ -68,50 +60,15 @@ export default function ChangePassword({
 						submit();
 					}}
 					headingText={<span>Hi, {firstName}</span>}
-					subheadingText="Please first verify it is you by entering your current password and then enter your new password."
+					subheadingText="Please enter a memorable new password."
 				>
-					<div className={styles.text_field}>
-						<div
-							className={styles.eye_wrap}
-							onClick={() => setCurrentShowPassword(!showCurrentPassword)}
-						>
-							<FontAwesomeIcon
-								icon={showCurrentPassword ? faEyeSlash : faEye}
-							/>
-						</div>
-
-						<TextField
-							error={currentPasswordErrorMessage !== ""}
-							onBlur={() => {
-								if (currentPassword === "")
-									setCurrentPasswordErrorMessage("Please enter a password");
-							}}
-							onFocus={() => setCurrentPasswordErrorMessage("")}
-							onChange={(e) => {
-								setCurrentPassword(e.target.value);
-							}}
-							id="current-password"
-							label="Current Password"
-							variant="outlined"
-							style={{ width: "100%" }}
-							type={showCurrentPassword ? "text" : "password"}
-						/>
-
-						<span className="helping-text password-helper">
-							{currentPasswordErrorMessage}
-						</span>
-					</div>
 					<TextField
 						error={newPasswordErrorMessage !== ""}
 						onBlur={() => {
 							if (newPassword === "")
 								setNewPasswordErrorMessage("Please enter a password");
-							comparePasswords();
 						}}
-						onFocus={() => {
-							setNewPasswordErrorMessage("");
-							setNewPassword2ErrorMessage("");
-						}}
+						onFocus={() => setNewPasswordErrorMessage("")}
 						onChange={(e) => {
 							setNewPassword(e.target.value);
 						}}
@@ -119,7 +76,7 @@ export default function ChangePassword({
 						label="New Password"
 						variant="outlined"
 						style={{ width: "100%" }}
-						type="password"
+						type={showPassword ? "text" : "password"}
 					/>
 					<span className="helping-text password-helper">
 						{newPasswordErrorMessage}
@@ -134,7 +91,6 @@ export default function ChangePassword({
 						onBlur={() => {
 							if (newPassword2 === "")
 								setNewPassword2ErrorMessage("Please enter a password");
-							comparePasswords();
 						}}
 						onFocus={() => setNewPassword2ErrorMessage("")}
 						onChange={(e) => {
@@ -144,7 +100,7 @@ export default function ChangePassword({
 						label="Confirm New Password"
 						variant="outlined"
 						style={{ width: "100%" }}
-						type="password"
+						type={showPassword ? "text" : "password"}
 					/>
 					<span className="helping-text password-helper">
 						{newPassword2ErrorMessage}
@@ -158,20 +114,25 @@ export default function ChangePassword({
 						{errorMessage}
 					</span>
 
-					<div className="button-wrapper">
-						<Link href="/forgotPassword">Forgotten my Password</Link>
+					<span style={{ margin: "0.5rem", display: "inline-block" }}>
+						<input
+							type="checkbox"
+							onChange={() => setShowPassword(!showPassword)}
+						/>
+						<span style={{ paddingLeft: "0.5rem" }}>Show password </span>
+					</span>
+
+					<div className="button-wrapper wide-button" style={{ width: "100%" }}>
 						<Button
 							type="submit"
 							variant="contained"
 							color="primary"
-							style={{ width: "100%" }}
+							style={{ width: "100% !important" }}
 							className={
 								newPassword === "" ||
 								newPassword2 === "" ||
 								newPasswordErrorMessage !== "" ||
 								newPassword2ErrorMessage !== "" ||
-								currentPassword === "" ||
-								currentPasswordErrorMessage !== "" ||
 								newPassword !== newPassword2
 									? "disable"
 									: ""

@@ -23,6 +23,7 @@ import Image from "next/image";
 import { isEmailFree } from "../server/auth/data";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
+import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
 
 const minSearchCooldownMillis = 700;
 
@@ -512,7 +513,6 @@ function FirstPage({
 
 	const [visitedFields, setVisitedFields] = useState([] as string[]);
 
-	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [showPassword, setShowPassword] = useState(false);
 
 	let [passwordStrength, setPasswordStrength] = useState(0);
@@ -526,27 +526,6 @@ function FirstPage({
 		password2ErrorMessage =
 			password === password2 ? "" : "The two passwords do not match";
 		setPassword2ErrorMessage(password2ErrorMessage);
-
-		// also update the strength value right now
-		if (password === "") {
-			passwordStrength = 0;
-			setPasswordStrengthNotes("");
-		} else {
-			const result = zxcvbn(password);
-			const score = result.score;
-			const passwordStrengthSummary = [
-				"A very weak password",
-				"A weak password",
-				"A medium password",
-				"A strong password",
-				"A very strong password",
-			][score];
-			// because the score bar goes from 1 to 4 inclusive
-			passwordStrength = Math.min(score + 1, 4);
-
-			setPasswordStrengthNotes(passwordStrengthSummary);
-		}
-		setPasswordStrength(passwordStrength);
 	}, [password, password2]);
 
 	// record the vals
@@ -713,30 +692,11 @@ function FirstPage({
 					{passwordErrorMessage}
 				</span>
 
-				{passwordStrengthNotes === "" && passwordStrength === 0 ? null : (
-					<div className="password-ui-strong" style={{ marginTop: 10 }}>
-						<div className="bars" style={{ marginBottom: 5 }}>
-							{[1, 2, 3, 4].map((barIdNumber) => (
-								<span
-									key={barIdNumber}
-									className={`bar ${
-										passwordStrength < barIdNumber
-											? ""
-											: `password-strength-bar-level-${passwordStrength}`
-									}`}
-									id={`bar-${barIdNumber}`}
-								></span>
-							))}
-						</div>
-
-						<p
-							style={{ fontSize: 12, marginTop: 10 }}
-							className="passwordStrength"
-						>
-							Password Strength: {passwordStrengthNotes}
-						</p>
-					</div>
-				)}
+				<PasswordStrengthBar
+					password={password}
+					passwordStrength={passwordStrength}
+					setPasswordStrength={setPasswordStrength}
+				/>
 
 				<TextField
 					className={`password2 ${getFieldClasses("password2", visitedFields)}`}

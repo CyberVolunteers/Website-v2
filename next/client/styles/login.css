@@ -212,10 +212,12 @@ input[type="password"]::-ms-reveal {
 	grid-gap: 1rem;
 	align-items: center;
 }
+.button-wrapper:not(.wide-button) .MuiButton-containedPrimary {
+	width: 130px !important;
+}
 .button-wrapper .MuiButton-containedPrimary {
 	height: 45px !important;
 	background-color: #f85220;
-	width: 130px !important;
 }
 .button-wrapper .MuiButton-containedPrimary:hover {
 	background-color: #f85220;
