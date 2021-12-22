@@ -127,7 +127,7 @@ export default function Login({
 									label="Password"
 									variant="outlined"
 									style={{ width: "100%" }}
-									type={showPassword ? "test" : "password"}
+									type={showPassword ? "text" : "password"}
 								/>
 
 								<span className="helping-text password-helper">
@@ -144,7 +144,7 @@ export default function Login({
 								</span>
 							</div>
 							<div className="button-wrapper">
-								<Link href="/forgotPassword">Forgot my Password</Link>
+								<Link href="/forgotPassword">Forgotten my Password</Link>
 								<Button
 									type="submit"
 									variant="contained"

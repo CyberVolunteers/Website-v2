@@ -12,17 +12,15 @@ export const Email = ({ email }: { email: string }) => {
 				change your email address. Once you have changed your email address a
 				verification email will be sent to your new email address.
 			</p>
-			<div className={styles.link}>
-				<Link href="#">
-					<>
-						<p>{email}</p>
+			<Link href="changeEmail">
+				<div className={styles.link}>
+					<p>{email}</p>
 
-						<p>
-							Change Email <i className="fas fa-angle-right"></i>
-						</p>
-					</>
-				</Link>
-			</div>
+					<p>
+						Change Email <i className="fas fa-angle-right"></i>
+					</p>
+				</div>
+			</Link>
 		</div>
 	);
 };

@@ -10,15 +10,19 @@ function CustomForm({
 	onSubmit,
 }: React.PropsWithChildren<{
 	headingText: React.ReactNode | string;
-	headingLinkText: React.ReactNode | string;
-	headingLinkHref: string;
+	headingLinkText?: React.ReactNode | string;
+	headingLinkHref?: string;
 	subheadingText: React.ReactNode | string;
 	onSubmit?: React.FormEventHandler<HTMLFormElement>;
 }>) {
 	return (
 		<form className="custom-form" onSubmit={onSubmit}>
 			<p className="header" style={{ fontWeight: "bold" }}>
-				{headingText} <Link href={headingLinkHref}>{headingLinkText}</Link>
+				{headingText}{" "}
+				{headingLinkHref === undefined ||
+				headingLinkText === undefined ? null : (
+					<Link href={headingLinkHref}>{headingLinkText}</Link>
+				)}
 			</p>
 			<p className="helper">{subheadingText}</p>
 

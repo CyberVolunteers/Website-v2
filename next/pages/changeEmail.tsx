@@ -1,8 +1,3 @@
-import {
-	FieldConstraintsCollection,
-	flatten,
-	Flattened,
-} from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { ReactElement } from "react";
@@ -22,7 +17,7 @@ import { getUserType } from "../server/auth/data";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import BackButton from "../client/components/BackButton";
 
-export default function ChangePassword({
+export default function ChangeEmail({
 	csrfToken,
 	firstName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -32,25 +27,22 @@ export default function ChangePassword({
 	const router = useRouter();
 	const isAfterRehydration = useIsAfterRehydration();
 
-	const [currentPassword, setCurrentPassword] = useState("");
-	const [newPassword, setNewPassword] = useState("");
-	const [newPassword2, setNewPassword2] = useState("");
+	const [email, setEmail] = useState("");
+	const [password, setPassword] = useState("");
 
-	const [showCurrentPassword, setCurrentShowPassword] = useState(false);
+	const [showPassword, setShowPassword] = useState(false);
 
 	const [errorMessage, setErrorMessage] = useState("");
-	const [currentPasswordErrorMessage, setCurrentPasswordErrorMessage] =
-		useState("");
-	const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
-	const [newPassword2ErrorMessage, setNewPassword2ErrorMessage] = useState("");
+	const [emailErrorMessage, setEmailErrorMessage] = useState("");
+	const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
 	async function submit() {}
 
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
 		<div>
-			<Head title="Change password - cybervolunteers" />
-			<BackButton text="Password" onClick={() => router.back()} />
+			<Head title="Change email - cybervolunteers" />
+			<BackButton text="Email" onClick={() => router.back()} />
 			<div className="body-area">
 				<CustomForm
 					onSubmit={(e) => {
@@ -58,85 +50,62 @@ export default function ChangePassword({
 						submit();
 					}}
 					headingText={<span>Hi, {firstName}</span>}
-					subheadingText="To continue, first verify its you by entering your current password."
+					subheadingText="Enter your new email and your current password. Once you have entered your email address you will receive a verification email."
 				>
+					<TextField
+						error={emailErrorMessage !== ""}
+						onBlur={() => {
+							if (email === "") setEmailErrorMessage("Please enter an email");
+						}}
+						onFocus={() => setEmailErrorMessage("")}
+						onChange={(e) => {
+							setEmail(e.target.value);
+						}}
+						id="email"
+						label="New Email"
+						variant="outlined"
+						style={{ width: "100%" }}
+					/>
+
+					<span className="helping-text email-helper">{emailErrorMessage}</span>
 					<div className={styles.text_field}>
 						<div
 							className={styles.eye_wrap}
-							onClick={() => setCurrentShowPassword(!showCurrentPassword)}
+							onClick={() => setShowPassword(!showPassword)}
 						>
-							<FontAwesomeIcon
-								icon={showCurrentPassword ? faEyeSlash : faEye}
-							/>
+							<FontAwesomeIcon icon={showPassword ? faEyeSlash : faEye} />
 						</div>
 
 						<TextField
-							error={currentPasswordErrorMessage !== ""}
+							error={passwordErrorMessage !== ""}
 							onBlur={() => {
-								if (currentPassword === "")
-									setCurrentPasswordErrorMessage("Please enter a password");
+								if (password === "")
+									setPasswordErrorMessage("Please enter a password");
 							}}
-							onFocus={() => setCurrentPasswordErrorMessage("")}
+							onFocus={() => setPasswordErrorMessage("")}
 							onChange={(e) => {
-								setCurrentPassword(e.target.value);
+								setPassword(e.target.value);
 							}}
-							id="current-password"
+							id="password"
 							label="Current Password"
 							variant="outlined"
 							style={{ width: "100%" }}
-							type={showCurrentPassword ? "text" : "password"}
+							type={showPassword ? "text" : "password"}
 						/>
 
 						<span className="helping-text password-helper">
-							{currentPasswordErrorMessage}
+							{passwordErrorMessage}
+						</span>
+
+						<span
+							className="helping-text login-helper"
+							style={{
+								display: errorMessage === "" ? "none" : "inline-block",
+							}}
+						>
+							{errorMessage}
 						</span>
 					</div>
-					<TextField
-						error={newPasswordErrorMessage !== ""}
-						onBlur={() => {
-							if (newPassword === "")
-								setNewPasswordErrorMessage("Please enter a password");
-						}}
-						onFocus={() => setNewPasswordErrorMessage("")}
-						onChange={(e) => {
-							setNewPassword(e.target.value);
-						}}
-						id="new-password"
-						label="New Password"
-						variant="outlined"
-						style={{ width: "100%" }}
-						type="password"
-					/>
-					<span className="helping-text password-helper">
-						{newPasswordErrorMessage}
-					</span>
-					<TextField
-						error={newPassword2ErrorMessage !== ""}
-						onBlur={() => {
-							if (newPassword2 === "")
-								setNewPassword2ErrorMessage("Please enter a password");
-						}}
-						onFocus={() => setNewPassword2ErrorMessage("")}
-						onChange={(e) => {
-							setNewPassword2(e.target.value);
-						}}
-						id="new-password2"
-						label="Confirm New Password"
-						variant="outlined"
-						style={{ width: "100%" }}
-						type="password"
-					/>
-					<span className="helping-text password-helper">
-						{newPassword2ErrorMessage}
-					</span>
-					<span
-						className="helping-text login-helper"
-						style={{
-							display: errorMessage === "" ? "none" : "inline-block",
-						}}
-					>
-						{errorMessage}
-					</span>
 					<div className="button-wrapper">
 						<Link href="/forgotPassword">Forgotten my Password</Link>
 						<Button
@@ -145,9 +114,7 @@ export default function ChangePassword({
 							color="primary"
 							style={{ width: "100%" }}
 							className={
-								currentPassword !== "" && currentPasswordErrorMessage === ""
-									? ""
-									: "disable"
+								password !== "" && passwordErrorMessage === "" ? "" : "disable"
 							}
 						>
 							NEXT
