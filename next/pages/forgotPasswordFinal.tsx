@@ -15,26 +15,34 @@ import { ReactElement } from "react";
 import Button from "../client/components/Button";
 
 import styles from "../client/styles/simplePage.module.css";
+import { useRouter } from "next/router";
+import { useIsAfterRehydration } from "../client/utils/otherHooks";
 
-export default function EmailConfirmationEmailSent({
-	isSuccessful,
-}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+export default function EmailConfirmationEmailSent({}): ReactElement {
+	const router = useRouter();
+	const isSuccessful = router.query.isSuccessful === "true";
 	const viewerType = useViewerType();
+	const isAfterRehydration = useIsAfterRehydration();
 	if (viewerType !== "server") updateLoginState();
+
+	if (!isAfterRehydration)
+		return (
+			<>
+				<Head title="Password reset - cybervolunteers" />
+			</>
+		);
 	return (
 		<div>
 			<Head
 				title={`${
-					isSuccessful
-						? "Email verified successfully"
-						: "Email verification failed"
+					isSuccessful ? "Password reset successfully" : "Password reset failed"
 				} - cybervolunteers`}
 			/>
 
 			{isSuccessful ? (
 				<div className={styles.container}>
 					<h1 className={styles.main_heading}>
-						Your email has been verified successfully.
+						Your password has been reset successfully.
 					</h1>
 					{/* <p className={styles.main_para}>
 						Feel free to */}
@@ -50,16 +58,11 @@ export default function EmailConfirmationEmailSent({
 					>
 						SEARCH LISTINGS
 					</Button>
-					<h4>
-						Note: if you are using this account on a different device or
-						browser, you would have to log out and back in on those pages for
-						this to take effect
-					</h4>
 				</div>
 			) : (
 				<div className={styles.container}>
 					<h1 className={styles.main_heading}>
-						Something went wrong when verifying your email.
+						Something went wrong when resetting your password.
 					</h1>
 					<p className={styles.main_para}>
 						It is possible that this is because the link you used is too old.
@@ -72,45 +75,3 @@ export default function EmailConfirmationEmailSent({
 		</div>
 	);
 }
-export const getServerSideProps: GetServerSideProps<{
-	isSuccessful: boolean;
-}> = async (context) => {
-	const { uuid, email } = context.query;
-	if (typeof uuid !== "string" || typeof email !== "string")
-		return {
-			props: {
-				isSuccessful: false,
-			},
-		};
-
-	let isSuccessful = await verifyUUID(email, uuid, "emailConfirmUUID");
-	if (!isSuccessful)
-		return {
-			props: {
-				isSuccessful: false,
-			},
-		};
-	await destroyUUID(email, "emailConfirmUUID");
-
-	// connect mongo
-	//TODO: somehow make it impossible to miss this?
-	await getMongo();
-
-	// set the values
-	const resultDoc = await setEmailAsVerified(email);
-
-	// if belongs to a user, set the new session
-	if (resultDoc !== null)
-		await updateSession(
-			context.req as ExtendedNextApiRequest,
-			context.res as NextApiResponse,
-			resultDoc
-		);
-	else isSuccessful = false; // the user was not found
-
-	return {
-		props: {
-			isSuccessful,
-		}, // will be passed to the page component as props
-	};
-};

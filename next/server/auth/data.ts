@@ -53,7 +53,9 @@ export async function login({
 		// update the hash
 		async (newHash) => {
 			// TODO: test this, esp. for orgs
-			accountData = await changeByEmail(email, { passwordHash: newHash });
+			accountData = await manipulateDataByEmail(email, {
+				passwordHash: newHash,
+			});
 		}
 	);
 
@@ -329,8 +331,12 @@ async function updateData(
  * @param newData
  * @returns the new data, as stored in the db (and processed by extractData)
  */
-async function changeByEmail(email: string, newData: { [key: string]: any }) {
-	const latestEmail = newData.email ?? email; // make sure to get the latest email data
+export async function manipulateDataByEmail(
+	email: string,
+	newData?: { [key: string]: any }
+) {
+	const latestEmail = newData?.email ?? email; // make sure to get the latest email data
+
 	// find instead of findOne to keep the time roughly constant relative to when there are no results
 	const [users, organisations] = await Promise.all([
 		User.find({ email }),
@@ -351,22 +357,25 @@ async function changeByEmail(email: string, newData: { [key: string]: any }) {
 	// make sure to put the modified data into the array if a charity
 	if (!doesEmailBelongToUser) {
 		const perUserFields = ["email", "isEmailVerified", "passwordHash"];
-		Object.entries(newData).forEach(([k, v]) => {
-			if (perUserFields.includes(k)) {
-				newData.$set = newData.$set ?? {};
-				newData.$set[`creds.$.${k}`] = v;
-				delete newData[k];
-			}
-		});
+		if (typeof newData !== "undefined")
+			Object.entries(newData).forEach(([k, v]) => {
+				if (perUserFields.includes(k)) {
+					newData.$set = newData.$set ?? {};
+					newData.$set[`creds.$.${k}`] = v;
+					delete newData[k];
+				}
+			});
 	}
 
-	return extractData(
-		await model.findOneAndUpdate(searchParams, newData, {
-			new: true,
-			upsert: false, // do not create a new one
-		}),
-		latestEmail
-	);
+	const newRes =
+		newData === undefined
+			? await model.findOne(searchParams)
+			: await model.findOneAndUpdate(searchParams, newData, {
+					new: true,
+					upsert: false, // do not create a new one
+			  });
+
+	return extractData(newRes, latestEmail);
 }
 
 /**
@@ -382,7 +391,7 @@ export async function changeEmail(oldEmail: string, newEmail: string) {
 		return null;
 	}
 
-	return await changeByEmail(oldEmail, {
+	return await manipulateDataByEmail(oldEmail, {
 		email: newEmail,
 		isEmailVerified: false,
 	});
@@ -394,7 +403,7 @@ export async function changeEmail(oldEmail: string, newEmail: string) {
  * @returns the new data, as stored in the db (and processed by extractData)
  */
 export async function setEmailAsVerified(email: string) {
-	return await changeByEmail(email, {
+	return await manipulateDataByEmail(email, {
 		isEmailVerified: true,
 	});
 }
@@ -407,7 +416,7 @@ export async function setEmailAsVerified(email: string) {
  */
 export async function setPassword(email: string, password: string) {
 	const passwordHash = await hash(password);
-	return await changeByEmail(email, {
+	return await manipulateDataByEmail(email, {
 		passwordHash,
 	});
 }

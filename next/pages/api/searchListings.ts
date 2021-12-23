@@ -7,8 +7,11 @@ import { logger } from "../../server/logger";
 import { searchListingsSpec } from "../../serverAndClient/publicFieldConstants";
 import { getLatAndLong } from "../../server/location";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

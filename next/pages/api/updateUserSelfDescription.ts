@@ -12,8 +12,11 @@ import { postcodeRE } from "../../client/utils/const";
 import isEmail from "validator/lib/isEmail";
 import isMobilePhone from "validator/lib/isMobilePhone";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

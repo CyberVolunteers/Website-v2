@@ -27,6 +27,7 @@ import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
 export default function ChangePassword({
 	csrfToken,
 	firstName,
+	lastName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	// TODO: fix view protections
 	// useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
@@ -54,7 +55,33 @@ export default function ChangePassword({
 		else setNewPassword2ErrorMessage("");
 	}
 
-	async function submit() {}
+	const isAllCorrect =
+		newPassword !== "" &&
+		newPassword2 !== "" &&
+		currentPassword !== "" &&
+		newPasswordErrorMessage === "" &&
+		newPassword2ErrorMessage === "" &&
+		currentPasswordErrorMessage === "" &&
+		newPassword === newPassword2;
+
+	async function submit() {
+		if (!isAllCorrect) return;
+		const res = await csrfFetch(csrfToken, "/api/changePassword", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({
+				oldPassword: currentPassword,
+				newPassword,
+			}),
+		});
+
+		if (res.status >= 400) return setErrorMessage(await res.text());
+		else router.push("/myAccount");
+	}
 
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
@@ -67,7 +94,11 @@ export default function ChangePassword({
 						e.preventDefault();
 						submit();
 					}}
-					headingText={<span>Hi, {firstName}</span>}
+					headingText={
+						<span>
+							Hi, {firstName} {lastName}
+						</span>
+					}
 					subheadingText="Please first verify it is you by entering your current password and then enter your new password."
 				>
 					<div className={styles.text_field}>
@@ -165,17 +196,7 @@ export default function ChangePassword({
 							variant="contained"
 							color="primary"
 							style={{ width: "100%" }}
-							className={
-								newPassword === "" ||
-								newPassword2 === "" ||
-								newPasswordErrorMessage !== "" ||
-								newPassword2ErrorMessage !== "" ||
-								currentPassword === "" ||
-								currentPasswordErrorMessage !== "" ||
-								newPassword !== newPassword2
-									? "disable"
-									: ""
-							}
+							className={isAllCorrect ? "" : "disable"}
 						>
 							NEXT
 						</Button>
@@ -189,20 +210,24 @@ export default function ChangePassword({
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
 	firstName: null | string;
+	lastName: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 	if (typeof session !== "object" || session === null)
 		return {
 			props: {
 				firstName: null,
+				lastName: "",
 				csrfToken: await updateCsrf(context),
 			},
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
 	if (!isVerifiedUser)
+		// TODO: tell them that only verified users can do that
 		return {
 			props: {
 				firstName: null,
+				lastName: "",
 				csrfToken: await updateCsrf(context),
 			},
 		};
@@ -211,6 +236,7 @@ export const getServerSideProps: GetServerSideProps<{
 		props: {
 			csrfToken: await updateCsrf(context),
 			firstName: session.firstName,
+			lastName: session.lastName,
 		}, // will be passed to the page component as props
 	};
 };

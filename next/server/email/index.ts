@@ -4,6 +4,9 @@ import { protocolAndHost } from "../../serverAndClient/staticDetails";
 import { sendEmail } from "./nodemailer";
 import { addTempKey, RedisUUIDStores } from "./redis";
 
+import confirmEmailTemplate from "./templates/confirmEmail";
+import resetPasswordTemplate from "./templates/forgotPasswordEmail";
+
 // https://www.geeksforgeeks.org/email-template-using-html-and-css/
 
 /**
@@ -31,7 +34,12 @@ export async function sendEmailWithUUID(
 	await addTempKey(email, uuid, store);
 }
 
-export async function sendEmailConfirmationEmail(email: string) {
+export async function sendEmailConfirmationEmail(
+	email: string,
+	firstName: string,
+	lastName: string
+) {
+	// current dir = /usr/app/.next/server/pages/api
 	await sendEmailWithUUID(
 		email,
 		(uuid) => {
@@ -40,13 +48,54 @@ export async function sendEmailConfirmationEmail(email: string) {
 				email,
 			})}`;
 			return {
-				text: `Go to this link: ${link}`,
-				html: `<h1>Please register:</h1> <p><a href="${link}">go</a> </p> <p> or if that does not work, visit this link: ${link}`,
+				text: `Thanks for signing up, ${firstName} ${lastName}. Please verify your email address to get access to the charity listings by going to this web page: ${link}. If this was not done by you please ignore this email.`,
+				html: confirmEmailTemplate(link, firstName, lastName),
 			};
 		},
 		"emailConfirmUUID",
 		{
-			subject: "Please verify your email.",
+			subject: "Please verify your email",
+			attachments: [
+				{
+					filename: "logo.svg",
+					path: `${__dirname}/../../../../public/img/logo.svg`,
+					cid: "logo",
+				},
+			],
+		}
+	);
+}
+
+export async function sendPasswordResetEmail(
+	email: string,
+	firstName: string,
+	lastName: string
+) {
+	// current dir = /usr/app/.next/server/pages
+	await sendEmailWithUUID(
+		email,
+		(uuid) => {
+			const link = `${protocolAndHost}/forgotPasswordWithToken?${new URLSearchParams(
+				{
+					uuid,
+					email,
+				}
+			)}`;
+			return {
+				text: `Did you request a password reset, ${firstName} ${lastName}? Please only go to the following link if you requested the password reset: ${link}.`,
+				html: resetPasswordTemplate(link, firstName, lastName),
+			};
+		},
+		"passwordResetUUID",
+		{
+			subject: "Password reset",
+			attachments: [
+				{
+					filename: "logo.svg",
+					path: `${__dirname}/../../../public/img/logo.svg`,
+					cid: "logo",
+				},
+			],
 		}
 	);
 }

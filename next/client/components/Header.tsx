@@ -239,7 +239,6 @@ function Header() {
 									router.pathname
 								) ? (
 									<li className={`${styles["bottomButton"]}`}>
-										{console.log("wtf")}
 										<Link href="/login" passHref>
 											<a>
 												<p>Sign in</p>

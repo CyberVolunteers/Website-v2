@@ -215,6 +215,7 @@ export const getServerSideProps: GetServerSideProps<{
 	accountData: UserClient | null;
 	csrfToken: string;
 }> = async (context: any) => {
+	// TODO: there is a bug where verifying the email resets the session for some reason
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 	if (typeof session !== "object" || session === null)
 		return {
@@ -223,8 +224,10 @@ export const getServerSideProps: GetServerSideProps<{
 				csrfToken: await updateCsrf(context),
 			},
 		};
+
 	const { isUser, isVerifiedUser } = getUserType(session);
-	if (!isVerifiedUser)
+
+	if (!isUser)
 		return {
 			props: {
 				accountData: null,

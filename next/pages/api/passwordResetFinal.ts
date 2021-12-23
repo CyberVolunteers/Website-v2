@@ -6,7 +6,9 @@ import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { verifyUUID } from "../../server/email/redis";
+import { destroyUUID, verifyUUID } from "../../server/email/redis";
+import { getMongo } from "../../server/mongo";
+import { incorrectUUIDError } from "../../client/utils/const";
 
 export const config = {
 	api: {
@@ -19,33 +21,31 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const { email, uuid, password } = req.body;
-
-		logger.info(
-			"server.passwordResetWithToken: updating %s with %s",
+		const {
 			email,
-			uuid
-		);
+			uuid,
+			password,
+		}: { email: string; uuid: string; password: string } = req.body;
 
-		const isCorrectUUID = await verifyUUID(email, uuid, "passwordResetUUID");
+		logger.info("server.passwordResetFinal: updating %s with %s", email, uuid);
 
-		if (!isCorrectUUID)
-			return res.status(400).send("We are sorry, but this link has expired");
+		let isSuccessful = await verifyUUID(email, uuid, "passwordResetUUID");
+		if (isSuccessful) return res.status(400).send(incorrectUUIDError);
+		await destroyUUID(email, "passwordResetUUID");
 
-		const newDoc = await setPassword(email, password);
+		// connect mongo
+		//TODO: somehow make it impossible to miss this?
+		await getMongo();
 
-		if (newDoc === null)
-			return res
-				.status(500)
-				.send("We could not update your data. Sorry for the inconvenience.");
-
+		// set the values
+		const newDoc = setPassword(email, password);
 		await updateSession(req, res, newDoc);
 
 		return res.end();
 	},
 };
 
-export default async function changeEmailRequest(
+export default async function passwordResetFinal(
 	req: NextApiRequest,
 	res: NextApiResponse<Data>
 ): Promise<void> {

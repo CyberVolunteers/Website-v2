@@ -7,8 +7,11 @@ import { logger } from "../../server/logger";
 import { getSession } from "../../server/auth/auth-cookie";
 import { isLoggedIn } from "../../server/auth/data";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

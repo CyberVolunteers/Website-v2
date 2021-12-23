@@ -1,53 +1,104 @@
-import {
-	FieldConstraintsCollection,
-	flatten,
-	Flattened,
-} from "combined-validator";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
 import React, { ReactElement, useEffect } from "react";
 import { useState } from "react";
-import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
+import { faCheck, faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import Head from "../client/components/Head";
 import Link from "next/link";
 import styles from "../client/styles/simplePage.module.css";
 import { csrfFetch } from "../client/utils/csrf";
 import { Button, TextField } from "@material-ui/core";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { updateCsrf } from "../server/csrf";
 import CustomForm from "../client/components/CustomForm";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
-import { getUserType } from "../server/auth/data";
+import { getUserType, manipulateDataByEmail } from "../server/auth/data";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import BackButton from "../client/components/BackButton";
 import zxcvbn from "zxcvbn";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { destroyUUID, verifyUUID } from "../server/email/redis";
+import { getMongo } from "../server/mongo";
+import { incorrectUUIDError } from "../client/utils/const";
 
 export default function ChangePassword({
 	csrfToken,
 	firstName,
 	lastName,
+	email,
+	uuid,
+	isSuccessful,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	// TODO: fix view protections
-	// useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
+	if (!isSuccessful)
+		return (
+			<>
+				<Head title="Could not reset your password - cybervolunteers" />
+				<div className={styles.container}>
+					<h1 className={styles.main_heading}>
+						Something went wrong when resetting your password.
+					</h1>
+					<p className={styles.main_para}>
+						It is possible that this is because the link you used is too old.
+						Please try again.
+					</p>
+
+					<h4>For your security, only the last sent email is valid.</h4>
+				</div>
+			</>
+		);
 
 	const router = useRouter();
-	const isAfterRehydration = useIsAfterRehydration();
 
 	const [showPassword, setShowPassword] = useState(false);
+
+	const isAfterRehydration = useIsAfterRehydration();
 
 	const [newPassword, setNewPassword] = useState("");
 	const [newPassword2, setNewPassword2] = useState("");
 
-	const [errorMessage, setErrorMessage] = useState("");
 	const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
 	const [newPassword2ErrorMessage, setNewPassword2ErrorMessage] = useState("");
+	const [errorMessage, setErrorMessage] = useState("");
 
-	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
-	async function submit() {}
+	function comparePasswords() {
+		if (newPassword !== newPassword2)
+			setNewPassword2ErrorMessage("The two passwords must be equal");
+		else setNewPassword2ErrorMessage("");
+	}
+
+	const isAllCorrect =
+		newPassword !== "" &&
+		newPassword2 !== "" &&
+		newPasswordErrorMessage === "" &&
+		newPassword2ErrorMessage === "" &&
+		newPassword === newPassword2;
+
+	async function submit() {
+		if (!isAllCorrect) return;
+		const res = await csrfFetch(csrfToken, "/api/passwordResetFinal", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({
+				email,
+				uuid,
+				password: newPassword,
+			}),
+		});
+
+		const errorMessage = await res.text();
+
+		if (errorMessage === incorrectUUIDError)
+			return router.push("/forgotPasswordFinal?isSuccessful=false");
+		if (res.status >= 400) return setErrorMessage(errorMessage);
+		router.push("/forgotPasswordFinal?isSuccessful=true");
+	}
 
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
@@ -65,15 +116,19 @@ export default function ChangePassword({
 							Hi, {firstName} {lastName}
 						</span>
 					}
-					subheadingText="Please enter a memorable new password."
+					subheadingText="Please enter a new, memorable password."
 				>
 					<TextField
 						error={newPasswordErrorMessage !== ""}
 						onBlur={() => {
 							if (newPassword === "")
 								setNewPasswordErrorMessage("Please enter a password");
+							comparePasswords();
 						}}
-						onFocus={() => setNewPasswordErrorMessage("")}
+						onFocus={() => {
+							setNewPasswordErrorMessage("");
+							setNewPassword2ErrorMessage("");
+						}}
 						onChange={(e) => {
 							setNewPassword(e.target.value);
 						}}
@@ -96,6 +151,7 @@ export default function ChangePassword({
 						onBlur={() => {
 							if (newPassword2 === "")
 								setNewPassword2ErrorMessage("Please enter a password");
+							comparePasswords();
 						}}
 						onFocus={() => setNewPassword2ErrorMessage("")}
 						onChange={(e) => {
@@ -119,29 +175,39 @@ export default function ChangePassword({
 						{errorMessage}
 					</span>
 
-					<span style={{ margin: "0.5rem", display: "inline-block" }}>
+					<div
+						className="checkbox-wrapper password-checkbox-wrapper"
+						style={{ marginBottom: 20 }}
+					>
 						<input
 							type="checkbox"
+							name=""
+							id="show-password-checkbox"
+							style={{ display: "none" }}
+							checked={showPassword}
 							onChange={() => setShowPassword(!showPassword)}
 						/>
-						<span style={{ paddingLeft: "0.5rem" }}>Show password </span>
-					</span>
+						<label
+							htmlFor="show-password-checkbox"
+							id="forget-password-wrapper"
+						>
+							<label
+								htmlFor="show-password-checkbox"
+								className="custom-checkbox custom-checkbox-box show-password-label"
+							>
+								<FontAwesomeIcon className="white-fa-check" icon={faCheck} />
+							</label>
+							<p> Show password</p>
+						</label>
+					</div>
 
-					<div className="button-wrapper wide-button" style={{ width: "100%" }}>
+					<div className="button-wrapper">
 						<Button
 							type="submit"
 							variant="contained"
 							color="primary"
-							style={{ width: "100% !important" }}
-							className={
-								newPassword === "" ||
-								newPassword2 === "" ||
-								newPasswordErrorMessage !== "" ||
-								newPassword2ErrorMessage !== "" ||
-								newPassword !== newPassword2
-									? "disable"
-									: ""
-							}
+							style={{ width: "100%" }}
+							className={isAllCorrect ? "" : "disable"}
 						>
 							NEXT
 						</Button>
@@ -154,34 +220,63 @@ export default function ChangePassword({
 
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
-	firstName: null | string;
+	firstName: string;
 	lastName: string;
+	uuid: string;
+	email: string;
+	isSuccessful: boolean;
 }> = async (context) => {
-	const session = await getSession(context.req as ExtendedNextApiRequest);
-	if (typeof session !== "object" || session === null)
+	const { uuid, email } = context.query;
+	if (typeof uuid !== "string" || typeof email !== "string")
 		return {
 			props: {
-				firstName: null,
+				csrfToken: "",
+				firstName: "",
 				lastName: "",
-				csrfToken: await updateCsrf(context),
+				email: "",
+				uuid: "",
+				isSuccessful: false,
 			},
 		};
-	const { isUser, isVerifiedUser } = getUserType(session);
-	if (!isVerifiedUser)
-		// TODO: tell them that only verified users can do that
+
+	let isSuccessful = await verifyUUID(email, uuid, "passwordResetUUID");
+	if (!isSuccessful)
 		return {
 			props: {
-				firstName: null,
+				csrfToken: "",
+				firstName: "",
 				lastName: "",
-				csrfToken: await updateCsrf(context),
+				email,
+				uuid,
+				isSuccessful: false,
+			},
+		};
+
+	// connect mongo
+	//TODO: somehow make it impossible to miss this?
+	await getMongo();
+
+	const { firstName, lastName } = (await manipulateDataByEmail(email)) ?? {};
+	if (typeof firstName !== "string" || typeof lastName !== "string")
+		return {
+			props: {
+				csrfToken: "",
+				firstName: "",
+				lastName: "",
+				email,
+				uuid,
+				isSuccessful: false,
 			},
 		};
 
 	return {
 		props: {
 			csrfToken: await updateCsrf(context),
-			firstName: session.firstName,
-			lastName: session.lastName,
+			firstName,
+			lastName,
+			email,
+			uuid,
+			isSuccessful: true,
 		}, // will be passed to the page component as props
 	};
 };

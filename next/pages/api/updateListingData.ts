@@ -1,7 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isVerifiedOrg, isVerifiedUser, updateListingData, updateUserData } from "../../server/auth/data";
+import {
+	isVerifiedOrg,
+	isVerifiedUser,
+	updateListingData,
+	updateUserData,
+} from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import {
 	listingDataUpdateSpec,
@@ -11,8 +16,11 @@ import { ExtendedNextApiRequest, HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

@@ -9,8 +9,11 @@ import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { doAllRulesApply, signupValidation } from "../../server/validation";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

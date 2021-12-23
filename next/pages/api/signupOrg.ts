@@ -14,8 +14,11 @@ import {
 	updateSession,
 } from "../../server/auth/auth-cookie";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

@@ -4,8 +4,11 @@ import { createHandler } from "../../server/apiRequests";
 import { removeSession } from "../../server/auth/auth-cookie";
 import { HandlerCollection } from "../../server/types";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

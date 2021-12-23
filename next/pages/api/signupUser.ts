@@ -17,8 +17,11 @@ import isEmail from "validator/lib/isEmail";
 import { postcodeRE } from "../../client/utils/const";
 import { sendEmailConfirmationEmail } from "../../server/email";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };
@@ -103,7 +106,7 @@ const handlers: HandlerCollection = {
 		}
 
 		// send an email verification link
-		await sendEmailConfirmationEmail(email);
+		await sendEmailConfirmationEmail(email, firstName, lastName);
 
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist

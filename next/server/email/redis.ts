@@ -11,7 +11,7 @@ export type RedisCacheStores = "postcodeByStreet" | "streetByAddress";
 //TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
 	await hset(k, v, store);
-	// TODO: this is broken
+	// TODO: this is broken - fix timings
 	// await expire(k, store);
 }
 
@@ -30,6 +30,15 @@ async function expire(k: string, store: RedisUUIDStores) {
 export async function getKey(k: string, store: RedisUUIDStores) {
 	return new Promise<string | undefined>((res, rej) => {
 		client.hget(store, k, resolver(res, rej));
+	});
+}
+
+export async function deleteKey(k: string, store: RedisUUIDStores) {
+	return new Promise<void>((res, rej) => {
+		client.hdel(store, k, (err) => {
+			if (err) return rej(err);
+			return res();
+		});
 	});
 }
 
@@ -62,6 +71,13 @@ export async function verifyUUID(
 	// if there hasn't been a request to verify the email,
 	if (storedUUIDRaw === undefined) return false;
 	else return comparisonResult;
+}
+
+export async function destroyUUID(
+	key: string,
+	store: RedisUUIDStores
+): Promise<void> {
+	await deleteKey(key, store);
 }
 
 export async function cacheQuery(

@@ -12,8 +12,11 @@ import { HandlerCollection } from "../../server/types";
 import { loginSpec } from "../../serverAndClient/publicFieldConstants";
 import { logger } from "../../server/logger";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

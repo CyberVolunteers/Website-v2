@@ -10,15 +10,22 @@ import {
 import { getSession } from "../../server/auth/auth-cookie";
 import { isVerifiedOrg } from "../../server/auth/data";
 import { createListing } from "../../server/listings";
-import { ExtendedNextApiRequest, HandlerCollection, MulterReq } from "../../server/types";
+import {
+	ExtendedNextApiRequest,
+	HandlerCollection,
+	MulterReq,
+} from "../../server/types";
 import { listings } from "../../serverAndClient/publicFieldConstants";
 import { allowedFileTypes } from "../../serverAndClient/staticDetails";
 import { logger } from "../../server/logger";
 import _default from "next/dist/client/router";
 
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };
@@ -72,7 +79,7 @@ const handlers: HandlerCollection = {
 		const fileExt = getFileExtension(file.originalname);
 		if (fileExt === null || !allowedFileTypes.includes(fileExt)) {
 			logger.info("server.createListing:Invalid extension");
-			return res.status (400).send("Please upload a valid image file");
+			return res.status(400).send("Please upload a valid image file");
 		}
 
 		const result = await createListing(

@@ -8,6 +8,8 @@ import CustomForm from "../client/components/CustomForm";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
 import { getUserType } from "../server/auth/data";
+import { sendPasswordResetEmail } from "../server/email";
+import { logger } from "../server/logger";
 
 export default function ForgotPassword({
 	csrfToken,
@@ -61,12 +63,22 @@ export const getServerSideProps: GetServerSideProps<{
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
 	if (!isVerifiedUser)
+		// TODO: tell them that only verified users can do that
 		return {
 			props: {
 				email: null,
 				csrfToken: await updateCsrf(context),
 			},
 		};
+
+	logger.info("client.forgotPassword: request for %s", session.email);
+
+	await sendPasswordResetEmail(
+		session.email,
+		session.firstName,
+		session.lastName
+	);
+
 	return {
 		props: {
 			email: session.email,

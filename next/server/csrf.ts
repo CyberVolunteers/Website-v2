@@ -13,6 +13,8 @@ import {
 } from "../serverAndClient/headersConfig";
 import { logger } from "./logger";
 
+// TODO: allow having two instances of the same page open at the same time
+
 /**
  * Generates a random hex string of a specified length
  * @param length
@@ -57,7 +59,10 @@ export async function updateCsrf(context: GetServerSidePropsContext<any>) {
  * @param res
  * @returns undefined
  */
-export async function enforceValidCsrf(req: NextApiRequest, res: NextApiResponse) {
+export async function enforceValidCsrf(
+	req: NextApiRequest,
+	res: NextApiResponse
+) {
 	const receivedPageName = req.headers[currentPageHeaderName.toLowerCase()];
 	if (typeof receivedPageName !== "string") {
 		logger.info("server.csrf:Incorrect or undefined current page header");

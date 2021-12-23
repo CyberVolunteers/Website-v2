@@ -6,8 +6,11 @@ import { createAjvJTDSchema } from "combined-validator";
 import { getPostcode, rawGetPlaceAutocomplete } from "../../server/location";
 import { logger } from "../../server/logger";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

@@ -12,8 +12,11 @@ import { Org } from "../../server/mongo/mongoModels";
 import { getPresentableName } from "../../client/components/FormComponent";
 import { userFieldNamesToShowPublic } from "../../serverAndClient/displayNames";
 
-export * from "../../server/defaultEndpointConfig";
-
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 type Data = {
 	name: string;
 };

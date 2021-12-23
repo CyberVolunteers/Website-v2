@@ -20,6 +20,7 @@ import BackButton from "../client/components/BackButton";
 export default function ChangeEmail({
 	csrfToken,
 	firstName,
+	lastName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	// TODO: fix view protections
 	// useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
@@ -36,7 +37,30 @@ export default function ChangeEmail({
 	const [emailErrorMessage, setEmailErrorMessage] = useState("");
 	const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
-	async function submit() {}
+	const isAllCorrect =
+		email !== "" &&
+		emailErrorMessage === "" &&
+		password !== "" &&
+		passwordErrorMessage === "";
+
+	async function submit() {
+		if (!isAllCorrect) return;
+		const res = await csrfFetch(csrfToken, "/api/changeEmail", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify({
+				password,
+				email,
+			}),
+		});
+
+		if (res.status >= 400) return setErrorMessage(await res.text());
+		else router.push("/myAccount");
+	}
 
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
@@ -49,7 +73,11 @@ export default function ChangeEmail({
 						e.preventDefault();
 						submit();
 					}}
-					headingText={<span>Hi, {firstName}</span>}
+					headingText={
+						<span>
+							Hi, {firstName} {lastName}
+						</span>
+					}
 					subheadingText="Enter your new email and your current password. Once you have entered your email address you will receive a verification email."
 				>
 					<TextField
@@ -113,9 +141,7 @@ export default function ChangeEmail({
 							variant="contained"
 							color="primary"
 							style={{ width: "100%" }}
-							className={
-								password !== "" && passwordErrorMessage === "" ? "" : "disable"
-							}
+							className={isAllCorrect ? "" : "disable"}
 						>
 							NEXT
 						</Button>
@@ -129,20 +155,23 @@ export default function ChangeEmail({
 export const getServerSideProps: GetServerSideProps<{
 	csrfToken: string;
 	firstName: null | string;
+	lastName: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
 	if (typeof session !== "object" || session === null)
 		return {
 			props: {
 				firstName: null,
+				lastName: "",
 				csrfToken: await updateCsrf(context),
 			},
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
-	if (!isVerifiedUser)
+	if (!isUser)
 		return {
 			props: {
 				firstName: null,
+				lastName: "",
 				csrfToken: await updateCsrf(context),
 			},
 		};
@@ -151,6 +180,7 @@ export const getServerSideProps: GetServerSideProps<{
 		props: {
 			csrfToken: await updateCsrf(context),
 			firstName: session.firstName,
+			lastName: session.lastName,
 		}, // will be passed to the page component as props
 	};
 };
