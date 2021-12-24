@@ -10,32 +10,33 @@ export type RedisCacheStores = "postcodeByStreet" | "streetByAddress";
 
 //TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
-	await hset(k, v, store);
+	await setKey(k, v, store);
 	// TODO: this is broken - fix timings
-	// await expire(k, store);
+	await expireKey(k, store);
 }
 
-async function hset(k: string, v: string, store: RedisUUIDStores) {
-	return new Promise<number>((res, rej) => {
-		client.hset(store, k, v, resolver(res, rej));
+async function setKey(k: string, v: string, store: RedisUUIDStores) {
+	const res = await new Promise<"OK">((res, rej) => {
+		client.set(store + k, v, resolver(res, rej));
 	});
+	return res === "OK";
 }
 
-async function expire(k: string, store: RedisUUIDStores) {
+async function expireKey(k: string, store: RedisUUIDStores) {
 	return new Promise<number>((res, rej) => {
 		client.expire(k, expireTimeSecondsByStore[store], resolver(res, rej));
 	});
 }
 
 export async function getKey(k: string, store: RedisUUIDStores) {
-	return new Promise<string | undefined>((res, rej) => {
-		client.hget(store, k, resolver(res, rej));
+	return new Promise<string | null | undefined>((res, rej) => {
+		client.get(store + k, resolver(res, rej));
 	});
 }
 
 export async function deleteKey(k: string, store: RedisUUIDStores) {
 	return new Promise<void>((res, rej) => {
-		client.hdel(store, k, (err) => {
+		client.del(store + k, (err) => {
 			if (err) return rej(err);
 			return res();
 		});
@@ -62,8 +63,7 @@ export async function verifyUUID(
 	store: RedisUUIDStores
 ): Promise<boolean> {
 	const storedUUIDRaw = await getKey(key, store);
-	const storedUUID =
-		storedUUIDRaw ?? "this should not be matched under any circumstances";
+	const storedUUID = storedUUIDRaw ?? "should not be matched";
 
 	// always do this so that the timing is the same
 	const comparisonResult = fixedTimeComparison(uuid, storedUUID);

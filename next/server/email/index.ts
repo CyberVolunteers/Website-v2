@@ -39,7 +39,6 @@ export async function sendEmailConfirmationEmail(
 	firstName: string,
 	lastName: string
 ) {
-	// current dir = /usr/app/.next/server/pages/api
 	await sendEmailWithUUID(
 		email,
 		(uuid) => {
@@ -58,7 +57,7 @@ export async function sendEmailConfirmationEmail(
 			attachments: [
 				{
 					filename: "logo.svg",
-					path: `${__dirname}/../../../../public/img/logo.svg`,
+					path: `/usr/app/public/img/logo.svg`,
 					cid: "logo",
 				},
 			],
@@ -66,12 +65,7 @@ export async function sendEmailConfirmationEmail(
 	);
 }
 
-export async function sendPasswordResetEmail(
-	email: string,
-	firstName: string,
-	lastName: string
-) {
-	// current dir = /usr/app/.next/server/pages
+export async function sendPasswordResetEmail(email: string) {
 	await sendEmailWithUUID(
 		email,
 		(uuid) => {
@@ -82,8 +76,8 @@ export async function sendPasswordResetEmail(
 				}
 			)}`;
 			return {
-				text: `Did you request a password reset, ${firstName} ${lastName}? Please only go to the following link if you requested the password reset: ${link}.`,
-				html: resetPasswordTemplate(link, firstName, lastName),
+				text: `Did you request a password reset? Please only go to the following link if you requested the password reset: ${link}.`,
+				html: resetPasswordTemplate(link),
 			};
 		},
 		"passwordResetUUID",
@@ -92,7 +86,7 @@ export async function sendPasswordResetEmail(
 			attachments: [
 				{
 					filename: "logo.svg",
-					path: `${__dirname}/../../../public/img/logo.svg`,
+					path: `/usr/app/public/img/logo.svg`,
 					cid: "logo",
 				},
 			],

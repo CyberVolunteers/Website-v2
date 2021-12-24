@@ -30,7 +30,7 @@ const handlers: HandlerCollection = {
 		logger.info("server.passwordResetFinal: updating %s with %s", email, uuid);
 
 		let isSuccessful = await verifyUUID(email, uuid, "passwordResetUUID");
-		if (isSuccessful) return res.status(400).send(incorrectUUIDError);
+		if (!isSuccessful) return res.status(400).send(incorrectUUIDError);
 		await destroyUUID(email, "passwordResetUUID");
 
 		// connect mongo

@@ -375,7 +375,9 @@ export async function manipulateDataByEmail(
 					upsert: false, // do not create a new one
 			  });
 
-	return extractData(newRes, latestEmail);
+	const out = extractData(newRes, latestEmail);
+	out.isOrg = !doesEmailBelongToUser;
+	return out;
 }
 
 /**

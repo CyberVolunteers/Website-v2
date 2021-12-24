@@ -144,7 +144,13 @@ export default function Login({
 								</span>
 							</div>
 							<div className="button-wrapper">
-								<Link href="/forgotPassword">Forgotten my Password</Link>
+								<Link
+									href={`/forgotPassword?possibleEmail=${encodeURIComponent(
+										email
+									)}`}
+								>
+									Forgotten my Password
+								</Link>
 								<Button
 									type="submit"
 									variant="contained"

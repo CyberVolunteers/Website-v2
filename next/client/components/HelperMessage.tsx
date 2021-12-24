@@ -1,7 +1,9 @@
 import React, { useState } from "react";
 import { Danger } from "./Danger";
 import styles from "../styles/helperMessage.module.css";
+import { useRouter } from "next/router";
 export const HelperMessage = ({ email }: { email: string }) => {
+	const router = useRouter();
 	const [clicked, setClicked] = useState(false);
 	return (
 		<div className={styles.help_container}>
@@ -14,15 +16,19 @@ email. Your email must be verified to sign up for volunteering opportunities.`}
 				<span
 					className={styles.highlighted_text}
 					style={{ cursor: "pointer" }}
-					onClick={(e) => setClicked(true)}
+					onClick={() => router.push("/sendEmailConfirmationEmail")}
 				>
 					{" "}
 					a new one
 				</span>
 				. Or change your
-				<a href="#" className={styles.highlighted_text}>
+				<a
+					href="#"
+					onClick={() => router.push("/changeEmail")}
+					className={styles.highlighted_text}
+				>
 					{" "}
-					email address
+					email address.
 				</a>
 			</p>
 			{clicked && (

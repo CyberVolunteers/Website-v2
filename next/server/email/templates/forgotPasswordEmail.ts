@@ -1,8 +1,4 @@
-export default function createTemplate(
-	link: string,
-	firstName: string,
-	lastName: string
-) {
+export default function createTemplate(link: string) {
 	return `<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
 	<!--[if !mso]><!-->
@@ -186,7 +182,7 @@ export default function createTemplate(
 																													<tr>
 																														<td style="padding:50px 30px 18px 30px; line-height:36px; text-align:inherit; background-color:#ffffff;" height="100%" valign="top" bgcolor="#ffffff" role="module-content">
 																															<div>
-																																<div style="font-family: inherit; text-align: center"><span style="font-size: 43px; line-height: 200%;">Did you request a password reset, ${firstName} ${lastName}?</span></div>
+																																<div style="font-family: inherit; text-align: center"><span style="font-size: 43px; line-height: 200%;">Did you request a password reset?</span></div>
 																																<div></div>
 																															</div>
 																														</td>
