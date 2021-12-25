@@ -45,9 +45,13 @@ const handlers: HandlerCollection = {
 		)
 			// make sure that non-scraped are at the top
 			.sort((e1: any, e2: any) => {
-				e1 = e1.orgId === 0 ? 0 : 1;
-				e2 = e2.orgId === 0 ? 0 : 1;
-				return e2 - e1;
+				let score1 = 0;
+				let score2 = 0;
+				if (e1.orgId !== 0) score1 += 1;
+				if (e2.orgId !== 0) score2 += 1;
+				if ((e1.imagePath ?? "_")[0] === "/") score1 += 5;
+				if ((e2.imagePath ?? "_")[0] === "/") score2 += 5;
+				return score2 - score1;
 			});
 		const orgs = JSON.parse(
 			(

@@ -151,7 +151,8 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 				{featuredListing === undefined ? null : (
 					<div className={styles["featured-card-wrapper"]}>
 						<h1 className="w-1000 bold">
-							Featured: Volunteering Opportunity in {"<category>"}
+							Featured: Volunteering Opportunity in{" "}
+							{featuredListing.categories[0]}
 						</h1>
 						<p className="w-1000">TITLE</p>
 						<FeaturedCard

@@ -15,6 +15,8 @@ import Button from "../client/components/Button";
 import simplePageStyles from "../client/styles/simplePage.module.css";
 import { capitalize } from "@material-ui/core";
 import { getMongo } from "../server/mongo";
+import { LinkTwoTone } from "@material-ui/icons";
+import { categoryNames } from "../client/utils/const";
 
 export default function ListingPage({
 	listing,
@@ -55,19 +57,25 @@ export default function ListingPage({
 								className={styles["Opportunity-text"]}
 								style={{ fontWeight: "bold !important" }}
 							>
-								Title of the Opportunity
+								{handleTextRender(listing.title)}
 							</h2>
 							<h2
 								className={styles["org-text"]}
 								style={{ fontWeight: "bold !important" }}
 							>
-								Name of Org
+								{handleTextRender(
+									listing.scrapedOrgName ?? listing.organisation.name
+								)}
 							</h2>
-							<img
-								width="100%"
-								className={styles["player-img"]}
-								src="/img/listing-placeholder-image.jpg"
-							/>
+							{typeof listing.imagePath === "string" &&
+							listing.imagePath.length !== 0 &&
+							listing.imagePath[0] === "/" ? (
+								<img
+									width="100%"
+									className={styles["player-img"]}
+									src={listing.imagePath}
+								/>
+							) : null}
 						</div>
 						{isSmallScreenVersion ? <InfoBox listing={listing} /> : null}
 					</div>
@@ -194,29 +202,27 @@ function InfoBox({ listing }: { listing: ListingType }) {
 		<div className={styles["info-box"]}>
 			<div className={styles["fixed-f"]}>
 				<div className={styles["icon-b"]}>
-					<div className={`${styles.row} ${styles["icon-row"]}`}>
-						<div className={styles.col}>
-							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img
-									src="/img/cause0.svg"
-									className={duplicateStyle("cause_icon")}
-								/>
-								<span>Group</span>
-							</a>
-							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img
-									src="/img/cause1.svg"
-									className={duplicateStyle("cause_icon")}
-								/>
-								<span>Graduate</span>
-							</a>
-							<a href="#" className={`${styles.link} ${styles.facebook}`}>
-								<img
-									src="/img/cause2.svg"
-									className={duplicateStyle("cause_icon")}
-								/>
-								<span>Leaf</span>
-							</a>
+					<div
+						className={`${styles.row} ${styles["icon-row"]} ${
+							listing.categories.includes("scraped") ? styles.no_icons_row : ""
+						}`}
+					>
+						<div className={`${styles.col} ${styles.icons_box}`}>
+							{listing.categories
+								.filter((c) => c !== "scraped")
+								.map((c, i) => (
+									<a
+										key={i}
+										href="#"
+										className={`${styles.link} ${styles.facebook}`}
+									>
+										<img
+											src={`/img/cause${categoryNames.indexOf(c)}.svg`}
+											className={duplicateStyle("cause_icon")}
+										/>
+										<span>{c}</span>
+									</a>
+								))}
 						</div>
 						<div className={styles.col}>
 							<a
@@ -278,13 +284,13 @@ function handleTextRender(text: string) {
 				.replaceAll("<b>", "")
 				.replaceAll("</b>", "")
 				.split("\n")
-				.map((t) => {
+				.map((t, i) => {
 					// TODO: also do bold tags
 					return (
-						<>
+						<span key={i}>
 							{t}
 							<br />
-						</>
+						</span>
 					);
 				})}
 		</>
