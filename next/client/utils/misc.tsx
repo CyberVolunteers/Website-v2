@@ -49,3 +49,31 @@ export async function updateOverallErrorsForRequests(
 	}
 	return true;
 }
+
+export function cleanStylisedText(text: string, keepMinimal?: true) {
+	if (keepMinimal) text = text.replaceAll(/\n/g, "");
+
+	return text
+		.replaceAll(/^(\n)+/g, "")
+		.replaceAll(/(\n)+$/g, "")
+		.replaceAll("<b>", "")
+		.replaceAll("</b>", "");
+}
+export function handleStylisedTextRender(text: string, keepMinimal?: true) {
+	text = cleanStylisedText(text, keepMinimal);
+	return (
+		<>
+			{capitalize(text)
+				.split("\n")
+				.map((t, i) => {
+					// TODO: also do bold tags
+					return (
+						<span key={i}>
+							{t}
+							<br />
+						</span>
+					);
+				})}
+		</>
+	);
+}

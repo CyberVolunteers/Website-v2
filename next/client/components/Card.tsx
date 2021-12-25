@@ -3,7 +3,11 @@ import Link from "next/link";
 import React from "react";
 
 import styles from "../styles/card.module.css";
-import { doEllipsis } from "../utils/misc";
+import {
+	cleanStylisedText,
+	doEllipsis,
+	handleStylisedTextRender,
+} from "../utils/misc";
 
 function Card({
 	imagePath,
@@ -22,9 +26,9 @@ function Card({
 	requestedVolunteers?: number;
 	uuid: string;
 }) {
-	title = doEllipsis(title, 30);
-	organisationName = doEllipsis(organisationName, 30);
-	desc = doEllipsis(desc, 160);
+	title = doEllipsis(cleanStylisedText(title, true), 30);
+	organisationName = doEllipsis(cleanStylisedText(organisationName, true), 30);
+	desc = doEllipsis(cleanStylisedText(desc, true), 130);
 
 	return (
 		<div className={`${styles["Card"]}`}>

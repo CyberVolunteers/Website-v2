@@ -17,6 +17,7 @@ import { capitalize } from "@material-ui/core";
 import { getMongo } from "../server/mongo";
 import { LinkTwoTone } from "@material-ui/icons";
 import { categoryNames } from "../client/utils/const";
+import { handleStylisedTextRender } from "../client/utils/misc";
 
 export default function ListingPage({
 	listing,
@@ -57,13 +58,13 @@ export default function ListingPage({
 								className={styles["Opportunity-text"]}
 								style={{ fontWeight: "bold !important" }}
 							>
-								{handleTextRender(listing.title)}
+								{handleStylisedTextRender(listing.title)}
 							</h2>
 							<h2
 								className={styles["org-text"]}
 								style={{ fontWeight: "bold !important" }}
 							>
-								{handleTextRender(
+								{handleStylisedTextRender(
 									listing.scrapedOrgName ?? listing.organisation.name
 								)}
 							</h2>
@@ -84,7 +85,7 @@ export default function ListingPage({
 						<div className={styles.container}>
 							<div className={styles.row}>
 								<p className={styles.paragraph}>
-									{handleTextRender(listing.desc)}
+									{handleStylisedTextRender(listing.desc)}
 								</p>
 							</div>
 						</div>
@@ -100,7 +101,7 @@ export default function ListingPage({
 								Requirements
 							</h2>
 							<p className={styles.paragraph}>
-								{handleTextRender(listing.requirements)}
+								{handleStylisedTextRender(listing.requirements)}
 							</p>
 						</div>
 					</div>
@@ -116,11 +117,11 @@ export default function ListingPage({
 								<p className={styles.paragraph}>
 									Available timings:
 									<br />
-									{handleTextRender(listing.time)}
+									{handleStylisedTextRender(listing.time)}
 									<br />
 									Expected duration:
 									<br />
-									{handleTextRender(listing.duration)}
+									{handleStylisedTextRender(listing.duration)}
 								</p>
 							</div>
 						</div>
@@ -157,7 +158,7 @@ export default function ListingPage({
 										About Org
 									</h2>
 									<p className={styles.paragraph}>
-										{handleTextRender(listing.organisation.desc)}
+										{handleStylisedTextRender(listing.organisation.desc)}
 									</p>
 									{/* <a href="#" className={styles.link}>
 										<button className={styles["Opportunities-button"]}>
@@ -238,30 +239,36 @@ function InfoBox({ listing }: { listing: ListingType }) {
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						Available timings:
 						<br />
-						{handleTextRender(listing.time)}
+						{handleStylisedTextRender(listing.time)}
 						<br />
 						Expected duration:
 						<br />
-						{handleTextRender(listing.duration)}
+						{handleStylisedTextRender(listing.duration)}
 					</p>
 					<h5 className={styles.h5}>Where</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						{handleTextRender(
+						{handleStylisedTextRender(
 							listing.address1 + "\n" + (listing.address2 ?? "")
 						)}
 					</p>
 					<h5 className={styles.h5}>Requirements</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						{listing.maxHoursPerWeek === listing.minHoursPerWeek
-							? `About ${listing.minHoursPerWeek} hours per week`
-							: `${listing.minHoursPerWeek}-${listing.maxHoursPerWeek} hours per week`}{" "}
-						to contribute to the cause
-						<br />
-						{handleTextRender(listing.requirements)}
+						{listing.minHoursPerWeek < 0 ? null : (
+							<>
+								{listing.maxHoursPerWeek === listing.minHoursPerWeek
+									? `About ${listing.minHoursPerWeek} hours per week`
+									: `${listing.minHoursPerWeek}-${listing.maxHoursPerWeek} hours per week`}{" "}
+								to contribute to the cause
+								<br />
+								{handleStylisedTextRender(listing.requirements)}
+							</>
+						)}
 					</p>
 					<h5 className={styles.h5}>Good For</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						{handleTextRender(decodeTargetAudience(listing.targetAudience))}
+						{handleStylisedTextRender(
+							decodeTargetAudience(listing.targetAudience)
+						)}
 					</p>
 					<a href="#" className={`${styles["link"]}`}>
 						<button className={`${styles["Opportunities-button2"]}`}>
@@ -272,28 +279,6 @@ function InfoBox({ listing }: { listing: ListingType }) {
 				</div>
 			</div>
 		</div>
-	);
-}
-
-function handleTextRender(text: string) {
-	return (
-		<>
-			{capitalize(text)
-				.replaceAll(/^(\n)+/g, "")
-				.replaceAll(/(\n)+$/g, "")
-				.replaceAll("<b>", "")
-				.replaceAll("</b>", "")
-				.split("\n")
-				.map((t, i) => {
-					// TODO: also do bold tags
-					return (
-						<span key={i}>
-							{t}
-							<br />
-						</span>
-					);
-				})}
-		</>
 	);
 }
 

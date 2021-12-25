@@ -3,7 +3,11 @@ import Link from "next/link";
 import React from "react";
 
 import styles from "../styles/featuredCard.module.css";
-import { doEllipsis } from "../utils/misc";
+import {
+	cleanStylisedText,
+	doEllipsis,
+	handleStylisedTextRender,
+} from "../utils/misc";
 
 function FeaturedCard({
 	imagePath,
@@ -22,9 +26,9 @@ function FeaturedCard({
 	requestedVolunteers?: number;
 	uuid: string;
 }) {
-	title = doEllipsis(title, 30);
-	organisationName = doEllipsis(organisationName, 30);
-	desc = doEllipsis(desc, 300);
+	title = doEllipsis(cleanStylisedText(title, true), 30);
+	organisationName = doEllipsis(cleanStylisedText(organisationName, true), 30);
+	desc = doEllipsis(cleanStylisedText(desc, true), 300);
 
 	return (
 		<div className={`${styles["FeaturedCard"]} w-1000`}>
