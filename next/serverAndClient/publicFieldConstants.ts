@@ -4,6 +4,14 @@ import {
 	filterRules,
 	flatten,
 } from "combined-validator";
+import { categoryNames, expandedCategoryNames } from "../client/utils/const";
+
+export const shortField = 100;
+export const mediumField = 500;
+export const longField = 2000;
+export const extremelyLongField = 10000;
+export const emailLengthField = 320;
+export const postcodeLengthField = 8;
 
 // client_ prefix means that the option is for the client
 
@@ -11,14 +19,14 @@ import {
 export const users: FieldConstraintsCollection = {
 	required: {
 		string: {
-			firstName: { maxLength: 30 },
-			lastName: { maxLength: 30 },
-			email: { maxLength: 320, client_specialEdit: true },
+			firstName: { maxLength: shortField },
+			lastName: { maxLength: shortField },
+			email: { maxLength: emailLengthField, client_specialEdit: true },
 			password: { client_specialEdit: true },
-			address1: { maxLength: 100 },
-			postcode: { maxLength: 8 },
+			address1: { maxLength: shortField },
+			postcode: { maxLength: postcodeLengthField },
 
-			city: { maxLength: 85 },
+			city: { maxLength: shortField },
 			// assuming it is UK for now
 			// country: { maxLength: 56 },
 		},
@@ -32,14 +40,14 @@ export const users: FieldConstraintsCollection = {
 	optional: {
 		string: {
 			gender: { enum: ["m", "f", "o"] },
-			occupation: { maxLength: 200 },
-			languages: { maxLength: 200 },
-			skillsAndInterests: { maxLength: 1000 },
+			occupation: { maxLength: mediumField },
+			languages: { maxLength: mediumField },
+			skillsAndInterests: { maxLength: longField },
 			// nationality: { maxLength: 60 },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
 
-			address2: { maxLength: 100 },
+			address2: { maxLength: shortField },
 		},
 	},
 };
@@ -47,20 +55,20 @@ export const users: FieldConstraintsCollection = {
 export const organisations: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { maxLength: 320, client_specialEdit: true },
-			contactEmails: { maxLength: 320, array: true },
+			email: { maxLength: emailLengthField, client_specialEdit: true },
+			contactEmails: { maxLength: emailLengthField, array: true },
 			password: { client_specialEdit: true },
-			orgType: { maxLength: 60 },
-			orgName: { maxLength: 150 },
-			orgDesc: { maxLength: 5000 },
-			orgLocation: { maxLength: 150, client_specialEdit: true },
+			orgType: { maxLength: shortField },
+			orgName: { maxLength: shortField },
+			orgDesc: { maxLength: longField },
+			orgLocation: { maxLength: mediumField, client_specialEdit: true },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
 		},
 	},
 	optional: {
 		string: {
-			websiteUrl: { maxLength: 100 },
+			websiteUrl: { maxLength: mediumField },
 		},
 		boolean: {
 			hasSafeguarding: { default: false },
@@ -71,22 +79,15 @@ export const organisations: FieldConstraintsCollection = {
 export const listings: FieldConstraintsCollection = {
 	required: {
 		string: {
-			duration: { maxLength: 1000 },
-			time: { maxLength: 1000 },
-			skills: { maxLength: 3000 },
-			requirements: { maxLength: 3000 },
-			title: { maxLength: 150 },
-			desc: { maxLength: 7000 },
-			category: {
-				enum: [
-					"Advocacy & Human Rights",
-					"Arts & Culture",
-					"Community",
-					"Computers & Technology",
-					"Education",
-					"Healthcare & Medicine",
-					"Elderly",
-				],
+			duration: { maxLength: longField },
+			time: { maxLength: longField },
+			skills: { maxLength: longField },
+			requirements: { maxLength: extremelyLongField },
+			title: { maxLength: shortField },
+			desc: { maxLength: extremelyLongField },
+			categories: {
+				enum: expandedCategoryNames,
+				array: true,
 			},
 			requiredData: {
 				enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
@@ -106,20 +107,20 @@ export const listings: FieldConstraintsCollection = {
 					},
 				},
 			},
-			location: {
-				required: {
-					string: {
-						place: { maxLength: 100 },
-						street: { maxLength: 100 },
-						city: { maxLength: 100 },
-						county: { maxLength: 100 },
-					},
-					boolean: {
-						isOnline: {},
-					},
-				},
-				client_specialEdit: true,
-			},
+			// location: {
+			// 	required: {
+			// 		string: {
+			// 			place: { maxLength: 100 },
+			// 			street: { maxLength: 100 },
+			// 			city: { maxLength: 100 },
+			// 			county: { maxLength: 100 },
+			// 		},
+			// 		boolean: {
+			// 			isOnline: {},
+			// 		},
+			// 	},
+			// 	client_specialEdit: true,
+			// },
 		},
 		boolean: {
 			isFlexible: {},
@@ -128,6 +129,12 @@ export const listings: FieldConstraintsCollection = {
 			minHoursPerWeek: {},
 			maxHoursPerWeek: { greaterOrEqualTo: "minHoursPerWeek" },
 			requestedNumVolunteers: {},
+			currentNumVolunteers: { default: 0 },
+		},
+	},
+	optional: {
+		string: {
+			overrideCharityName: {},
 		},
 	},
 };
@@ -135,7 +142,7 @@ export const listings: FieldConstraintsCollection = {
 export const loginSpec: FieldConstraintsCollection = {
 	required: {
 		string: {
-			email: { maxLength: 320 },
+			email: { maxLength: emailLengthField },
 			password: {},
 		},
 	},
@@ -151,7 +158,7 @@ export const searchListingsSpec: FieldConstraintsCollection = {
 		string: {
 			targetLoc: {},
 			category: {
-				enum: ["Any", ...(listings.required?.string?.category?.enum ?? [])],
+				enum: ["Any", ...(listings.required?.string?.categories?.enum ?? [])],
 			},
 			minHours: {},
 			maxHours: {},

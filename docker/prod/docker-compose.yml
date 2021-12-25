@@ -14,6 +14,9 @@ services:
       WAIT_HOSTS: mongo-prod:27017
       WAIT_HOSTS_TIMEOUT: 120
 
+    volumes:
+      - ../../mongo/dataFromOldServer:/data/dataFromOldServer
+
     links:
       - "mongo-prod:db"
       - "redis-prod:redis"
@@ -36,7 +39,7 @@ services:
   redis-prod:
     image: "redis:6.2.5-alpine"
 
-  nginx-prod: 
+  nginx-prod:
     image: nginx:latest
     restart: always
     volumes:

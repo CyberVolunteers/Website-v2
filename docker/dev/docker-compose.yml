@@ -11,6 +11,7 @@ services:
       - ../../next/:/usr/app
       # Ignore node_modules
       - /usr/app/node_modules
+      - ../../mongo/dataFromOldServer:/data/dataFromOldServer
 
     depends_on:
       - mongo-dev

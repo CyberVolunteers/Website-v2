@@ -9,7 +9,11 @@ import { HandlerCollection } from "../../../server/types";
 import { Listing, Org, User } from "../../../server/mongo/mongoModels";
 import { logger } from "../../../server/logger";
 
-export * from "../../../server/defaultEndpointConfig";
+export const config = {
+	api: {
+		bodyParser: false,
+	},
+};
 
 type Data = {
 	name: string;
@@ -21,7 +25,7 @@ const handlers: HandlerCollection = {
 
 		if (!isAdminLevel(session, 3)) {
 			logger.warn("server.admin_section_console.mongo.ts:Unauthorized");
-			return res.status(400).send("Unauthorized");
+			return res.status(401).send("Unauthorized");
 		}
 
 		let q1, q2, q3: any;

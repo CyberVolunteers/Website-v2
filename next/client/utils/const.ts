@@ -392,7 +392,10 @@ export const categoryNames = [
 	"Elderly", // 4
 	"Race & Ethnicity", // 5
 	"International", // 6
+	"Arts & Culture", // 7
 ];
+
+export const expandedCategoryNames = categoryNames.concat(["scraped"]);
 
 export type LocalHeaderItem =
 	| undefined

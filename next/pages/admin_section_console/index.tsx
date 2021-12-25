@@ -12,6 +12,11 @@ export default function Console(): ReactElement {
 					<p>Mongo</p>
 				</a>
 			</Link>
+			<Link href="/admin_section_console/makePostRequest" passHref>
+				<a>
+					<p>Make post request</p>
+				</a>
+			</Link>
 		</div>
 	);
 }

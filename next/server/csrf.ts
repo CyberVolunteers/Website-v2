@@ -95,6 +95,8 @@ export async function enforceValidCsrf(
 
 		return res
 			.status(403)
-			.send("Invalid csrf token. Please try refreshing the page");
+			.send(
+				"Something went wrong. This is almost always solved by refreshing the page."
+			);
 	}
 }
