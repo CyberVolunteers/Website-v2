@@ -42,15 +42,55 @@ const handlers: HandlerCollection = {
 					"/data/dataFromOldServer/listingsNewVersion.json"
 				)
 			).toString()
+		)
+			// make sure that non-scraped are at the top
+			.sort((e1: any, e2: any) => {
+				e1 = e1.orgId === 0 ? 0 : 1;
+				e2 = e2.orgId === 0 ? 0 : 1;
+				return e2 - e1;
+			});
+		const orgs = JSON.parse(
+			(
+				await promisify(readFile)("/data/dataFromOldServer/orgsNewVersion.json")
+			).toString()
 		);
 
 		// delete all listings
-		console.log(await Listing.find({}));
-		await Listing.deleteMany({});
-		console.log(await Listing.find({}));
-		await Listing.insertMany(listings);
+		logger.info(
+			"Length before - listings: %s",
+			(await Listing.find({})).length
+		);
+		logger.info("Length before - orgs: %s", (await Org.find({})).length);
 
-		console.log((await Listing.find({})).length);
+		await Listing.deleteMany({});
+		await Org.deleteMany({});
+
+		logger.info(
+			"Length after delete - listings: %s",
+			(await Listing.find({})).length
+		);
+		logger.info("Length after delete - orgs: %s", (await Org.find({})).length);
+
+		const newOrg = await Org.insertMany(orgs);
+
+		const newIdsByOldIds: { [key: number]: string } = {};
+		newOrg.forEach((o, i) => {
+			newIdsByOldIds[orgs[i].id] = o._id;
+		});
+
+		listings.forEach((l: any) => {
+			l.organisation = newIdsByOldIds[l.orgId];
+		});
+
+		await Listing.insertMany(listings);
+		// TODO: fill in the "listings" array in Org
+
+		logger.info(
+			"Length after insert - listings: %s",
+			(await Listing.find({})).length
+		);
+		logger.info("Length after insert - orgs: %s", (await Org.find({})).length);
+		logger.info("First thing in the listing: %s", (await Listing.find({}))[0]);
 
 		return res.send("Success");
 	},

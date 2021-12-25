@@ -31,13 +31,55 @@ import SearchIcon from "@material-ui/icons/Search";
 import PlusIcon from "@material-ui/icons/Add";
 
 import { Category } from "@material-ui/icons";
+import { GetServerSideProps } from "next";
+import { ExtendedNextApiRequest } from "../server/types";
+import { Listing as ListingType } from "../server/mongo/mongoModels";
+import { extractData } from "../server/auth/data";
+import { getMongo } from "../server/mongo";
 
-type Listing = {
-	imagePath: string;
-	title: string;
-	organisationName: string;
+type OrgType = {
+	contactEmails: string[];
+	isOrganisationVerified: boolean;
+	hasSafeguarding: boolean;
+	listings: []; // TODO: change that somehow?
+	type: string;
+	name: string;
 	desc: string;
+	location: string;
+	phoneNumber: string;
+	creds: {
+		email: string;
+		passwordHash: string;
+	};
+};
+type ListingType = {
+	duration: string;
+	time: string;
+	skills: string;
+	requirements: string;
+	title: string;
+	desc: string;
+	categories: string[];
+	// requiredData: {
+	// 	enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
+	// 	array: true,
+	// },
+	imagePath: string;
 	uuid: string;
+	targetAudience: {
+		under16: boolean;
+		between16And18: boolean;
+		between18And55: boolean;
+		over55: boolean;
+	};
+	isFlexible: boolean;
+	minHoursPerWeek: number;
+	maxHoursPerWeek: number;
+	requestedNumVolunteers: number;
+	currentNumVolunteers: number;
+	organisation: OrgType;
+
+	scrapedOrgName?: string;
 };
 
 const MAX_LISTINGS_PER_PAGE = 6;
@@ -50,26 +92,12 @@ const preventEvent = (e: {
 	e.stopPropagation();
 };
 
-function SearchListings() {
-	const listings: Listing[] = [
-		{
-			imagePath: "/img/cad.jpg",
-			title: "TITLE",
-			organisationName: "ORG NAME",
-			desc: "DESC and a bunch of words A loan of $7,700 helps a member who is going to stock up with bundles of used clothing, which will build up...",
-			uuid: "3",
-		},
-	];
-
-	for (let i = 0; i < 6; i++) {
-		listings.push(...listings);
-	}
-
+function SearchListings({ listings }: { listings: ListingType[] }) {
 	const pagesNum = Math.ceil(listings.length / MAX_LISTINGS_PER_PAGE);
-	const [selectedPage, setSelectedPage] = useState(2);
+	const [selectedPage, setSelectedPage] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
 
-	const featuredListing: Listing | undefined = listings[0];
+	const featuredListing: ListingType | undefined = listings[0];
 
 	return (
 		<div className="Home">
@@ -144,7 +172,9 @@ function SearchListings() {
 									key={i}
 									imagePath={listing.imagePath}
 									title={listing.title}
-									organisationName={listing.organisationName}
+									organisationName={
+										listing.scrapedOrgName ?? listing.organisation.name
+									}
 									desc={listing.desc}
 									uuid={listing.uuid}
 								/>
@@ -589,3 +619,67 @@ function deleteFromList(
 		setSelectionOptions(out);
 	};
 }
+
+export const getServerSideProps: GetServerSideProps<{
+	listings: ListingType[];
+}> = async (context: any) => {
+	await getMongo(); // connect
+	// TODO: there has to be a better way than this
+	const listings = await ListingType.find({}).populate("organisation");
+
+	const processedListings: ListingType[] = listings.map((l: any) => {
+		const out: ListingType = {
+			duration: l.duration,
+			time: l.time,
+			skills: l.skills,
+			requirements: l.requirements,
+			title: l.title,
+			desc: l.desc,
+			categories: l.categories,
+			// requiredData: {
+			// 	enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
+			// 	array: true,
+			// },
+			imagePath: l.imagePath,
+			uuid: l.uuid,
+			targetAudience: {
+				under16: l.targetAudience.under16,
+				between16And18: l.targetAudience.between16And18,
+				between18And55: l.targetAudience.between18And55,
+				over55: l.targetAudience.over55,
+			},
+			isFlexible: l.isFlexible,
+			minHoursPerWeek: l.minHoursPerWeek,
+			maxHoursPerWeek: l.maxHoursPerWeek,
+			requestedNumVolunteers: l.requestedNumVolunteers,
+			currentNumVolunteers: l.currentNumVolunteers,
+
+			organisation: {
+				contactEmails: l.organisation.contactEmails,
+				isOrganisationVerified: l.organisation.isOrganisationVerified,
+				hasSafeguarding: l.organisation.hasSafeguarding,
+				listings: l.organisation.listings,
+				type: l.organisation.orgType,
+				name: l.organisation.orgName,
+				desc: l.organisation.orgDesc,
+				location: l.organisation.orgLocation,
+				phoneNumber: l.organisation.phoneNumber,
+				creds: l.organisation.creds.map((c: any) => ({
+					email: c.email,
+					passwordHash: c.passwordHash,
+				})),
+			},
+		};
+
+		if (typeof l.scrapedOrgName === "string") {
+			out.scrapedOrgName = l.scrapedOrgName;
+		}
+		return out;
+	});
+
+	console.log(processedListings[processedListings.length - 1].scrapedOrgName);
+
+	return {
+		props: { listings: processedListings }, // will be passed to the page component as props
+	};
+};

@@ -61,8 +61,6 @@ export default function ForgotPassword({
 		router.push(`/forgotPassword?email=${encodeURIComponent(enteredEmail)}`);
 	}
 
-	console.log(router.query);
-
 	const [enteredEmail, setEnteredEmail] = useState(
 		typeof router.query.possibleEmail === "string"
 			? router.query.possibleEmail

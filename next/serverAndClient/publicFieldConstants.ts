@@ -134,7 +134,7 @@ export const listings: FieldConstraintsCollection = {
 	},
 	optional: {
 		string: {
-			overrideCharityName: {},
+			scrapedOrgName: { maxLength: shortField },
 		},
 	},
 };

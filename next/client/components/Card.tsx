@@ -21,20 +21,28 @@ function Card({
 	requestedVolunteers?: number;
 	uuid: string;
 }) {
+	title = doEllipsis(title, 30);
+	organisationName = doEllipsis(organisationName, 30);
+	desc = doEllipsis(desc, 160);
+
 	return (
 		<div className={`${styles["Card"]}`}>
-			<div className={`${styles["card-image-container"]} img-container`}>
-				<Image
-					src={imagePath}
-					// width={100}
-					// height={100}
-					sizes={"30vw"}
-					layout="fill"
-					objectPosition="center top"
-					objectFit="contain"
-					alt="Listing image"
-				/>
-			</div>
+			{typeof imagePath !== "string" ||
+			imagePath.length === 0 ||
+			imagePath[0] !== "/" ? null : (
+				<div className={`${styles["card-image-container"]} img-container`}>
+					<Image
+						src={imagePath}
+						// width={100}
+						// height={100}
+						sizes={"30vw"}
+						layout="fill"
+						objectPosition="center top"
+						objectFit="contain"
+						alt="Listing image"
+					/>
+				</div>
+			)}
 			<div className={`${styles["bottom"]}`}>
 				<h3 className={`${styles["title"]} bold`}>{title}</h3>
 				<h4 className={`${styles["organisationName"]}`}>{organisationName}</h4>
@@ -77,3 +85,8 @@ function Card({
 }
 
 export default Card;
+
+function doEllipsis(text: string, maxLength: number) {
+	if (text.length <= maxLength) return text;
+	return text.substring(0, maxLength - 3) + "...";
+}

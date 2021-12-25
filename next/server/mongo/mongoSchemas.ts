@@ -33,7 +33,7 @@ function constructListingSchema() {
 	const schema = constructSchema(deepAssign(listingPublic, listingPrivate));
 	// also add a reference to the creator, the users who signed up and coordinates
 	schema.add({
-		// organisation: { type: Schema.Types.ObjectId, required: true, ref: "Orgs" },
+		organisation: { type: Schema.Types.ObjectId, required: true, ref: "Orgs" },
 		users: [{ type: Schema.Types.ObjectId, required: true, ref: "Users" }],
 		// coords: {
 		// 	type: {
