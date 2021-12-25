@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 
 import styles from "../styles/featuredCard.module.css";
+import { doEllipsis } from "../utils/misc";
 
 function FeaturedCard({
 	imagePath,
@@ -21,16 +22,27 @@ function FeaturedCard({
 	requestedVolunteers?: number;
 	uuid: string;
 }) {
+	title = doEllipsis(title, 30);
+	organisationName = doEllipsis(organisationName, 30);
+	desc = doEllipsis(desc, 300);
+
 	return (
 		<div className={`${styles["FeaturedCard"]} w-1000`}>
 			<div className={`img-container`}>
-				<Image
-					src={imagePath}
+				<img
+					src={
+						typeof imagePath !== "string" ||
+						imagePath.length === 0 ||
+						imagePath[0] !== "/"
+							? "/img/placeholder16x9.jpg"
+							: imagePath
+					}
 					// width={100}
 					// height={100}
-					sizes={"40vw"}
-					layout="fill"
-					objectFit="contain"
+					// sizes={"40vw"}
+					// layout="fill"
+					style={{ objectFit: "contain" }}
+					// objectFit="contain"
 					alt="Featured listing image"
 				/>
 			</div>

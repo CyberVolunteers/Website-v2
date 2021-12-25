@@ -1,19 +1,46 @@
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { style } from "@mui/system";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
 import { ReactElement } from "react";
 
 import Head from "../client/components/Head";
 import styles from "../client/styles/listing.module.css";
 import { useWindowSize } from "../client/utils/otherHooks";
+import { Listing } from "../server/mongo/mongoModels";
+import { getCleanListingData } from "../server/mongo/util";
+import { ListingType } from "./searchListings";
 
-export default function ListingPage({}: InferGetServerSidePropsType<
-	typeof getServerSideProps
->): ReactElement {
+import Button from "../client/components/Button";
+
+import simplePageStyles from "../client/styles/simplePage.module.css";
+import { capitalize } from "@material-ui/core";
+import { getMongo } from "../server/mongo";
+
+export default function ListingPage({
+	listing,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const screenWidth = useWindowSize().width ?? 1000;
 	const isSmallScreenVersion = screenWidth <= 768;
 	// useViewProtection(["org", "user"]);
+
+	if (listing === null)
+		return (
+			<div>
+				<Head title="Listing not found - cybervolunteers" />
+
+				<div className={simplePageStyles.container}>
+					<h1 className={simplePageStyles.main_heading}>
+						This listing could not be found
+					</h1>
+					<p className={simplePageStyles.main_para}>
+						It is possible that it was deleted or the link was wrong.
+					</p>
+					<Button href="/searchListings" style={{ width: 220 }}>
+						SEE ALL LISTINGS
+					</Button>
+				</div>
+			</div>
+		);
 
 	return (
 		<>
@@ -42,27 +69,14 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 								src="/img/listing-placeholder-image.jpg"
 							/>
 						</div>
-						{isSmallScreenVersion ? <InfoBox /> : null}
+						{isSmallScreenVersion ? <InfoBox listing={listing} /> : null}
 					</div>
 
 					<div className={styles.row}>
 						<div className={styles.container}>
 							<div className={styles.row}>
 								<p className={styles.paragraph}>
-									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-									do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-									Ut enim ad minim veniam, quis nostrud exercitation ullamco
-									laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-									irure dolor in reprehenderit in voluptate velit esse cillum
-									dolore eu fugiat nulla pariatur.
-									<br />
-									<br />
-									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-									do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-									Ut enim ad minim veniam, quis nostrud exercitation ullamco
-									laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-									irure dolor in reprehenderit in voluptate velit esse cillum
-									dolore eu fugiat nulla pariatur.
+									{handleTextRender(listing.desc)}
 								</p>
 							</div>
 						</div>
@@ -78,12 +92,7 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 								Requirements
 							</h2>
 							<p className={styles.paragraph}>
-								Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do
-								eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut
-								enim ad minim veniam, quis nostrud exercitation ullamco laboris
-								nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor
-								in reprehenderit in voluptate velit esse cillum dolore eu fugiat
-								nulla pariatur.
+								{handleTextRender(listing.requirements)}
 							</p>
 						</div>
 					</div>
@@ -97,12 +106,13 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 									When and time Commitments
 								</h2>
 								<p className={styles.paragraph}>
-									Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed
-									do eiusmod tempor incididunt ut labore et dolore magna aliqua.
-									Ut enim ad minim veniam, quis nostrud exercitation ullamco
-									laboris nisi ut aliquip ex ea commodo consequat. Duis aute
-									irure dolor in reprehenderit in voluptate velit esse cillum
-									dolore eu fugiat nulla pariatur.
+									Available timings:
+									<br />
+									{handleTextRender(listing.time)}
+									<br />
+									Expected duration:
+									<br />
+									{handleTextRender(listing.duration)}
 								</p>
 							</div>
 						</div>
@@ -139,26 +149,13 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 										About Org
 									</h2>
 									<p className={styles.paragraph}>
-										Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-										sed do eiusmod tempor incididunt ut labore et dolore magna
-										aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-										ullamco laboris nisi ut aliquip ex ea commodo consequat.
-										Duis aute irure dolor in reprehenderit in voluptate velit
-										esse cillum dolore eu fugiat nulla pariatur.
-										<br />
-										<br />
-										Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-										sed do eiusmod tempor incididunt ut labore et dolore magna
-										aliqua. Ut enim ad minim veniam, quis nostrud exercitation
-										ullamco laboris nisi ut aliquip ex ea commodo consequat.
-										Duis aute irure dolor in reprehenderit in voluptate velit
-										esse cillum dolore eu fugiat nulla pariatur.
+										{handleTextRender(listing.organisation.desc)}
 									</p>
-									<a href="#" className={styles.link}>
+									{/* <a href="#" className={styles.link}>
 										<button className={styles["Opportunities-button"]}>
 											More Opportunities from Org
 										</button>
-									</a>
+									</a> */}
 								</div>
 								<br />
 								{/* <div className="w-100">
@@ -179,7 +176,7 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 						</div>
 					</div>
 				</div>
-				{isSmallScreenVersion ? null : <InfoBox />}
+				{isSmallScreenVersion ? null : <InfoBox listing={listing} />}
 			</div>
 			<footer className={styles["footer-b"]}>
 				<a href="#" className={styles.link}>
@@ -192,7 +189,7 @@ export default function ListingPage({}: InferGetServerSidePropsType<
 	);
 }
 
-function InfoBox() {
+function InfoBox({ listing }: { listing: ListingType }) {
 	return (
 		<div className={styles["info-box"]}>
 			<div className={styles["fixed-f"]}>
@@ -233,44 +230,134 @@ function InfoBox() {
 					</div>
 					<h5 className={styles.h5}>When</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						Mon 22 Nov, 2021 - Tue 23 Nov, 2021
+						Available timings:
 						<br />
-						09:15 AM - 03:15 PM
+						{handleTextRender(listing.time)}
+						<br />
+						Expected duration:
+						<br />
+						{handleTextRender(listing.duration)}
 					</p>
 					<h5 className={styles.h5}>Where</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						This opportunity is virtual and has no fixed location
+						{handleTextRender(
+							listing.address1 + "\n" + (listing.address2 ?? "")
+						)}
 					</p>
 					<h5 className={styles.h5}>Requirements</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						2-8 hours per week
+						{listing.maxHoursPerWeek === listing.minHoursPerWeek
+							? `About ${listing.minHoursPerWeek} hours per week`
+							: `${listing.minHoursPerWeek}-${listing.maxHoursPerWeek} hours per week`}{" "}
+						to contribute to the cause
 						<br />
-						Driving License
-						<br />
-						Criminal Record Check
+						{handleTextRender(listing.requirements)}
 					</p>
 					<h5 className={styles.h5}>Good For</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						Kids, Teens, Groups size 6
+						{handleTextRender(decodeTargetAudience(listing.targetAudience))}
 					</p>
 					<a href="#" className={`${styles["link"]}`}>
 						<button className={`${styles["Opportunities-button2"]}`}>
 							I want to help
 						</button>
 					</a>
-					<h5 className={styles.h52}>8 places left</h5>
+					{/* <h5 className={styles.h52}>8 places left</h5> */}
 				</div>
 			</div>
 		</div>
 	);
 }
 
+function handleTextRender(text: string) {
+	return (
+		<>
+			{capitalize(text)
+				.replaceAll(/^(\n)+/g, "")
+				.replaceAll(/(\n)+$/g, "")
+				.replaceAll("<b>", "")
+				.replaceAll("</b>", "")
+				.split("\n")
+				.map((t) => {
+					// TODO: also do bold tags
+					return (
+						<>
+							{t}
+							<br />
+						</>
+					);
+				})}
+		</>
+	);
+}
+
+function decodeTargetAudience(a: {
+	under16: boolean;
+	between16And18: boolean;
+	between18And55: boolean;
+	over55: boolean;
+}): string {
+	if (a.under16 && a.between16And18 && a.between18And55 && a.over55)
+		return "All ages";
+	if (!a.under16 && !a.between16And18 && !a.between18And55 && !a.over55)
+		return "All ages";
+
+	const ages: [number, number][] = [];
+	if (a.under16) ages.push([0, 16]);
+	if (a.between16And18) ages.push([16, 18]);
+	if (a.between18And55) ages.push([18, 55]);
+	if (a.over55) ages.push([55, 100]);
+
+	let i = 0;
+
+	while (i < ages.length - 1) {
+		const [minAge1, maxAge1] = ages[i];
+		const [minAge2, maxAge2] = ages[i + 1];
+		console.log(minAge1, maxAge1, minAge2, maxAge2);
+		// if we need to splice the ages, e.g. go from 16-18 and 18-55 to 18-55:
+		if (maxAge1 === minAge2) {
+			ages[i] = [minAge1, maxAge2];
+			ages.splice(i + 1, 1);
+		} else i++;
+	}
+
+	const ageStrings = ages.map(([minAge, maxAge]) => {
+		if (minAge === 0) return `anyone up to ${maxAge} years old`;
+		if (maxAge === 100) return `anyone older than ${minAge} years old`;
+	});
+
+	return ageStrings.join(" or ");
+}
+
 function duplicateStyle(cl: string) {
 	return `${styles[cl]} ${cl}`;
 }
 
-export const getServerSideProps: GetServerSideProps<{}> = async (context) => {
+export const getServerSideProps: GetServerSideProps<{
+	listing: ListingType | null;
+}> = async (context) => {
+	const uuid = context.query.uuid;
+	if (typeof uuid !== "string")
+		return {
+			props: {
+				listing: null,
+			},
+		};
+
+	await getMongo();
+
+	const listing = await Listing.findOne({ uuid }).populate("organisation");
+	if (listing === null)
+		return {
+			props: {
+				listing: null,
+			},
+		};
+	const processedListing: ListingType = getCleanListingData(listing);
+
 	return {
-		props: {}, // will be passed to the page component as props
+		props: {
+			listing: processedListing,
+		}, // will be passed to the page component as props
 	};
 };

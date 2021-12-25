@@ -3,6 +3,7 @@ import Link from "next/link";
 import React from "react";
 
 import styles from "../styles/card.module.css";
+import { doEllipsis } from "../utils/misc";
 
 function Card({
 	imagePath,
@@ -85,8 +86,3 @@ function Card({
 }
 
 export default Card;
-
-function doEllipsis(text: string, maxLength: number) {
-	if (text.length <= maxLength) return text;
-	return text.substring(0, maxLength - 3) + "...";
-}

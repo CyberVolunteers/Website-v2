@@ -2,6 +2,11 @@ import { capitalize } from "@material-ui/core";
 import { Dispatch, SetStateAction } from "react";
 import { error } from "./logger";
 
+export function doEllipsis(text: string, maxLength: number) {
+	if (text.length <= maxLength) return text;
+	return text.substring(0, maxLength - 3) + "...";
+}
+
 export function undoCamelCase(s: string) {
 	let out = s.replace(/([A-Z])/g, " $1"); // add a space before all the capital letters
 	out = out.replace(/([0-9]+)/g, " $1"); // add a space before digits
@@ -11,7 +16,9 @@ export function undoCamelCase(s: string) {
 
 async function createErrorMessage(resStatus: number, resContents: string) {
 	// it is a separate function to account for a possible improvement
-	return capitalize(`${resStatus >= 500 ? "server " : ""}error: ${resContents}`);
+	return capitalize(
+		`${resStatus >= 500 ? "server " : ""}error: ${resContents}`
+	);
 }
 
 export async function updateOverallErrorsForRequests(

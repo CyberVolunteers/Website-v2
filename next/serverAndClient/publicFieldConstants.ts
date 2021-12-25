@@ -85,6 +85,7 @@ export const listings: FieldConstraintsCollection = {
 			requirements: { maxLength: extremelyLongField },
 			title: { maxLength: shortField },
 			desc: { maxLength: extremelyLongField },
+			address1: { maxLength: mediumField },
 			categories: {
 				enum: expandedCategoryNames,
 				array: true,
@@ -135,6 +136,7 @@ export const listings: FieldConstraintsCollection = {
 	optional: {
 		string: {
 			scrapedOrgName: { maxLength: shortField },
+			address2: { maxLength: shortField },
 		},
 	},
 };

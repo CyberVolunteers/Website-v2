@@ -235,9 +235,12 @@ function Header() {
 								{/* Only show on small screens and when not on certain pages */}
 								{!isLargeVersion &&
 								!isLoggedIn &&
-								!["/login", "/organisationSignup", "/userSignup"].includes(
-									router.pathname
-								) ? (
+								![
+									"/login",
+									"/organisationSignup",
+									"/userSignup",
+									"/listing",
+								].includes(router.pathname) ? (
 									<li className={`${styles["bottomButton"]}`}>
 										<Link href="/login" passHref>
 											<a>

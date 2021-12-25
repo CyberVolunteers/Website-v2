@@ -33,9 +33,10 @@ import PlusIcon from "@material-ui/icons/Add";
 import { Category } from "@material-ui/icons";
 import { GetServerSideProps } from "next";
 import { ExtendedNextApiRequest } from "../server/types";
-import { Listing as ListingType } from "../server/mongo/mongoModels";
+import { Listing } from "../server/mongo/mongoModels";
 import { extractData } from "../server/auth/data";
 import { getMongo } from "../server/mongo";
+import { getCleanListingData } from "../server/mongo/util";
 
 type OrgType = {
 	contactEmails: string[];
@@ -52,7 +53,7 @@ type OrgType = {
 		passwordHash: string;
 	};
 };
-type ListingType = {
+export type ListingType = {
 	duration: string;
 	time: string;
 	skills: string;
@@ -80,6 +81,9 @@ type ListingType = {
 	organisation: OrgType;
 
 	scrapedOrgName?: string;
+
+	address1: string;
+	address2?: string;
 };
 
 const MAX_LISTINGS_PER_PAGE = 6;
@@ -97,7 +101,9 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 	const [selectedPage, setSelectedPage] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
 
-	const featuredListing: ListingType | undefined = listings[0];
+	const featuredListing: ListingType | undefined = listings.find(
+		(l) => l.title === "Home from Hospital Volunteers"
+	);
 
 	return (
 		<div className="Home">
@@ -141,20 +147,25 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 			</div>
 
 			<div className={styles["main-content"]}>
-				{showFilter ? <Filter></Filter> : null}
-				<div className={styles["featured-card-wrapper"]}>
-					<h1 className="w-1000 bold">
-						Featured: Volunteering Opportunity in {"<category>"}
-					</h1>
-					<p className="w-1000">TITLE</p>
-					<FeaturedCard
-						imagePath="/img/cad.jpg"
-						title="TITLE"
-						organisationName="ORG NAME"
-						desc="DESC and a bunch of words A loan of $7,700 helps a member who is going to stock up with bundles of used clothing, which will build up..."
-						uuid="3"
-					/>
-				</div>
+				{showFilter ? <Filter /> : null}
+				{featuredListing === undefined ? null : (
+					<div className={styles["featured-card-wrapper"]}>
+						<h1 className="w-1000 bold">
+							Featured: Volunteering Opportunity in {"<category>"}
+						</h1>
+						<p className="w-1000">TITLE</p>
+						<FeaturedCard
+							imagePath={featuredListing.imagePath}
+							title={featuredListing.title}
+							organisationName={
+								featuredListing.scrapedOrgName ??
+								featuredListing.organisation.name
+							}
+							desc={featuredListing.desc}
+							uuid={featuredListing.uuid}
+						/>
+					</div>
+				)}
 
 				<div className={`${styles["cards-grid"]} w-1000`}>
 					{(() => {
@@ -625,59 +636,9 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context: any) => {
 	await getMongo(); // connect
 	// TODO: there has to be a better way than this
-	const listings = await ListingType.find({}).populate("organisation");
+	const listings = await Listing.find({}).populate("organisation");
 
-	const processedListings: ListingType[] = listings.map((l: any) => {
-		const out: ListingType = {
-			duration: l.duration,
-			time: l.time,
-			skills: l.skills,
-			requirements: l.requirements,
-			title: l.title,
-			desc: l.desc,
-			categories: l.categories,
-			// requiredData: {
-			// 	enum: Object.keys(flatten(users)).filter((k) => k !== "password"),
-			// 	array: true,
-			// },
-			imagePath: l.imagePath,
-			uuid: l.uuid,
-			targetAudience: {
-				under16: l.targetAudience.under16,
-				between16And18: l.targetAudience.between16And18,
-				between18And55: l.targetAudience.between18And55,
-				over55: l.targetAudience.over55,
-			},
-			isFlexible: l.isFlexible,
-			minHoursPerWeek: l.minHoursPerWeek,
-			maxHoursPerWeek: l.maxHoursPerWeek,
-			requestedNumVolunteers: l.requestedNumVolunteers,
-			currentNumVolunteers: l.currentNumVolunteers,
-
-			organisation: {
-				contactEmails: l.organisation.contactEmails,
-				isOrganisationVerified: l.organisation.isOrganisationVerified,
-				hasSafeguarding: l.organisation.hasSafeguarding,
-				listings: l.organisation.listings,
-				type: l.organisation.orgType,
-				name: l.organisation.orgName,
-				desc: l.organisation.orgDesc,
-				location: l.organisation.orgLocation,
-				phoneNumber: l.organisation.phoneNumber,
-				creds: l.organisation.creds.map((c: any) => ({
-					email: c.email,
-					passwordHash: c.passwordHash,
-				})),
-			},
-		};
-
-		if (typeof l.scrapedOrgName === "string") {
-			out.scrapedOrgName = l.scrapedOrgName;
-		}
-		return out;
-	});
-
-	console.log(processedListings[processedListings.length - 1].scrapedOrgName);
+	const processedListings: ListingType[] = listings.map(getCleanListingData);
 
 	return {
 		props: { listings: processedListings }, // will be passed to the page component as props

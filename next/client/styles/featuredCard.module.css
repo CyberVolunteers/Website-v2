@@ -75,6 +75,13 @@
 	margin-top: 2rem;
 }
 
+@media screen and (max-width: 1200px) {
+	.FeaturedCard {
+		width: 95%;
+		grid-template-columns: 1fr;
+	}
+}
+
 @media screen and (max-width: 700px) {
 	.FeaturedCard {
 		grid-template-columns: 1fr;
