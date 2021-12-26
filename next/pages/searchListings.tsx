@@ -1,9 +1,7 @@
 import React, {
 	Dispatch,
-	DispatchWithoutAction,
 	ReactElement,
 	ReactNode,
-	Ref,
 	RefObject,
 	SetStateAction,
 	useEffect,
@@ -14,14 +12,9 @@ import Head from "../client/components/Head";
 
 import FeaturedCard from "../client/components/FeaturedCard";
 
-import Link from "next/link";
 import Card from "../client/components/Card";
 
 import styles from "../client/styles/searchListings.module.css";
-import FormControl from "@material-ui/core/FormControl";
-import InputLabel from "@material-ui/core/InputLabel";
-import Select from "@material-ui/core/Select";
-import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { categoryNames } from "../client/utils/const";
 
 import ArrowDropDownIcon from "@material-ui/icons/ArrowDropDown";
@@ -30,11 +23,8 @@ import CloseIcon from "@material-ui/icons/Close";
 import SearchIcon from "@material-ui/icons/Search";
 import PlusIcon from "@material-ui/icons/Add";
 
-import { Category } from "@material-ui/icons";
 import { GetServerSideProps } from "next";
-import { ExtendedNextApiRequest } from "../server/types";
 import { Listing } from "../server/mongo/mongoModels";
-import { extractData } from "../server/auth/data";
 import { getMongo } from "../server/mongo";
 import { getCleanListingData } from "../server/mongo/util";
 
@@ -97,9 +87,19 @@ const preventEvent = (e: {
 };
 
 function SearchListings({ listings }: { listings: ListingType[] }) {
+	const minHours = 10;
+	const maxHours = 100; //TODO: get the actual values
+
 	const pagesNum = Math.ceil(listings.length / MAX_LISTINGS_PER_PAGE);
 	const [selectedPage, setSelectedPage] = useState(0);
 	const [showFilter, setShowFilter] = useState(false);
+
+	const [categories, setCategories] = useState([] as string[]);
+	const [keywords, setKeywords] = useState([] as string[]);
+	const [location, setLocation] = useState("");
+	const [hoursRange, setHoursRange] = useState(
+		null as null | [number, number] | "flexible"
+	);
 
 	const featuredListing: ListingType | undefined = listings.find(
 		(l) => l.title === "Home from Hospital Volunteers"
@@ -147,7 +147,22 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 			</div>
 
 			<div className={styles["main-content"]}>
-				{showFilter ? <Filter /> : null}
+				{showFilter ? (
+					<Filter
+						minHours={minHours}
+						maxHours={maxHours}
+						{...{
+							categories,
+							setCategories,
+							location,
+							setLocation,
+							hoursRange,
+							setHoursRange,
+							keywords,
+							setKeywords,
+						}}
+					/>
+				) : null}
 				{featuredListing === undefined ? null : (
 					<div className={styles["featured-card-wrapper"]}>
 						<h1 className="w-1000 bold">
@@ -330,22 +345,39 @@ function CustomDropdown({
 	);
 }
 
-function Filter() {
+function Filter({
+	location,
+	setLocation,
+	hoursRange: hoursRangeToDisplay,
+	setHoursRange: setHoursRangeToDisplay,
+	categories: categoryOptions,
+	setCategories: setCategoryOptions,
+	keywords,
+	setKeywords,
+	minHours,
+	maxHours,
+}: {
+	location: string;
+	setLocation: React.Dispatch<React.SetStateAction<string>>;
+	hoursRange: [number, number] | "flexible" | null;
+	setHoursRange: React.Dispatch<
+		React.SetStateAction<[number, number] | "flexible" | null>
+	>;
+	keywords: string[];
+	setKeywords: React.Dispatch<React.SetStateAction<string[]>>;
+	categories: string[];
+	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
+	minHours: number;
+	maxHours: number;
+}) {
 	const [isFirstRedraw, setIsFirstRedraw] = useState(true);
 	const [visitedFields, setVisitedFields] = useState([] as string[]);
-	const [categoryOptions, setCategoryOptions] = useState([] as string[]);
-	const [keywords, setKeywords] = useState([] as string[]);
-
-	const [location, setLocation] = useState("");
 	const [currentKeyword, setCurrentKeyword] = useState("");
-
-	const minHours = 10;
-	const maxHours = 100; //TODO: get the actual values
 
 	const barWidth = 200;
 
 	const [minHoursHandlePos, setMinHoursHandlePos] = useState(0);
-	const [maxHoursHandlePos, setMaxHoursHandlePos] = useState(0);
+	const [maxHoursHandlePos, setMaxHoursHandlePos] = useState(barWidth);
 
 	function interpolate(pos: number): number {
 		return minHours + (pos / barWidth) * (maxHours - minHours);
@@ -354,9 +386,6 @@ function Filter() {
 	const selectedMinHours = interpolate(minHoursHandlePos);
 	const selectedMaxHours = interpolate(maxHoursHandlePos);
 
-	const [hoursRangeToDisplay, setHoursRangeToDisplay] = useState(
-		null as null | [number, number] | "flexible"
-	);
 	const [areHoursFlexible, setAreHoursFlexible] = useState(false);
 
 	const isSearchEmpty =

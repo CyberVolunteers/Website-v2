@@ -42,7 +42,7 @@ function Card({
 						// height={100}
 						sizes={"30vw"}
 						layout="fill"
-						objectPosition="center top"
+						objectPosition="center center"
 						objectFit="contain"
 						alt="Listing image"
 					/>

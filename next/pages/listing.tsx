@@ -225,7 +225,7 @@ function InfoBox({ listing }: { listing: ListingType }) {
 									</a>
 								))}
 						</div>
-						<div className={styles.col}>
+						{/* <div className={styles.col}>
 							<a
 								href="#"
 								className={`${styles.link} ${styles.facebook} ${styles["user-icon"]}`}
@@ -233,17 +233,13 @@ function InfoBox({ listing }: { listing: ListingType }) {
 								<FontAwesomeIcon icon={faHeart} />
 								<span>Save to Favourites</span>
 							</a>
-						</div>
+						</div> */}
 					</div>
 					<h5 className={styles.h5}>When</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						Available timings:
+						{handleStylisedTextRender(listing.duration)}
 						<br />
 						{handleStylisedTextRender(listing.time)}
-						<br />
-						Expected duration:
-						<br />
-						{handleStylisedTextRender(listing.duration)}
 					</p>
 					<h5 className={styles.h5}>Where</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
@@ -251,7 +247,7 @@ function InfoBox({ listing }: { listing: ListingType }) {
 							listing.address1 + "\n" + (listing.address2 ?? "")
 						)}
 					</p>
-					<h5 className={styles.h5}>Requirements</h5>
+					{/* <h5 className={styles.h5}>Requirements</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						{listing.minHoursPerWeek < 0 ? null : (
 							<>
@@ -263,7 +259,7 @@ function InfoBox({ listing }: { listing: ListingType }) {
 								{handleStylisedTextRender(listing.requirements)}
 							</>
 						)}
-					</p>
+					</p> */}
 					<h5 className={styles.h5}>Good For</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
 						{handleStylisedTextRender(
@@ -304,7 +300,6 @@ function decodeTargetAudience(a: {
 	while (i < ages.length - 1) {
 		const [minAge1, maxAge1] = ages[i];
 		const [minAge2, maxAge2] = ages[i + 1];
-		console.log(minAge1, maxAge1, minAge2, maxAge2);
 		// if we need to splice the ages, e.g. go from 16-18 and 18-55 to 18-55:
 		if (maxAge1 === minAge2) {
 			ages[i] = [minAge1, maxAge2];
