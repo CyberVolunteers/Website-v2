@@ -30,30 +30,34 @@ function constructOrgSchema() {
 }
 
 function constructListingSchema() {
+	const pointSchema = new Schema({
+		type: {
+			type: String,
+			enum: ["Point"],
+			required: true,
+		},
+		coordinates: {
+			type: [Number],
+			required: true,
+		},
+	});
 	const schema = constructSchema(deepAssign(listingPublic, listingPrivate));
 	// also add a reference to the creator, the users who signed up and coordinates
 	schema.add({
 		organisation: { type: Schema.Types.ObjectId, required: true, ref: "Orgs" },
 		users: [{ type: Schema.Types.ObjectId, required: true, ref: "Users" }],
-		// coords: {
-		// 	type: {
-		// 		type: String,
-		// 		enum: ["Point"],
-		// 		required: true,
-		// 	},
-		// 	coordinates: {
-		// 		type: [Number],
-		// 		required: true,
-		// 	},
-		// 	required: false,
-		// },
+		coords: {
+			type: pointSchema,
+			required: false,
+			index: "2dsphere",
+		},
 	});
 
 	// text index for text search
 	schema.index(
 		{
 			duration: "text",
-			place: "text",
+			address1: "text",
 			time: "text",
 			skills: "text",
 			requirements: "text",
@@ -62,17 +66,13 @@ function constructListingSchema() {
 		},
 		{
 			weights: {
-				title: 10,
-				desc: 5,
-				skills: 3,
-				requirements: 3,
+				title: 5,
+				desc: 3,
+				skills: 2,
+				requirements: 2,
 			},
 		}
 	);
-
-	schema.index({
-		coords: "2dsphere",
-	});
 
 	return schema;
 }

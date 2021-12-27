@@ -3,7 +3,12 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { isResult, login, signupUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
-import { users } from "../../serverAndClient/publicFieldConstants";
+import {
+	emailLengthField,
+	postcodeLengthField,
+	shortField,
+	users,
+} from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { stringify } from "ajv";
@@ -131,14 +136,14 @@ export default async function signUp(
 				createAjvJTDSchema({
 					required: {
 						string: {
-							firstName: { maxLength: 30 },
-							lastName: { maxLength: 30 },
-							email: { maxLength: 320, client_specialEdit: true },
+							firstName: { maxLength: shortField },
+							lastName: { maxLength: shortField },
+							email: { maxLength: emailLengthField, client_specialEdit: true },
 							password: { client_specialEdit: true },
-							address1: { maxLength: 100 },
-							postcode: { maxLength: 8 },
+							address1: { maxLength: shortField },
+							postcode: { maxLength: postcodeLengthField },
 
-							city: { maxLength: 85 },
+							city: { maxLength: shortField },
 							// assuming it is UK for now
 							// country: { maxLength: 56 },
 						},
@@ -148,7 +153,7 @@ export default async function signUp(
 					},
 					optional: {
 						string: {
-							address2: { maxLength: 100 },
+							address2: { maxLength: shortField },
 						},
 					},
 				})

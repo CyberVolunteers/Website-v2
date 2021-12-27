@@ -77,3 +77,11 @@ export function handleStylisedTextRender(text: string, keepMinimal?: true) {
 		</>
 	);
 }
+
+export async function wait(time: number): Promise<void> {
+	return new Promise((res, rej) => {
+		setTimeout(() => {
+			res();
+		}, time);
+	});
+}

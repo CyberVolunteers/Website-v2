@@ -4,6 +4,7 @@ import React, {
 	ReactNode,
 	RefObject,
 	SetStateAction,
+	useCallback,
 	useEffect,
 	useRef,
 	useState,
@@ -23,10 +24,14 @@ import CloseIcon from "@material-ui/icons/Close";
 import SearchIcon from "@material-ui/icons/Search";
 import PlusIcon from "@material-ui/icons/Add";
 
-import { GetServerSideProps } from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Listing } from "../server/mongo/mongoModels";
 import { getMongo } from "../server/mongo";
 import { getCleanListingData } from "../server/mongo/util";
+import { wait } from "../client/utils/misc";
+import { useRouter } from "next/router";
+
+const minLocationSearchCooldownMillis = 500;
 
 type OrgType = {
 	contactEmails: string[];
@@ -86,13 +91,25 @@ const preventEvent = (e: {
 	e.stopPropagation();
 };
 
-function SearchListings({ listings }: { listings: ListingType[] }) {
-	const minHours = 10;
-	const maxHours = 100; //TODO: get the actual values
+function SearchListings({
+	listings: _listings,
+	maxHours,
+	minHours,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	const router = useRouter();
 
+	const queryKeywords: null | string =
+		typeof router.query.keywords === "string" ? router.query.keywords : null;
+
+	const [errorMessage, setErrorMessage] = useState("");
+	const [warningMessage, setWarningMessage] = useState("");
+
+	const [listings, setListings] = useState(_listings);
+	const [isShowingAllListings, setIsShowingAllListings] = useState(true);
 	const pagesNum = Math.ceil(listings.length / MAX_LISTINGS_PER_PAGE);
+
 	const [selectedPage, setSelectedPage] = useState(0);
-	const [showFilter, setShowFilter] = useState(false);
+	const [showFilter, setShowFilter] = useState(queryKeywords !== null);
 
 	const [categories, setCategories] = useState([] as string[]);
 	const [keywords, setKeywords] = useState([] as string[]);
@@ -101,9 +118,109 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 		null as null | [number, number] | "flexible"
 	);
 
-	const featuredListing: ListingType | undefined = listings.find(
-		(l) => l.title === "Home from Hospital Volunteers"
-	);
+	const [areHoursFlexible, setAreHoursFlexible] = useState(false);
+
+	useEffect(() => {
+		if (queryKeywords === null) return;
+		setShowFilter(true);
+		setKeywords([queryKeywords]);
+	}, [queryKeywords]);
+
+	const featuredListing: ListingType | undefined = isShowingAllListings
+		? listings.find((l) => l.title === "Home from Hospital Volunteers")
+		: undefined;
+
+	useEffect(() => {
+		if (!showFilter) {
+			setListings(_listings);
+			setIsShowingAllListings(true);
+			setSelectedPage(0);
+		} else {
+			submit();
+		}
+	}, [showFilter]);
+
+	useEffect(() => {
+		(async () => {
+			const thisUpdatorId = Math.random();
+			window.lastAddressSuggestionsUpdatorId = thisUpdatorId;
+
+			if (location.length <= 4) return;
+
+			await wait(minLocationSearchCooldownMillis);
+			// if there have been no more requests, proceed
+			if (window.lastAddressSuggestionsUpdatorId !== thisUpdatorId) return;
+			submit();
+		})();
+	}, [location]);
+
+	useEffect(() => {
+		submit();
+	}, [categories, keywords, areHoursFlexible]);
+
+	useEffect(() => {
+		if (hoursRange === null) submit();
+	}, [hoursRange]);
+
+	async function submit() {
+		if (!showFilter) return;
+		const query: {
+			location?: string;
+			keywords?: string[];
+			categories?: string[];
+			minHours?: number;
+			maxHours?: number;
+			isFlexible?: boolean;
+		} = {};
+
+		if (hoursRange !== null) {
+			if (hoursRange === "flexible") query.isFlexible = true;
+			else {
+				query.minHours = hoursRange[0];
+				query.maxHours = hoursRange[1];
+			}
+		}
+
+		if (categories.length > 0) query.categories = categories;
+		if (keywords.length > 0) query.keywords = keywords;
+		if (location !== "") query.location = location;
+
+		const res = await fetch("/api/searchListings", {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				"content-type": "application/json",
+				accept: "application/json",
+			},
+			body: JSON.stringify(query),
+		});
+
+		// TODO: have an error message there
+		if (res.status >= 400) return setErrorMessage(await res.text());
+
+		// TODO: show a warning if could not find the place
+
+		const resData = await res.json();
+
+		if (!resData.couldLocationBeUsed && location !== "")
+			setWarningMessage("We are sorry, we could not recognize that place");
+		else setWarningMessage("");
+		const newListings = resData.results
+			.map((lData: any) => {
+				let l = _listings.find((l) => l.uuid === lData.uuid);
+				if (l === undefined) return null;
+				l = { ...l, ...lData };
+				return l;
+			})
+			.filter((l: any) => l !== null);
+
+		newListings.sort((e1: any, e2: any) => e2.score - e1.score);
+
+		setListings(newListings);
+		setIsShowingAllListings(false);
+
+		setSelectedPage(0);
+	}
 
 	return (
 		<div className="Home">
@@ -149,6 +266,7 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 			<div className={styles["main-content"]}>
 				{showFilter ? (
 					<Filter
+						onConfirm={submit}
 						minHours={minHours}
 						maxHours={maxHours}
 						{...{
@@ -160,9 +278,27 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 							setHoursRange,
 							keywords,
 							setKeywords,
+							areHoursFlexible,
+							setAreHoursFlexible,
 						}}
 					/>
 				) : null}
+				<span
+					className="helping-text login-helper"
+					style={{
+						display: errorMessage === "" ? "none" : "inline-block",
+					}}
+				>
+					{errorMessage}
+				</span>
+				<span
+					className="helping-text login-helper"
+					style={{
+						display: warningMessage === "" ? "none" : "inline-block",
+					}}
+				>
+					{warningMessage}
+				</span>
 				{featuredListing === undefined ? null : (
 					<div className={styles["featured-card-wrapper"]}>
 						<h1 className="w-1000 bold">
@@ -226,57 +362,65 @@ function SearchListings({ listings }: { listings: ListingType[] }) {
 						>
 							1
 						</span>
-						{selectedPage >= 3 ? (
+						{pagesNum <= 2 ? null : (
 							<>
-								<span>.</span>
-								<span>.</span>
-								<span>.</span>
+								{selectedPage >= 3 ? (
+									<>
+										<span>.</span>
+										<span>.</span>
+										<span>.</span>
+									</>
+								) : null}
+
+								{spanIfInRange(
+									selectedPage,
+									1,
+									pagesNum,
+									selectedPage,
+									setSelectedPage
+								)}
+								{spanIfInRange(
+									selectedPage + 1,
+									1,
+									pagesNum,
+									selectedPage,
+									setSelectedPage
+								)}
+								{spanIfInRange(
+									selectedPage + 2,
+									1,
+									pagesNum,
+									selectedPage,
+									setSelectedPage
+								)}
+
+								{selectedPage <= pagesNum - 4 ? (
+									<>
+										<span>.</span>
+										<span>.</span>
+										<span>.</span>
+									</>
+								) : null}
 							</>
-						) : null}
-
-						{spanIfInRange(
-							selectedPage,
-							1,
-							pagesNum,
-							selectedPage,
-							setSelectedPage
-						)}
-						{spanIfInRange(
-							selectedPage + 1,
-							1,
-							pagesNum,
-							selectedPage,
-							setSelectedPage
-						)}
-						{spanIfInRange(
-							selectedPage + 2,
-							1,
-							pagesNum,
-							selectedPage,
-							setSelectedPage
 						)}
 
-						{selectedPage <= pagesNum - 3 ? (
-							<>
-								<span>.</span>
-								<span>.</span>
-								<span>.</span>
-							</>
-						) : null}
-
-						<span
-							className={`${styles.number} ${
-								selectedPage === pagesNum - 1 ? styles.select : ""
-							}`}
-							onClick={() => setSelectedPage(pagesNum - 1)}
-						>
-							{pagesNum}
-						</span>
+						{pagesNum <= 1 ? null : (
+							<span
+								className={`${styles.number} ${
+									selectedPage === pagesNum - 1 ? styles.select : ""
+								}`}
+								onClick={() => setSelectedPage(pagesNum - 1)}
+							>
+								{pagesNum}
+							</span>
+						)}
 					</div>
 					<img
 						src="/img/arrowRight.svg"
 						onClick={() =>
-							setSelectedPage(Math.min(selectedPage + 1, pagesNum - 1))
+							setSelectedPage(
+								Math.max(0, Math.min(selectedPage + 1, pagesNum - 1))
+							)
 						}
 					></img>
 				</div>
@@ -346,17 +490,23 @@ function CustomDropdown({
 }
 
 function Filter({
+	onConfirm,
+
 	location,
 	setLocation,
-	hoursRange: hoursRangeToDisplay,
-	setHoursRange: setHoursRangeToDisplay,
+	hoursRange: hoursRange,
+	setHoursRange: setHoursRange,
 	categories: categoryOptions,
 	setCategories: setCategoryOptions,
 	keywords,
 	setKeywords,
 	minHours,
 	maxHours,
+
+	areHoursFlexible,
+	setAreHoursFlexible,
 }: {
+	onConfirm?: () => void;
 	location: string;
 	setLocation: React.Dispatch<React.SetStateAction<string>>;
 	hoursRange: [number, number] | "flexible" | null;
@@ -369,9 +519,11 @@ function Filter({
 	setCategories: React.Dispatch<React.SetStateAction<string[]>>;
 	minHours: number;
 	maxHours: number;
+
+	areHoursFlexible: boolean;
+	setAreHoursFlexible: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
-	const [isFirstRedraw, setIsFirstRedraw] = useState(true);
-	const [visitedFields, setVisitedFields] = useState([] as string[]);
+	// const [visitedFields, setVisitedFields] = useState([] as string[]);
 	const [currentKeyword, setCurrentKeyword] = useState("");
 
 	const barWidth = 200;
@@ -383,25 +535,14 @@ function Filter({
 		return minHours + (pos / barWidth) * (maxHours - minHours);
 	}
 
-	const selectedMinHours = interpolate(minHoursHandlePos);
-	const selectedMaxHours = interpolate(maxHoursHandlePos);
-
-	const [areHoursFlexible, setAreHoursFlexible] = useState(false);
+	const selectedMinHours = Math.round(interpolate(minHoursHandlePos));
+	const selectedMaxHours = Math.round(interpolate(maxHoursHandlePos));
 
 	const isSearchEmpty =
 		location === "" &&
 		categoryOptions.length === 0 &&
-		hoursRangeToDisplay === null &&
+		hoursRange === null &&
 		keywords.length === 0;
-
-	useEffect(() => {
-		if (!isFirstRedraw)
-			setHoursRangeToDisplay([
-				Math.round(selectedMinHours),
-				Math.round(selectedMaxHours),
-			]);
-		setIsFirstRedraw(false);
-	}, [minHoursHandlePos, maxHoursHandlePos]);
 
 	return (
 		<div id={styles.filter}>
@@ -438,17 +579,17 @@ function Filter({
 					))}
 				</CustomDropdown>
 				<CustomDropdown title="Weekly Hours">
-					{Array.isArray(hoursRangeToDisplay) ? (
+					{hoursRange !== "flexible" ? (
 						<div className={styles["slider-bar-labels"]}>
 							<div className={styles["slider-bar-min-label"]}>
-								{hoursRangeToDisplay[0]} hours
+								{selectedMinHours} hours
 							</div>
 							<div className={styles["slider-bar-max-label"]}>
-								{hoursRangeToDisplay[1]} hours
+								{selectedMaxHours} hours
 							</div>
 						</div>
 					) : null}
-					{hoursRangeToDisplay === "flexible" ? null : (
+					{hoursRange === "flexible" ? null : (
 						<div className={styles["slider-bar"]}>
 							<div
 								onDragStart={preventEvent}
@@ -464,12 +605,20 @@ function Filter({
 								max={maxHoursHandlePos}
 								initVal={0}
 								setPos={setMinHoursHandlePos}
+								onDrop={() => {
+									onConfirm?.();
+									setHoursRange([selectedMinHours, selectedMaxHours]);
+								}}
 							/>
 							<Handle
 								min={minHoursHandlePos}
 								max={barWidth}
 								initVal={barWidth}
 								setPos={setMaxHoursHandlePos}
+								onDrop={() => {
+									onConfirm?.();
+									setHoursRange([selectedMinHours, selectedMaxHours]);
+								}}
 							/>
 						</div>
 					)}
@@ -481,12 +630,12 @@ function Filter({
 							onChange={() => {
 								setAreHoursFlexible(!areHoursFlexible);
 								if (areHoursFlexible) {
-									setHoursRangeToDisplay([
+									setHoursRange([
 										Math.round(selectedMinHours),
 										Math.round(selectedMaxHours),
 									]);
 								} else {
-									setHoursRangeToDisplay("flexible");
+									setHoursRange("flexible");
 								}
 							}}
 						/>
@@ -535,17 +684,15 @@ function Filter({
 				/>
 				<SelectionOptionsSet
 					selectionOptions={
-						hoursRangeToDisplay === null
+						hoursRange === null
 							? []
-							: hoursRangeToDisplay === "flexible"
+							: hoursRange === "flexible"
 							? ["Flexible hours"]
-							: hoursRangeToDisplay[0] === hoursRangeToDisplay[1]
-							? [`${hoursRangeToDisplay[0]} hours per week`]
-							: [
-									`${hoursRangeToDisplay[0]}-${hoursRangeToDisplay[1]} hours per week`,
-							  ]
+							: hoursRange[0] === hoursRange[1]
+							? [`${hoursRange[0]} hours per week`]
+							: [`${hoursRange[0]}-${hoursRange[1]} hours per week`]
 					}
-					setSelectionOptions={() => setHoursRangeToDisplay(null)}
+					setSelectionOptions={() => setHoursRange(null)}
 				/>
 				<SelectionOptionsSet
 					selectionOptions={keywords}
@@ -557,8 +704,9 @@ function Filter({
 						onClick={() => {
 							setLocation("");
 							setCategoryOptions([]);
-							setHoursRangeToDisplay(null);
+							setHoursRange(null);
 							setKeywords([]);
+							// no need to do onConfirm because we are setting the arrays
 						}}
 					>
 						Clear All
@@ -596,7 +744,11 @@ function Handle({
 	min,
 	initVal,
 	setPos,
+	onDrop,
+	onDrag,
 }: {
+	onDrag?: () => void;
+	onDrop?: () => void;
 	max: number;
 	min: number;
 	initVal: number;
@@ -628,6 +780,7 @@ function Handle({
 			onDrop={preventEvent}
 			onPointerDown={(e) => {
 				if (selfRef.current) {
+					onDrag?.();
 					setMousePos(e.clientX);
 					setMousePosBeforeDrag(e.clientX);
 					selfRef.current.setPointerCapture(e.pointerId);
@@ -638,6 +791,7 @@ function Handle({
 			}}
 			onPointerUp={(e) => {
 				if (selfRef.current) {
+					onDrop?.();
 					setPosBetweenDrags(pos);
 					setMousePosBeforeDrag(null);
 					selfRef.current.onpointermove = null;
@@ -663,6 +817,8 @@ function deleteFromList(
 
 export const getServerSideProps: GetServerSideProps<{
 	listings: ListingType[];
+	maxHours: number;
+	minHours: number;
 }> = async (context: any) => {
 	await getMongo(); // connect
 	// TODO: there has to be a better way than this
@@ -670,7 +826,18 @@ export const getServerSideProps: GetServerSideProps<{
 
 	const processedListings: ListingType[] = listings.map(getCleanListingData);
 
+	// TODO: cache that?
+
+	const maxHours = (
+		await Listing.find({}, "maxHoursPerWeek -_id")
+			.sort({
+				maxHoursPerWeek: -1,
+			})
+			.limit(1)
+	)[0].maxHoursPerWeek;
+	const minHours = 0;
+
 	return {
-		props: { listings: processedListings }, // will be passed to the page component as props
+		props: { listings: processedListings, minHours, maxHours }, // will be passed to the page component as props
 	};
 };

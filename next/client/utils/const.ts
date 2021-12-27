@@ -13,6 +13,9 @@ export const pagesWithReducedHeaderAndFooter = [
 	"/userSignup",
 ];
 
+export const maxSearchDistanceMeters = 30 * 1000;
+export const distanceRelativeScore = 0.75;
+
 export const countryCodes = [
 	{ code: "AF", name: "Afghanistan" },
 	{ code: "AL", name: "Albania" },

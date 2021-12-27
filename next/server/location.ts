@@ -39,3 +39,23 @@ export async function rawGetPlaceAutocomplete(query: string) {
 	});
 	return placeAutocompleteResults;
 }
+
+export async function geocode(
+	place: string
+): Promise<{ lat: number; lng: number } | null> {
+	const client = new Client({});
+
+	const res = await client.geocode({
+		params: {
+			address: place,
+			// TODO: location in the UK + radius
+			key: geocodingKey ?? "",
+		},
+	});
+
+	if (res.status !== 200) return null;
+	const allResults = res.data.results;
+	if (allResults.length === 0) return null;
+	const bestResult = allResults[0];
+	return bestResult.geometry.location;
+}

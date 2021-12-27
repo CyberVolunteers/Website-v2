@@ -175,6 +175,7 @@ function Header() {
 										onChange={(v) => setSearchKeywords(v.currentTarget.value)}
 									/>
 								</div>
+								<button type="submit" style={{ display: "none" }} />
 							</form>
 							<ul className="dflex-align-center">
 								{/* because it resizes automatically, we need to disable it to prevent flicker */}

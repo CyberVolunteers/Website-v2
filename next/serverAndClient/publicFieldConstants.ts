@@ -108,20 +108,6 @@ export const listings: FieldConstraintsCollection = {
 					},
 				},
 			},
-			// location: {
-			// 	required: {
-			// 		string: {
-			// 			place: { maxLength: 100 },
-			// 			street: { maxLength: 100 },
-			// 			city: { maxLength: 100 },
-			// 			county: { maxLength: 100 },
-			// 		},
-			// 		boolean: {
-			// 			isOnline: {},
-			// 		},
-			// 	},
-			// 	client_specialEdit: true,
-			// },
 		},
 		boolean: {
 			isFlexible: {},
@@ -146,25 +132,6 @@ export const loginSpec: FieldConstraintsCollection = {
 		string: {
 			email: { maxLength: emailLengthField },
 			password: {},
-		},
-	},
-};
-
-export const searchListingsSpec: FieldConstraintsCollection = {
-	required: {
-		string: {
-			keywords: {},
-		},
-	},
-	optional: {
-		string: {
-			targetLoc: {},
-			category: {
-				enum: ["Any", ...(listings.required?.string?.categories?.enum ?? [])],
-			},
-			minHours: {},
-			maxHours: {},
-			isOnline: { enum: ["true", "false"] },
 		},
 	},
 };

@@ -3,7 +3,6 @@ import { baseListingImagePath } from "../serverAndClient/staticDetails";
 import { v4 as uuidv4 } from "uuid";
 import { connection } from "mongoose";
 import { logger } from "./logger";
-import { getLatAndLong } from "./location";
 import sharp from "sharp";
 
 // TODO: combine creating and updating a lsiting?

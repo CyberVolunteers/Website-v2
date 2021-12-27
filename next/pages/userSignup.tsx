@@ -24,8 +24,9 @@ import { isEmailFree } from "../server/auth/data";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
+import { wait } from "../client/utils/misc";
 
-const minSearchCooldownMillis = 700;
+const minSearchCooldownMillis = 500;
 
 // TODO: make sure no text fields persist after a refresh
 // TODO: a loading spinner
@@ -1228,14 +1229,6 @@ export const getServerSideProps: GetServerSideProps<{
 		}, // will be passed to the page component as props
 	};
 };
-
-async function wait(time: number): Promise<void> {
-	return new Promise((res, rej) => {
-		setTimeout(() => {
-			res();
-		}, time);
-	});
-}
 
 function cleanPostcode(p: string) {
 	return p.replaceAll(/[^0-9a-zA-Z]/g, "");
