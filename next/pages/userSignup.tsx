@@ -16,11 +16,9 @@ import CustomForm from "../client/components/CustomForm";
 import CustomButton from "../client/components/Button";
 
 import { csrfFetch } from "../client/utils/csrf";
-import zxcvbn from "zxcvbn";
 import isEmail from "validator/lib/isEmail";
 import { months, postcodeRE } from "../client/utils/const";
 import Image from "next/image";
-import { isEmailFree } from "../server/auth/data";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
@@ -109,7 +107,7 @@ export default function UserSignup({
 
 	return (
 		<>
-			<Head title="Volunteer sign up - cybervolunteers" />
+			<Head title="Sign up - cybervolunteers" />
 			<div className=" SignUp">
 				<div className="body-area">
 					<CustomForm
@@ -510,7 +508,7 @@ function FirstPage({
 	const [secondNameErrorMessage, setSecondNameErrorMessage] = useState("");
 	const [emailErrorMessage, setEmailErrorMessage] = useState("");
 	const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
-	let [password2ErrorMessage, setPassword2ErrorMessage] = useState("");
+	const [password2ErrorMessage, setPassword2ErrorMessage] = useState("");
 
 	const [visitedFields, setVisitedFields] = useState([] as string[]);
 
@@ -523,10 +521,9 @@ function FirstPage({
 
 	// check that the passwords match and that they are strong enough
 	useEffect(() => {
-		// update the value now so that the following checks have the correct value
-		password2ErrorMessage =
-			password === password2 ? "" : "The two passwords do not match";
-		setPassword2ErrorMessage(password2ErrorMessage);
+		setPassword2ErrorMessage(
+			password === password2 ? "" : "The two passwords do not match"
+		);
 	}, [password, password2]);
 
 	// record the vals
@@ -1177,8 +1174,8 @@ function TermsOfServiceNote({
 						fontWeight: 600,
 					}}
 				>
-					(Required) By creating an account you agree that you've read and agree
-					with the{" "}
+					(Required) By creating an account you agree that {"you've"} read and
+					agree with the{" "}
 					<Link
 						// TODO: make that page
 						href="/termsOfService"

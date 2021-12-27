@@ -18,7 +18,7 @@ export default function Console({
 
 	return (
 		<div>
-			<Head title="Admin - mongo" />
+			<Head title="Admin" />
 			<meta name="robots" content="noindex" />
 			<h1>Mongo console</h1>
 

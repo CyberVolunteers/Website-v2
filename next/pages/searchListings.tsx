@@ -224,7 +224,7 @@ function SearchListings({
 
 	return (
 		<div className="Home">
-			<Head title="Cybervolunteers" />
+			<Head title="Volunteer - cybervolunteers" />
 
 			<div
 				style={{ display: "flex", alignItems: "center" }}

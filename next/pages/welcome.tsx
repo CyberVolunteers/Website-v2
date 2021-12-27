@@ -3,7 +3,6 @@ import React from "react";
 import Button from "../client/components/Button";
 import Head from "../client/components/Head";
 import styles from "../client/styles/simplePage.module.css";
-import { useViewProtection } from "../client/utils/otherHooks";
 import { getSession } from "../server/auth/auth-cookie";
 import { isLoggedIn } from "../server/auth/data";
 import { ExtendedNextApiRequest } from "../server/types";

@@ -82,7 +82,7 @@ export default function AboutUs(): ReactElement {
 						<div className="presentation">
 							<h3>Register your interest</h3>
 							<p>
-								Simply click "Volunteer Now" to notify the charity of your
+								Simply click {`"Volunteer Now"`} to notify the charity of your
 								interest.
 							</p>
 						</div>
@@ -163,7 +163,7 @@ export default function AboutUs(): ReactElement {
 				<li>
 					<div className="icon-wrapper">
 						<img className="icon-64" src="/img/org_icon.svg" />
-						<p>Create your organisation's profile.</p>
+						<p>Create your {"organisation's"} profile.</p>
 					</div>
 				</li>
 				<li>

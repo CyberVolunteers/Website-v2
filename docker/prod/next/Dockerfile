@@ -18,7 +18,9 @@ RUN apk add python build-base
 USER node:node
 
 RUN npm i
+RUN export NODE_ENV=production
 RUN npx next telemetry disable
+RUN npm run lint
 RUN npm run build
 
-CMD /wait && npm run start
+CMD /wait && NODE_ENV=production npm run start

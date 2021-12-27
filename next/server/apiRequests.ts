@@ -59,9 +59,9 @@ export function createHandler(
 			return res.status(405).end(`Method ${req.method} Not Allowed`);
 		}
 
-		// expect to use csrf at least with post
-		if (method === "POST" && !options.useCsrf && publicRuntimeConfig.IS_DEV)
-			logger.warn("Make sure to use csrf tokens with post");
+		// // expect to use csrf at least with post
+		// if (method === "POST" && !options.useCsrf && publicRuntimeConfig.IS_DEV)
+		// 	logger.warn("Make sure to use csrf tokens with post");
 
 		try {
 			// preserve the original url (needed for some middleware that was designed for expressjs)
@@ -154,25 +154,25 @@ async function sanitize(
  * @param middleware the actual middleware
  * @returns
  */
-export function runMiddleware(
-	req: ExtendedNextApiRequest,
-	res: ExtendedNextApiResponse,
-	middleware: (
-		req: ExtendedNextApiResponse,
-		res: ExtendedNextApiResponse,
-		next: (passedVal: any) => void
-	) => void
-) {
-	return new Promise((resolve, reject) => {
-		middleware(req, res, (result) => {
-			if (result instanceof Error) {
-				return reject(result);
-			}
+// export function runMiddleware(
+// 	req: ExtendedNextApiRequest,
+// 	res: ExtendedNextApiResponse,
+// 	middleware: (
+// 		req: ExtendedNextApiResponse,
+// 		res: ExtendedNextApiResponse,
+// 		next: (passedVal: any) => void
+// 	) => void
+// ) {
+// 	return new Promise((resolve, reject) => {
+// 		middleware(req, res, (result) => {
+// 			if (result instanceof Error) {
+// 				return reject(result);
+// 			}
 
-			return resolve(result);
-		});
-	});
-}
+// 			return resolve(result);
+// 		});
+// 	});
+// }
 
 /**
  * Uses ajv to parse json and put it into req.body

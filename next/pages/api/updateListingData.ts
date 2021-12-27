@@ -27,26 +27,26 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const session = await getSession(req);
+		// const session = await getSession(req);
 
-		logger.info(
-			"server.updateListingData: updating listing %s by %s with %s",
-			req.body.uuid,
-			session,
-			req.body
-		);
+		// logger.info(
+		// 	"server.updateListingData: updating listing %s by %s with %s",
+		// 	req.body.uuid,
+		// 	session,
+		// 	req.body
+		// );
 
-		if (!isVerifiedOrg(session))
-			return res.status(400).send("You need to be a charity to do this");
+		// if (!isVerifiedOrg(session))
+		// 	return res.status(400).send("You need to be a charity to do this");
 
-		const orgId = session._id;
+		// const orgId = session._id;
 
-		const newDoc = await updateListingData(req.body, orgId, req.body.uuid);
+		// const newDoc = await updateListingData(req.body, orgId, req.body.uuid);
 
-		if (newDoc === null)
-			return res
-				.status(500)
-				.send("We could not update your data. Sorry for the inconvenience.");
+		// if (newDoc === null)
+		// 	return res
+		// 		.status(500)
+		// 		.send("We could not update your data. Sorry for the inconvenience.");
 
 		return res.end();
 	},

@@ -33,14 +33,14 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		let {
+		const {
 			firstName,
 			lastName,
 			email,
 			password,
 			address1,
 			address2,
-			postcode,
+			postcode: _postcode,
 			city,
 			birthDate: birthDateString,
 		} = req.body as {
@@ -55,7 +55,7 @@ const handlers: HandlerCollection = {
 			address2?: string;
 		};
 		const birthDate = new Date(birthDateString);
-		postcode = postcode.toUpperCase();
+		const postcode = _postcode.toUpperCase();
 		// NOTE: does not check the location
 
 		// Fields:

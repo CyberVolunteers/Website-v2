@@ -7,7 +7,6 @@ import { orgDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { doAllRulesApply, signupValidation } from "../../server/validation";
 
 export const config = {
 	api: {
@@ -20,28 +19,28 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		const session = await getSession(req);
+		// const session = await getSession(req);
 
-		if (!doAllRulesApply(req.body, signupValidation))
-			return res
-				.status(400)
-				.send(
-					"This data does not seem correct. Could you please double-check it?"
-				);
+		// if (!doAllRulesApply(req.body, signupValidation))
+		// 	return res
+		// 		.status(400)
+		// 		.send(
+		// 			"This data does not seem correct. Could you please double-check it?"
+		// 		);
 
-		logger.info("server.updateOrgData: updating %s with %s", session, req.body);
+		// logger.info("server.updateOrgData: updating %s with %s", session, req.body);
 
-		if (!isVerifiedOrg(session))
-			return res.status(400).send("You need to be an organisation to do this");
+		// if (!isVerifiedOrg(session))
+		// 	return res.status(400).send("You need to be an organisation to do this");
 
-		const newDoc = await updateOrgData(req.body, session.email);
+		// const newDoc = await updateOrgData(req.body, session.email);
 
-		if (newDoc === null)
-			return res
-				.status(500)
-				.send("We could not update your data. Sorry for the inconvenience.");
+		// if (newDoc === null)
+		// 	return res
+		// 		.status(500)
+		// 		.send("We could not update your data. Sorry for the inconvenience.");
 
-		await updateSession(req, res, newDoc);
+		// await updateSession(req, res, newDoc);
 
 		return res.end();
 	},

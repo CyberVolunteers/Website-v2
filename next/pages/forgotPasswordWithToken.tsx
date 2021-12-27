@@ -47,7 +47,28 @@ export default function ChangePassword({
 				</div>
 			</>
 		);
+	else
+		return (
+			<MainPage
+				{...{
+					csrfToken,
+					firstName,
+					lastName,
+					email,
+					uuid,
+					isSuccessful,
+				}}
+			/>
+		);
+}
 
+function MainPage({
+	csrfToken,
+	firstName,
+	lastName,
+	email,
+	uuid,
+}: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	const router = useRouter();
 
 	const [showPassword, setShowPassword] = useState(false);

@@ -1,15 +1,9 @@
 import multer from "multer";
 import { createAjvJTDSchema, deepAssign } from "combined-validator";
 import { NextApiRequest, NextApiResponse } from "next";
-import {
-	ajv,
-	createHandler,
-	runMiddleware,
-	verifyJSONShape,
-} from "../../server/apiRequests";
+import { ajv, createHandler, verifyJSONShape } from "../../server/apiRequests";
 import { getSession } from "../../server/auth/auth-cookie";
 import { isVerifiedOrg } from "../../server/auth/data";
-import { createListing } from "../../server/listings";
 import {
 	ExtendedNextApiRequest,
 	HandlerCollection,
@@ -58,51 +52,43 @@ const bodyParser = ajv.compileParser(
 
 const handlers: HandlerCollection = {
 	POST: async function (req: MulterReq, res) {
-		await runMiddleware(req, res, upload.single("listingImage") as any);
-
-		const file = req.file;
-		if (file === undefined) {
-			logger.info("server.createListing:No image file");
-			return res.status(400).send("Please send us an image file");
-		}
-
-		//IMPORTANT: do not forget to check the json shape as well
-		if (verifyJSONShape(req, res, bodyParser) === false) return;
-
-		const session = await getSession(req);
-
-		if (session === null || !isVerifiedOrg(session)) {
-			logger.info("server.createListing:Not an org");
-			return res.status(403).send("You need to be an organisation to do that");
-		}
-
-		const fileExt = getFileExtension(file.originalname);
-		if (fileExt === null || !allowedFileTypes.includes(fileExt)) {
-			logger.info("server.createListing:Invalid extension");
-			return res.status(400).send("Please upload a valid image file");
-		}
-
-		const result = await createListing(
-			req.body,
-			session._id,
-			fileExt,
-			file.buffer
-		);
-
-		if (result === true) return res.end();
-
-		switch (result) {
-			case "location":
-				return res
-					.status(400)
-					.send("We could not find that location. Please double-check it.");
-			default:
-				return res
-					.status(400)
-					.send(
-						"We could not process that. It is most likely that this image format is not supported."
-					);
-		}
+		// await runMiddleware(req, res, upload.single("listingImage") as any);
+		// const file = req.file;
+		// if (file === undefined) {
+		// 	logger.info("server.createListing:No image file");
+		// 	return res.status(400).send("Please send us an image file");
+		// }
+		// //IMPORTANT: do not forget to check the json shape as well
+		// if (verifyJSONShape(req, res, bodyParser) === false) return;
+		// const session = await getSession(req);
+		// if (session === null || !isVerifiedOrg(session)) {
+		// 	logger.info("server.createListing:Not an org");
+		// 	return res.status(403).send("You need to be an organisation to do that");
+		// }
+		// const fileExt = getFileExtension(file.originalname);
+		// if (fileExt === null || !allowedFileTypes.includes(fileExt)) {
+		// 	logger.info("server.createListing:Invalid extension");
+		// 	return res.status(400).send("Please upload a valid image file");
+		// }
+		// const result = await createListing(
+		// 	req.body,
+		// 	session._id,
+		// 	fileExt,
+		// 	file.buffer
+		// );
+		// if (result === true) return res.end();
+		// switch (result) {
+		// 	case "location":
+		// 		return res
+		// 			.status(400)
+		// 			.send("We could not find that location. Please double-check it.");
+		// 	default:
+		// 		return res
+		// 			.status(400)
+		// 			.send(
+		// 				"We could not process that. It is most likely that this image format is not supported."
+		// 			);
+		// }
 	},
 };
 

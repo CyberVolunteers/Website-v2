@@ -1,5 +1,4 @@
 import Head from "../client/components/Head";
-import Link from "next/link";
 import {
 	GetServerSideProps,
 	InferGetServerSidePropsType,

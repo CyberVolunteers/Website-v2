@@ -18,7 +18,7 @@ import styles from "../client/styles/simplePage.module.css";
 import { useRouter } from "next/router";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 
-export default function EmailConfirmationEmailSent({}): ReactElement {
+export default function EmailConfirmationEmailSent(): ReactElement {
 	const router = useRouter();
 	const isSuccessful = router.query.isSuccessful === "true";
 	const viewerType = useViewerType();

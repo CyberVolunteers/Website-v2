@@ -16,9 +16,9 @@ export default function OrganisationSignup(
 		<div>
 			<Head title="Organisation sign up - cybervolunteers" />
 
-			<p>Hello and welcome to my secure website</p>
+			{/* <p>Hello and welcome to my secure website</p>
 
-			<Signup presentableNames={orgFieldNamesToShow} target="org" {...props} />
+			<Signup presentableNames={orgFieldNamesToShow} target="org" {...props} /> */}
 		</div>
 	);
 }

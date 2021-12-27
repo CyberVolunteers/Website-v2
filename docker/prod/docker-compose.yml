@@ -21,6 +21,10 @@ services:
       - "mongo-prod:db"
       - "redis-prod:redis"
 
+    # assuming nginx is not present
+    ports:
+      - 3000:3000
+
   mongo-prod:
     image: mongo
     command: [--auth]
@@ -39,19 +43,19 @@ services:
   redis-prod:
     image: "redis:6.2.5-alpine"
 
-  nginx-prod:
-    image: nginx:latest
-    restart: always
-    volumes:
-      - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
-      - /etc/letsencrypt/:/etc/letsencrypt/
+  # nginx-prod:
+  #   image: nginx:latest
+  #   restart: always
+  #   volumes:
+  #     - ../../nginx/nginx.conf:/etc/nginx/nginx.conf
+  #     - /etc/letsencrypt/:/etc/letsencrypt/
 
-    links:
-      - "web-next-prod:next"
+  #   links:
+  #     - "web-next-prod:next"
 
-    ports:
-      - 3000:80
-      - 3001:443
+  #   # ports:
+  #   #   - 3000:80
+  #   #   - 3001:443
 
 secrets:
   mongo_root_user:

@@ -47,8 +47,6 @@ export default function ChangePassword({
 	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
-	async function submit() {}
-
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
 		<div>
@@ -58,7 +56,6 @@ export default function ChangePassword({
 				<CustomForm
 					onSubmit={(e) => {
 						e.preventDefault();
-						submit();
 					}}
 					headingText={
 						<span>

@@ -5,7 +5,7 @@ import Head from "../client/components/Head";
 export default function ListingJoinSuccess(): ReactElement {
 	return (
 		<div>
-			<Head title="Joined successfully - cybervolunteers" />
+			<Head title="Joined the listing successfully - cybervolunteers" />
 			<h1>We have added you to this opportunity</h1>
 			<p>The charity has been notified.</p>
 			<Link href="/searchListings" passHref>

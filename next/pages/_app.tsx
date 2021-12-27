@@ -1,7 +1,7 @@
 import "../client/styles/global.css";
 import type { AppProps } from "next/app";
 import Header from "../client/components/Header";
-import React, { useState } from "react";
+import React from "react";
 import Footer from "../client/components/Footer";
 import { ReactElement } from "react";
 import { useEffect } from "react";

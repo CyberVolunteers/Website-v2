@@ -77,7 +77,7 @@ const handlers: HandlerCollection = {
 		const newOrg = await Org.insertMany(orgs);
 
 		const newIdsByOldIds: { [key: number]: string } = {};
-		newOrg.forEach((o, i) => {
+		(newOrg as any[]).forEach((o, i) => {
 			newIdsByOldIds[orgs[i].id] = o._id;
 		});
 

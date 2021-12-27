@@ -1,9 +1,7 @@
 import { GetServerSideProps } from "next";
-import Link from "next/link";
 import { ReactElement } from "react";
 import Head from "../../client/components/Head";
 import { csrfFetch } from "../../client/utils/csrf";
-import { useIsAfterRehydration } from "../../client/utils/otherHooks";
 import { updateCsrf } from "../../server/csrf";
 
 export default function MakePostRequest({
@@ -32,11 +30,13 @@ export default function MakePostRequest({
 			let newData = await res.text();
 			try {
 				newData = JSON.parse(newData);
+				// eslint-disable-next-line
 			} catch {}
 
 			// eslint-disable-next-line
 			//@ts-ignore
 			window.newData = newData;
+			// eslint-disable-next-line
 			console.log(newData);
 		};
 

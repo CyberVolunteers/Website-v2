@@ -1,19 +1,12 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import {
-	manipulateDataByEmail,
-	changeEmail,
-	getUserType,
-	isLoggedIn,
-	setPassword,
-} from "../../server/auth/data";
+import { getUserType, setPassword } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
 import { verifyHash } from "../../server/auth/password";
-import { sendEmailConfirmationEmail } from "../../server/email";
 
 export const config = {
 	api: {
@@ -59,6 +52,8 @@ const handlers: HandlerCollection = {
 			oldPassword,
 			passwordHash,
 			// do no update the hash as that is what we would be doing next
+
+			// eslint-disable-next-line
 			() => {}
 		);
 

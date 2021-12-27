@@ -1,16 +1,11 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isVerifiedUser, updateUserData } from "../../server/auth/data";
+import { updateUserData } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
-import { userDataUpdateSpec } from "../../serverAndClient/publicFieldConstants";
-import { ExtendedNextApiRequest, HandlerCollection } from "../../server/types";
+import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
 import { getSession, updateSession } from "../../server/auth/auth-cookie";
-import { doAllRulesApply } from "../../server/validation";
-import { postcodeRE } from "../../client/utils/const";
-import isEmail from "validator/lib/isEmail";
-import isMobilePhone from "validator/lib/isMobilePhone";
 
 export const config = {
 	api: {

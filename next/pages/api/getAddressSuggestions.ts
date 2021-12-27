@@ -23,7 +23,7 @@ const handlers: HandlerCollection = {
 
 		const q = rawQ
 			// only keep allowed characters
-			.replaceAll(/[^ 0-9a-zA-Z\.:;,-]/g, " ")
+			.replaceAll(/[^ 0-9a-zA-Z.:;,-]/g, " ")
 			// only leave one space
 			.replaceAll(/ +/g, " ");
 
