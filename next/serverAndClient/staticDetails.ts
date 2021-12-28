@@ -10,4 +10,4 @@ export const relativeDistanceSearchValue = 0.75;
 
 export const protocolAndHost = publicRuntimeConfig.IS_DEV
 	? "http://localhost:3000"
-	: "https://cybervolunteers";
+	: "https://cybervolunteers.online";
