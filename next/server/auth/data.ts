@@ -5,6 +5,8 @@ import { logger } from "../logger";
 
 const { publicRuntimeConfig } = getConfig();
 
+const firstAdminEmail = process.env.FIRST_ADMIN_EMAIL;
+
 /**
  * Determines whether the email belongs to a user or an organisation and logs them in
  * @param credentials an object containing an `email` and a `password` string
@@ -193,7 +195,19 @@ export async function signupUser(_params: {
 	const passwordHash = await hash(params.password ?? "");
 	delete params.password;
 	params.passwordHash = passwordHash;
-	const newUser = new User({ ...params, participationNumber: 0 });
+	let adminLevelObj: { adminLevel?: number } = {};
+
+	// make them an admin
+	if (params.email === firstAdminEmail) {
+		logger.warn("Creating an admin with email %s", params.email);
+		adminLevelObj = { adminLevel: 3 };
+	}
+
+	const newUser = new User({
+		...adminLevelObj,
+		...params,
+		participationNumber: 0,
+	});
 
 	if ((await isEmailFree(params.email)) === false) {
 		logger.info("server.auth.session:Email used for user");
