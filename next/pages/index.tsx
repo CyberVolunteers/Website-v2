@@ -20,18 +20,25 @@ import { faUserCircle } from "@fortawesome/free-regular-svg-icons";
 
 import { faHandsHelping } from "@fortawesome/free-solid-svg-icons";
 import {
-	CarouselListingData,
 	categoryNames as rawCategoryNames,
-	indexPageListings,
+	indexCardListings,
 } from "../client/utils/const";
+import {
+	GetServerSideProps,
+	GetStaticProps,
+	InferGetServerSidePropsType,
+	InferGetStaticPropsType,
+} from "next";
+import { Listing } from "../server/mongo/mongoModels";
+import { getMongo } from "../server/mongo";
 
-const MAX_CHAR_NUM_IN_DESC = 100;
-
-export default function Home(): ReactElement {
+export default function Home({
+	indexListings,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const categoryNamesToShow = rawCategoryNames.slice(0, 5);
 	// if (useIsAfterRehydration()) HandleSliderMovement();
 	const [categoryIndex, setCategoryIndex] = useState(0);
-	const applicableListings = indexPageListings.filter(
+	const applicableListings = indexListings.filter(
 		(el) => el.categoryIndex === categoryIndex
 	);
 
@@ -79,7 +86,7 @@ export default function Home(): ReactElement {
 							<span className="main-heading-span">with purpose</span>
 						</h1>
 						<span className="first-section-button">
-							<Link href="#">Find an opportunity</Link>
+							<Link href="/searchListings">Find an opportunity</Link>
 						</span>
 					</div>
 				</div>
@@ -223,18 +230,12 @@ export default function Home(): ReactElement {
 									{applicableListings
 										.map((el, i) => (
 											<IndexCard
+												uuid={el.uuid}
 												key={i}
-												img={`/img/${el.imgName}`}
-												title={el.opportunityTitle}
+												img={el.imgName}
+												title={el.title}
 												subtitle={el.charityName}
-												desc={(() => {
-													if (el.desc.length <= MAX_CHAR_NUM_IN_DESC)
-														return el.desc;
-													return (
-														el.desc.substring(0, MAX_CHAR_NUM_IN_DESC - 3) +
-														"..."
-													);
-												})()}
+												desc={el.desc}
 												divRef={i === 0 ? firstCardRef : undefined}
 												// meternow="20"
 												// totalgo="120"
@@ -397,7 +398,7 @@ export default function Home(): ReactElement {
 						Volunteer now!
 					</h1>
 					<span className="find-opportunity-button">
-						<Link href="#">Find an opportunity</Link>
+						<Link href="/searchListings">Find an opportunity</Link>
 					</span>
 				</div>
 
@@ -552,3 +553,41 @@ function Carousel({
 		</div>
 	);
 }
+
+export const getServerSideProps: GetServerSideProps<{
+	indexListings: {
+		uuid: string;
+		categoryIndex: number;
+		charityName: string;
+
+		imgName: string;
+		desc: string;
+		title: string;
+	}[];
+}> = async () => {
+	await getMongo();
+	const listings = await Listing.find({});
+	const indexListings = indexCardListings.map((l) => {
+		// TODO: use a more appropriate, efficient way
+		const completeListing = listings.find(
+			(_l: any) => _l.uuid === l.uuid && !_l.categories.includes("scraped")
+		);
+		if (!completeListing)
+			throw new Error(
+				`Could not find a listing with the uuid ${
+					l.uuid
+				} in the listing ${JSON.stringify(l)}`
+			);
+		return {
+			...l,
+			imgName: completeListing?.imagePath,
+			desc: completeListing?.desc,
+			title: completeListing?.title,
+		};
+	});
+	return {
+		props: {
+			indexListings,
+		},
+	};
+};

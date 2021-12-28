@@ -234,7 +234,9 @@ function SearchListings({
 					{/* <small>
 						<span>All Loans</span> Eco-friendly
 					</small> */}
-					<h1 style={{ fontWeight: "bold", fontSize: "2rem" }}>Eco-friendly</h1>
+					<h1 className="bold" style={{ fontSize: "2rem" }}>
+						Volunteer now
+					</h1>
 					{/* <p>
 						Protecting the environment and creating economic growth don’t always
 						go hand in hand, but by supporting these loans you give people
@@ -305,7 +307,7 @@ function SearchListings({
 							Featured: Volunteering Opportunity in{" "}
 							{featuredListing.categories[0]}
 						</h1>
-						<p className="w-1000">TITLE</p>
+						<p className="w-1000">{featuredListing.title}</p>
 						<FeaturedCard
 							imagePath={featuredListing.imagePath}
 							title={featuredListing.title}

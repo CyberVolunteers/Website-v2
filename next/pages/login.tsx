@@ -76,7 +76,7 @@ export default function Login({
 							e.preventDefault();
 							submit();
 						}}
-						headingLinkHref="/signupSelect"
+						headingLinkHref="/userSignup"
 						headingText={
 							<span>
 								Sign in below <br />

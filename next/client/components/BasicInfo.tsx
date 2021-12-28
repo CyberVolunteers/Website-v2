@@ -108,6 +108,7 @@ export const BasicInfo = ({
 		if (res.status >= 400) return setErrorMessage(await res.text());
 
 		const newData = await res.json();
+		console.log(newData);
 		// override the changes
 		setData({ ...data, ...newData });
 	}
@@ -257,7 +258,7 @@ export const BasicInfo = ({
 				<div className={`${styles.grid_three} fourth_input`}>
 					<FloatingInput
 						type="text"
-						label="Address line 2*"
+						label="Address line 2"
 						value={address2}
 						onChange={(e) => {
 							HandleAllCheck(e);

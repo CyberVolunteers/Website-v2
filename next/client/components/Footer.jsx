@@ -52,7 +52,7 @@ function Footer() {
 						</Link>
 					</li>
 					<li>
-						<Link href="/signupSelect" passHref>
+						<Link href="/userSignup" passHref>
 							<a>
 								<p>Sign up</p>
 							</a>
@@ -66,9 +66,9 @@ function Footer() {
 						</Link>
 					</li> */}
 					<li>
-						<Link href="/logout" passHref>
+						<Link href="/myAccount" passHref>
 							<a>
-								<p>Log out</p>
+								<p>My Account</p>
 							</a>
 						</Link>
 					</li>

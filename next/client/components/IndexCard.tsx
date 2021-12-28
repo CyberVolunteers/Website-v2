@@ -1,16 +1,8 @@
 import React, { RefObject } from "react";
+import { cleanStylisedText, doEllipsis } from "../utils/misc";
+import Button from "./Button";
+
 const StyleSheet = {
-	VolenteerButton: {
-		backgroundColor: "#f85220",
-		border: "none",
-		color: "#fff",
-		padding: "1rem 2rem",
-		fontSize: "1rem",
-		cursor: "pointer",
-		marginTop: "15px",
-		width: "100%",
-		fontWeight: "600",
-	},
 	SubTitle: {
 		color: "rgb(117, 108, 108)",
 		fontWeight: "bold",
@@ -47,10 +39,12 @@ const StyleSheet = {
 		minHeight: "3rem",
 	},
 	Desc: {
+		height: "62px",
 		fontWeight: "bold",
 	},
 };
 function IndexCard({
+	uuid,
 	img,
 	title,
 	subtitle,
@@ -59,11 +53,15 @@ function IndexCard({
 }: /*meternow, totalgo*/
 {
 	img: string;
+	uuid: string;
 	title: string;
 	subtitle: string;
 	desc: string;
 	divRef?: RefObject<HTMLDivElement>;
 }) {
+	title = doEllipsis(cleanStylisedText(title, true), 60);
+	subtitle = doEllipsis(cleanStylisedText(subtitle, true), 40);
+	desc = doEllipsis(cleanStylisedText(desc, true), 90);
 	return (
 		<div
 			ref={divRef}
@@ -80,6 +78,7 @@ function IndexCard({
 				<img
 					src={img}
 					style={{
+						height: "160px",
 						width: "100%",
 						borderTopLeftRadius: "10px",
 						borderTopRightRadius: "10px",
@@ -119,9 +118,24 @@ function IndexCard({
 					</p>
 
 					<div className="submittion-area dflex-align-center">
-						<button className="lend-now" style={StyleSheet.VolenteerButton}>
+						<Button
+							href={`/listing?uuid=${uuid}`}
+							className="lend-now"
+							style={{
+								textAlign: "center",
+								backgroundColor: "#f85220",
+								border: "none",
+								color: "#fff",
+								padding: "1rem 2rem",
+								fontSize: "1rem",
+								cursor: "pointer",
+								marginTop: "15px",
+								width: "100%",
+								fontWeight: "600",
+							}}
+						>
 							Volunteer Now
-						</button>
+						</Button>
 					</div>
 				</div>
 			</div>

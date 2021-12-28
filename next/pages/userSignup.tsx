@@ -1176,16 +1176,10 @@ function TermsOfServiceNote({
 				>
 					(Required) By creating an account you agree that {"you've"} read and
 					agree with the{" "}
-					<Link
-						// TODO: make that page
-						href="/termsOfService"
-					>
-						terms of service
-					</Link>{" "}
-					and{" "}
+					<Link href="/downloads/termsOfUse.docx">terms of service</Link> and{" "}
 					<Link
 						//TODO: same here
-						href="/privacyPolicy"
+						href="/downloads/privacyPolicy.docx"
 					>
 						privacy policy
 					</Link>

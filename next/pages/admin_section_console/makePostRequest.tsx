@@ -25,7 +25,9 @@ export default function MakePostRequest({
 				},
 				body: JSON.stringify(data),
 			});
-			if (res.status >= 400) return await res.text();
+			// eslint-disable-next-line
+			//@ts-ignore
+			if (res.status >= 400) return console.log(await res.text());
 
 			let newData = await res.text();
 			try {

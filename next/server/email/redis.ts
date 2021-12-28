@@ -63,6 +63,7 @@ export async function verifyUUID(
 	store: RedisUUIDStores
 ): Promise<boolean> {
 	const storedUUIDRaw = await getKey(key, store);
+	logger.warn("Retrieved key: %s", storedUUIDRaw);
 	const storedUUID = storedUUIDRaw ?? "should not be matched";
 
 	// always do this so that the timing is the same

@@ -145,7 +145,7 @@ export default function AboutUs(): ReactElement {
 					Volunteer now!
 				</h1>
 				<span className="find-opportunity-button">
-					<Link href="#">Find an opportunity</Link>
+					<Link href="/searchListings">Find an opportunity</Link>
 				</span>
 			</div>
 

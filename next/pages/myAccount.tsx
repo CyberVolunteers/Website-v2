@@ -50,6 +50,24 @@ export default function MyAccount({
 	// const userType = useViewerType();
 	// const isOrg = getAccountInfo()?.isOrg;
 
+	const missingInfoSections: ReactElement[] = [];
+	function isEmpty(el: string | undefined) {
+		return el === undefined || el === "";
+	}
+	if (
+		!accountData ||
+		isEmpty(accountData.gender) ||
+		isEmpty(accountData.phoneNumber)
+	)
+		missingInfoSections.push(<a href="#basic_info">Basic info</a>);
+	if (
+		!accountData ||
+		isEmpty(accountData.occupation) ||
+		isEmpty(accountData.languages) ||
+		isEmpty(accountData.skillsAndInterests)
+	)
+		missingInfoSections.push(<a href="#Skills">Your Skills and Interests.</a>);
+
 	const isAfterRehydration = useIsAfterRehydration();
 
 	const [activeSection, setActiveSection] = useState(
@@ -147,11 +165,16 @@ export default function MyAccount({
 						>
 							Personal Information
 						</h1>
-						<p className={personalInformationStyles.first_para}>
-							You are missing information in the following sections:{" "}
-							<a href="#basic_info">Basic info,</a>{" "}
-							<a href="#Skills">Your Skills and Interests.</a>
-						</p>
+						{missingInfoSections.length === 0 ? null : (
+							<p className={personalInformationStyles.first_para}>
+								You are missing information in the following sections:{" "}
+								{missingInfoSections.map((el, i) => {
+									if (i === missingInfoSections.length - 1)
+										return <span key={i}>{el}</span>;
+									return <span key={i}>{el}, </span>;
+								})}
+							</p>
+						)}
 					</div>
 
 					<BasicInfo
@@ -186,7 +209,10 @@ export default function MyAccount({
 							You have volunteered for <b>2</b> charities.
 						</p>
 
-						<Button style={{ width: 210, fontSize: "16px", marginTop: 20 }}>
+						<Button
+							href="/searchListings"
+							style={{ width: 210, fontSize: "16px", marginTop: 20 }}
+						>
 							Find an opportunity
 						</Button>
 					</div>

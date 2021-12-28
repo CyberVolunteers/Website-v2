@@ -14,6 +14,7 @@ import { ReactElement } from "react";
 import Button from "../client/components/Button";
 
 import styles from "../client/styles/simplePage.module.css";
+import { logger } from "../server/logger";
 
 export default function EmailConfirmationEmailSent({
 	isSuccessful,
@@ -75,6 +76,11 @@ export const getServerSideProps: GetServerSideProps<{
 	isSuccessful: boolean;
 }> = async (context) => {
 	const { uuid, email } = context.query;
+	logger.warn(
+		"Confirming email; the uuid is %s and the email is %s",
+		uuid,
+		email
+	);
 	if (typeof uuid !== "string" || typeof email !== "string")
 		return {
 			props: {

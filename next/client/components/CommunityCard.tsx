@@ -15,7 +15,7 @@ function Card({
 	return (
 		<div className="Card community-card">
 			<img src={img_src} alt="" />
-			<p>{text}</p>
+			<p className="community_card_text">{text}</p>
 
 			<h4 className="bold">{title}</h4>
 			<p>{subtitle}</p>
