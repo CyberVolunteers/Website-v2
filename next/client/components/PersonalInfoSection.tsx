@@ -3,6 +3,9 @@ import Button from "./Button";
 import styles from "../styles/personalInfoSection.module.css";
 import { UserClient } from "../../server/auth/data";
 import { months } from "../utils/const";
+
+const notSpecifiedText = "Not specified";
+
 export const PersonalInfoSection = ({
 	data,
 	setActiveSection,
@@ -58,34 +61,34 @@ export const PersonalInfoSection = ({
 					? "Female"
 					: gender === "o"
 					? "Other"
-					: "<Not specified>",
+					: notSpecifiedText,
 		},
 		{
 			left: "Phone Number",
 			right:
 				phoneNumber === undefined || phoneNumber === ""
-					? "<Not specified>"
+					? notSpecifiedText
 					: phoneNumber,
 		},
 		{
 			left: "Occupation",
 			right:
 				occupation === undefined || occupation === ""
-					? "<Not specified>"
+					? notSpecifiedText
 					: occupation,
 		},
 		{
 			left: "Skills and interests",
 			right:
 				skillsAndInterests === undefined || skillsAndInterests === ""
-					? "<Not specified>"
+					? notSpecifiedText
 					: skillsAndInterests,
 		},
 		{
 			left: "Languages",
 			right:
 				languages === undefined || languages === ""
-					? "<Not specified>"
+					? notSpecifiedText
 					: languages,
 		},
 	];

@@ -6,6 +6,7 @@ function Button({
 	style,
 	href,
 	disabled,
+	isHighlighted,
 	onClick,
 	outline,
 	className,
@@ -16,10 +17,13 @@ function Button({
 	onClick?: () => void;
 	outline?: boolean;
 	className?: string;
+	isHighlighted?: boolean;
 }>) {
-	const underlyingClassName = `${styles.button} ${
+	const underlyingClassName = `${styles.custom_button} ${styles.button} ${
 		disabled ? styles.disabled : ""
-	} ${outline === true && styles.outline} ${className ?? ""}`;
+	} ${outline ? styles.outline : ""} ${isHighlighted ? styles.active : ""} ${
+		className ?? ""
+	}`;
 	if (href !== undefined)
 		return (
 			<Link href={href}>

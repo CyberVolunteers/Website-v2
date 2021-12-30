@@ -190,6 +190,11 @@
 	border-bottom: none !important;
 }
 
+select.MuiSelect-root {
+	position: relative;
+	top: 3px;
+}
+
 select:focus {
 	background-color: transparent !important;
 }
@@ -324,6 +329,11 @@ select:focus {
 	.expand-address .half-width {
 		grid-column: span 2;
 	}
+}
+
+.MuiInputBase-root input {
+	position: relative;
+	top: 3px;
 }
 
 .MuiFormControl-root.highlight-black fieldset {

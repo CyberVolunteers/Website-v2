@@ -1,6 +1,8 @@
-import React, { RefObject } from "react";
+import React, { RefObject, useRef } from "react";
 import { cleanStylisedText, doEllipsis } from "../utils/misc";
 import Button from "./Button";
+import Link from "next/link";
+import { useRouter } from "next/router";
 
 const StyleSheet = {
 	SubTitle: {
@@ -59,9 +61,12 @@ function IndexCard({
 	desc: string;
 	divRef?: RefObject<HTMLDivElement>;
 }) {
+	const router = useRouter();
+
 	title = doEllipsis(cleanStylisedText(title, true), 60);
 	subtitle = doEllipsis(cleanStylisedText(subtitle, true), 40);
 	desc = doEllipsis(cleanStylisedText(desc, true), 90);
+
 	return (
 		<div
 			ref={divRef}
@@ -109,17 +114,26 @@ function IndexCard({
 						></div>
 					</div> */}
 					<p className="description" style={StyleSheet.Desc}>
-						{desc}
-
-						<a href="#" style={{ color: "#F85220" }}>
-							{" "}
-							Read more
-						</a>
+						{desc}{" "}
+						<Link href={`/listing?uuid=${uuid}`} passHref>
+							<a
+								style={{ color: "#F85220" }}
+								onPointerDown={() => {
+									router.push(`/listing?uuid=${uuid}`);
+								}}
+							>
+								Read more
+							</a>
+						</Link>
 					</p>
 
-					<div className="submittion-area dflex-align-center">
+					<div
+						onPointerDown={() => {
+							router.push(`/listing?uuid=${uuid}`);
+						}}
+						className="submittion-area dflex-align-center"
+					>
 						<Button
-							href={`/listing?uuid=${uuid}`}
 							className="lend-now"
 							style={{
 								textAlign: "center",
@@ -134,7 +148,7 @@ function IndexCard({
 								fontWeight: "600",
 							}}
 						>
-							Volunteer Now
+							<div>Volunteer Now</div>
 						</Button>
 					</div>
 				</div>

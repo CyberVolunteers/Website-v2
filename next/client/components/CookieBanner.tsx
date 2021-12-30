@@ -11,31 +11,23 @@ export const cookieTypes = [
 	{
 		id: "required",
 		name: "Strictly necessory Cookies",
-		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-											Architecto blanditiis amet explicabo tenetur, natus
-											consequatur repellendus maxime deleniti ex laboriosam.`,
+		desc: "These cookies are necessary for the website to function and cannot be switched off in our systems. They are usually only set in response to actions made by you which amount to a request for services, such as setting your privacy preferences, logging in or filling in forms. You can set your browser to block or alert you about these cookies, but most parts of the site might not work because of that.",
 		isAlwaysActive: true,
 	},
 	{
 		id: "functional",
 		name: "Functional Cookies",
-		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-											Architecto blanditiis amet explicabo tenetur, natus
-											consequatur repellendus maxime deleniti ex laboriosam.`,
+		desc: "These cookies enable the website to provide enhanced functionality and personalisation. They may be set by us or by third party providers whose services we have added to our pages. If you do not allow these cookies then some or all of these services may not function properly.",
 	},
 	{
 		id: "performance",
 		name: "Performance Cookies",
-		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-											Architecto blanditiis amet explicabo tenetur, natus
-											consequatur repellendus maxime deleniti ex laboriosam.`,
+		desc: "These cookies allow us to count visits and traffic sources so we can measure and improve the performance of our site. They help us to know which pages are the most and least popular and see how visitors move around the site. All information these cookies collect is aggregated and therefore anonymous. If you do not allow these cookies we will not know when you have visited our site, and will not be able to monitor its performance.",
 	},
 	{
 		id: "targeting",
 		name: "Trageting Cookies",
-		desc: `Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-											Architecto blanditiis amet explicabo tenetur, natus
-											consequatur repellendus maxime deleniti ex laboriosam.`,
+		desc: "These cookies may be set through our site by our advertising partners. They may be used by those companies to build a profile of your interests and show you relevant adverts on other sites. They do not store directly personal information, but are based on uniquely identifying your browser and internet device. If you do not allow these cookies, you will experience less targeted advertising.",
 	},
 ];
 
@@ -145,13 +137,17 @@ function CookieBanner() {
 						<div className="presentation-area">
 							<h3>Cookie Settings</h3>
 							<p>
-								Lorem ipsum, dolor sit amet consectetur adipisicing elit.
-								Aliquid dolores ducimus, eligendi optio, obcaecati nulla
-								blanditiis voluptate reprehenderit id veritatis ex tempora
-								iusto, accusamus ut! Animi accusamus architecto odio consequatur
-								eveniet, quam, sint temporibus, inventore est quis cupiditate
-								vel minus quae eius repudiandae soluta. At debitis sed ullam
-								quos dolore.
+								When you visit any website, it may store or retrieve information
+								on your browser, mostly in the form of cookies. This information
+								might be about you, your preferences or your device and is
+								mostly used to make the site work as you expect it to. The
+								information does not usually directly identify you, but it can
+								give you a more personalized web experience. Because we respect
+								your right to privacy, you can choose not to allow some types of
+								cookies. Click on the different category headings to find out
+								more and change our default settings. However, blocking some
+								types of cookies may impact your experience of the site and the
+								services we are able to offer.
 							</p>
 							<button
 								onClick={() => {

@@ -59,7 +59,7 @@ function FeaturedCard({
 					{desc}
 
 					<Link href={`/listing?uuid=${uuid}`} passHref>
-						<a>Read more</a>
+						<a style={{ color: "#F85220" }}>Read more</a>
 					</Link>
 				</p>
 

@@ -4,12 +4,14 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createAjvJTDSchema } from "combined-validator";
 import { ajv, createHandler } from "../../../server/apiRequests";
 import { getSession } from "../../../server/auth/auth-cookie";
-import { isAdminLevel } from "../../../server/auth/data";
+import { isAdminLevel, ListingServer } from "../../../server/auth/data";
 import { HandlerCollection } from "../../../server/types";
 import { Listing, Org, User } from "../../../server/mongo/mongoModels";
 import { logger } from "../../../server/logger";
 import { readFile } from "fs";
 import { promisify } from "util";
+import { indexCardListings } from "../../../client/utils/const";
+import { letterSpacing } from "@mui/system";
 
 export const config = {
 	api: {
@@ -20,6 +22,8 @@ export const config = {
 type Data = {
 	name: string;
 };
+
+type ListingType = {};
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
@@ -36,22 +40,49 @@ const handlers: HandlerCollection = {
 			"server.admin_section_console.reloadListings.ts:reloading listings"
 		);
 
-		const listings = JSON.parse(
+		const listingsRaw: (ListingServer & { orgId: number })[] = JSON.parse(
 			(
 				await promisify(readFile)(
 					"/data/dataFromOldServer/listingsNewVersion.json"
 				)
 			).toString()
-		)
-			// make sure that non-scraped are at the top
-			.sort((e1: any, e2: any) => {
-				let score1 = 0;
-				let score2 = 0;
-				if (e1.orgId !== 0) score1 += 1;
-				if (e2.orgId !== 0) score2 += 1;
+		);
+		let listingsWithCustomImages: (ListingServer & { orgId: number })[] = [];
+		let listingsWithLogosNotScraped: (ListingServer & { orgId: number })[] = [];
+		let listingsScraped: (ListingServer & { orgId: number })[] = [];
 
-				return score2 - score1;
-			});
+		listingsRaw.forEach((l) => {
+			if (l.orgId === 0) return listingsScraped.push(l);
+			if (indexCardListings.some((el) => el.uuid === l.uuid))
+				return listingsWithCustomImages.push(l);
+			return listingsWithLogosNotScraped.push(l);
+		});
+
+		listingsWithCustomImages = separateByCharity(listingsWithCustomImages);
+		listingsWithLogosNotScraped = separateByCharity(
+			listingsWithLogosNotScraped
+		);
+		listingsScraped = separateByCharity(listingsScraped);
+
+		// make sure that the first + the last pages of "searchListings" have the listings with custom images
+		const listings: (ListingServer & { orgId: number })[] =
+			listingsWithCustomImages.splice(0, 12);
+
+		listings.push(...listingsWithLogosNotScraped);
+		listings.push(...listingsScraped);
+
+		listings.push(...listingsWithCustomImages);
+
+		// const listings = listingsRaw
+		// 	// make sure that non-scraped are at the top
+		// 	.sort((e1: any, e2: any) => {
+		// 		let score1 = 0;
+		// 		let score2 = 0;
+		// 		if (e1.orgId !== 0) score1 += 1;
+		// 		if (e2.orgId !== 0) score2 += 1;
+
+		// 		return score2 - score1;
+		// 	});
 		const orgs = JSON.parse(
 			(
 				await promisify(readFile)("/data/dataFromOldServer/orgsNewVersion.json")
@@ -112,4 +143,33 @@ export default async function ReloadListing(
 			POST: ajv.compileParser(createAjvJTDSchema({})),
 		}
 	)(req, res);
+}
+
+function separateByCharity(
+	oldListingsArray: (ListingServer & { orgId: number })[]
+) {
+	const listingsByOrgId: Map<number, (ListingServer & { orgId: number })[]> =
+		new Map();
+
+	oldListingsArray.forEach((l) => {
+		const arr = listingsByOrgId.get(l.orgId);
+		if (arr === undefined) {
+			listingsByOrgId.set(l.orgId, [l]);
+		} else arr.push(l);
+	});
+
+	const newListingsArray: (ListingServer & { orgId: number })[] = [];
+
+	while (listingsByOrgId.size > 0) {
+		const orgIdsToDelete: number[] = [];
+		listingsByOrgId.forEach((listings, orgId) => {
+			const newListing = listings.pop();
+			if (newListing === undefined) return orgIdsToDelete.push(orgId);
+			newListingsArray.push(newListing);
+		});
+
+		orgIdsToDelete.forEach((orgId) => listingsByOrgId.delete(orgId));
+	}
+
+	return newListingsArray;
 }

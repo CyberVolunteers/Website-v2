@@ -23,7 +23,11 @@
 	margin-left: 10px;
 }
 .bottom .title {
+	width: 310px;
 	color: #f85220;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
 }
 .bottom .organisationName {
 	color: rgb(156, 156, 156);

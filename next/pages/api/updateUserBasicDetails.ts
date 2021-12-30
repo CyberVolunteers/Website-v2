@@ -20,12 +20,12 @@ type Data = {
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
-		let {
+		const {
 			firstName,
 			lastName,
 			address1,
 			address2: address2Raw,
-			postcode,
+			postcode: postcodeRaw,
 			city,
 			birthDate: birthDateString,
 
@@ -44,7 +44,7 @@ const handlers: HandlerCollection = {
 			gender?: "" | "m" | "f" | "o";
 		};
 		const birthDate = new Date(birthDateString);
-		postcode = postcode.toUpperCase();
+		const postcode = postcodeRaw.toUpperCase();
 		const address2 = address2Raw ?? "";
 		const phoneNumber = phoneNumberRaw ?? "";
 		const gender = genderRaw ?? "";

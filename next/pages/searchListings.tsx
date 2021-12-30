@@ -30,6 +30,7 @@ import { getMongo } from "../server/mongo";
 import { getCleanListingData } from "../server/mongo/util";
 import { wait } from "../client/utils/misc";
 import { useRouter } from "next/router";
+import { useWindowSize } from "../client/utils/otherHooks";
 
 const minLocationSearchCooldownMillis = 500;
 
@@ -96,6 +97,9 @@ function SearchListings({
 	maxHours,
 	minHours,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	const screenWidth = useWindowSize()?.width;
+	const isMobile = !!screenWidth && screenWidth < 770;
+
 	const router = useRouter();
 
 	const queryKeywords: null | string =
@@ -105,7 +109,6 @@ function SearchListings({
 	const [warningMessage, setWarningMessage] = useState("");
 
 	const [listings, setListings] = useState(_listings);
-	const [isShowingAllListings, setIsShowingAllListings] = useState(true);
 	const pagesNum = Math.ceil(listings.length / MAX_LISTINGS_PER_PAGE);
 
 	const [selectedPage, setSelectedPage] = useState(0);
@@ -126,14 +129,25 @@ function SearchListings({
 		setKeywords([queryKeywords]);
 	}, [queryKeywords]);
 
-	const featuredListing: ListingType | undefined = isShowingAllListings
+	const featuredListing: ListingType | undefined = !showFilter
 		? listings.find((l) => l.title === "Home from Hospital Volunteers")
 		: undefined;
 
 	useEffect(() => {
+		setCategories([]);
+		setKeywords([]);
+		setLocation("");
+		setHoursRange(null);
+
+		setShowFilter(false);
+		setListings(_listings);
+		setSelectedPage(0);
+	}, [isMobile]);
+
+	useEffect(() => {
+		if (isMobile) return;
 		if (!showFilter) {
 			setListings(_listings);
-			setIsShowingAllListings(true);
 			setSelectedPage(0);
 		} else {
 			submit();
@@ -163,6 +177,7 @@ function SearchListings({
 	}, [hoursRange]);
 
 	async function submit() {
+		if (isMobile) return;
 		if (!showFilter) return;
 		const query: {
 			location?: string;
@@ -217,13 +232,12 @@ function SearchListings({
 		newListings.sort((e1: any, e2: any) => e2.score - e1.score);
 
 		setListings(newListings);
-		setIsShowingAllListings(false);
 
 		setSelectedPage(0);
 	}
 
 	return (
-		<div className="Home">
+		<div className="Home" style={{ overflow: "hidden" }}>
 			<Head title="Volunteer - cybervolunteers" />
 
 			<div
@@ -254,19 +268,21 @@ function SearchListings({
 						</Link>
 					</div> */}
 
-					<div
-						className={`${styles["filter-button-container"]} dflex-align-center`}
-						style={{ cursor: "pointer" }}
-						onClick={() => setShowFilter(!showFilter)}
-					>
-						<img className={styles["filter-img"]} src={"/img/filter.svg"} />
-						<p>Filter</p>
-					</div>
+					{isMobile ? null : (
+						<div
+							className={`${styles["filter-button-container"]} dflex-align-center`}
+							style={{ cursor: "pointer" }}
+							onClick={() => setShowFilter(!showFilter)}
+						>
+							<img className={styles["filter-img"]} src={"/img/filter.svg"} />
+							<p>Filter</p>
+						</div>
+					)}
 				</div>
 			</div>
 
 			<div className={styles["main-content"]}>
-				{showFilter ? (
+				{!isMobile && showFilter ? (
 					<Filter
 						onConfirm={submit}
 						minHours={minHours}
@@ -351,6 +367,7 @@ function SearchListings({
 
 				<div className={`${styles["pagination-area"]} w-1000`}>
 					<img
+						className={styles.pagination_arrow}
 						src="/img/arrowLeft.svg"
 						onClick={() => setSelectedPage(Math.max(selectedPage - 1, 0))}
 					></img>
@@ -418,6 +435,7 @@ function SearchListings({
 						)}
 					</div>
 					<img
+						className={styles.pagination_arrow}
 						src="/img/arrowRight.svg"
 						onClick={() =>
 							setSelectedPage(

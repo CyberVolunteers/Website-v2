@@ -50,7 +50,10 @@ export default function ListingPage({
 			{/* TODO: add the title of the listing here  */}
 			<Head title="Listing - cybervolunteers" />
 
-			<div className={styles.page_container}>
+			<div
+				className={styles.page_container}
+				style={{ overflow: "hidden", width: "98vw" }}
+			>
 				<div className={styles.content}>
 					<div className={styles.container}>
 						<div className={styles.row}>
@@ -155,7 +158,7 @@ export default function ListingPage({
 										className={styles["Opportunity-text"]}
 										style={{ fontWeight: "bold !important" }}
 									>
-										About Org
+										About {listing.scrapedOrgName ?? listing.organisation.name}
 									</h2>
 									<p className={styles.paragraph}>
 										{handleStylisedTextRender(listing.organisation.desc)}
@@ -237,9 +240,16 @@ function InfoBox({ listing }: { listing: ListingType }) {
 					</div>
 					<h5 className={styles.h5}>When</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>
-						{handleStylisedTextRender(listing.duration)}
-						<br />
-						{handleStylisedTextRender(listing.time)}
+						{handleStylisedTextRender(
+							listing.duration,
+							undefined,
+							styles.card_text_div
+						)}
+						{handleStylisedTextRender(
+							listing.time,
+							undefined,
+							styles.card_text_div
+						)}
 					</p>
 					<h5 className={styles.h5}>Where</h5>
 					<p className={`${styles.paragraph} ${styles["mon-text"]}`}>

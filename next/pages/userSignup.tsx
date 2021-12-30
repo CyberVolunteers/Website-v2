@@ -557,6 +557,7 @@ function FirstPage({
 						setFirstNameErrorMessage("");
 					}}
 					onChange={(e) => setFirstName(e.target.value)}
+					value={firstName}
 					id="fname"
 					label="First name"
 					autoComplete="on"
@@ -588,6 +589,7 @@ function FirstPage({
 					}}
 					// onChange={HandleTextValidation}
 					onChange={(e) => setLastName(e.target.value)}
+					value={lastName}
 					id="lname"
 					label="Last name"
 					variant="outlined"
@@ -644,6 +646,7 @@ function FirstPage({
 					}}
 					// onChange={HandleEmailValidation}
 					onChange={(e) => setEmail(e.target.value)}
+					value={email}
 					id="email"
 					label="Email"
 					autoComplete="on"
@@ -1056,7 +1059,7 @@ function SecondPage({
 					/>
 					<span
 						className="helping-text password-helper"
-						style={{ marginBottom: "0px" }}
+						style={{ marginBottom: "0px", paddingLeft: "3px" }}
 					>
 						{dayErrorMessage}
 					</span>
@@ -1118,7 +1121,10 @@ function SecondPage({
 						}}
 					/>
 
-					<span className="helping-text password-helper">
+					<span
+						className="helping-text password-helper"
+						style={{ paddingLeft: "3px" }}
+					>
 						{yearErrorMessage}
 					</span>
 				</div>

@@ -208,7 +208,10 @@ function Header() {
 								{!isLargeVersion ? null : (
 									<>
 										{isLoggedIn ? (
-											<li>{myAccountEl}</li>
+											<>
+												<li>{aboutUsEl}</li>
+												<li>{myAccountEl}</li>
+											</>
 										) : (
 											<>
 												<li>{signInEl}</li>
@@ -227,9 +230,9 @@ function Header() {
 														<li>{charitySignUpEl}</li>
 													</ul>
 												</li>
+												<li>{aboutUsEl}</li>
 											</>
 										)}
-										<li>{aboutUsEl}</li>
 									</>
 								)}
 

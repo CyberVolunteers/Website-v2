@@ -395,3 +395,7 @@ div.filter-button-container {
 		height: 100%;
 	}
 }
+
+.pagination_arrow {
+	cursor: pointer;
+}

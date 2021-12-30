@@ -2,6 +2,7 @@ import { hash, verifyHash } from "./password";
 import { Listing, Org, User } from "../mongo/mongoModels";
 import getConfig from "next/config";
 import { logger } from "../logger";
+import { categoryNames } from "../../client/utils/const";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -136,6 +137,38 @@ export function isResult<T>(
 ): res is { errorMessage: string } {
 	return "errorMessage" in res;
 }
+
+export type ListingServer = {
+	categories: typeof categoryNames;
+	requiredData: string[];
+	currentNumVolunteers: number;
+	users: string | UserServer[];
+	_id?: string;
+	createdDate: Date;
+	uuid: string;
+	duration: string;
+	time: string;
+	skills: string;
+	requirements: string;
+	title: string;
+	desc: string;
+	imagePath: string;
+	targetAudience: {
+		under16: boolean;
+		between16And18: boolean;
+		between18And55: boolean;
+		over55: boolean;
+		_id?: string;
+	};
+	address1: string;
+	address2?: string;
+	isFlexible: boolean;
+	minHoursPerWeek: number;
+	maxHoursPerWeek: number;
+	requestedNumVolunteers: number;
+	organisation: string; // TODO: change it
+	__v?: number;
+};
 
 export type UserServer = UserClient & {
 	passwordHash: string;

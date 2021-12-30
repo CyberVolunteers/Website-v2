@@ -33,6 +33,11 @@ export const SkillsAndInterests = ({
 		setSkillsAndInterests(data.skillsAndInterests ?? "");
 	}
 
+	const areThereChanges =
+		occupation !== (data.occupation ?? "") ||
+		languages !== (data.languages ?? "") ||
+		skillsAndInterests !== (data.skillsAndInterests ?? "");
+
 	async function saveChanges() {
 		const res = await csrfFetch(csrfToken, "/api/updateUserSelfDescription", {
 			method: "POST",
@@ -159,10 +164,11 @@ export const SkillsAndInterests = ({
 					Discard Changes
 				</Button>
 				<Button
+					isHighlighted={areThereChanges}
 					style={{
 						backgroundColor: "transparent",
 						color: "#333",
-						borderColor: "#484848",
+						borderColor: areThereChanges ? "" : "#484848",
 					}}
 					className="skill_save_two"
 					onClick={saveChanges}

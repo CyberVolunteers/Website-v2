@@ -50,6 +50,8 @@ export const BasicInfo = ({
 		setGender((data.gender as Gender) ?? "");
 	}, []);
 
+	console.log(month);
+
 	useEffect(() => {
 		setErrorMessage("");
 	}, [
@@ -81,6 +83,19 @@ export const BasicInfo = ({
 		setPhone(data.phoneNumber ?? "");
 	}
 
+	const areThereChanges =
+		firstName !== data.firstName ||
+		lastName !== data.lastName ||
+		address1 !== data.address1 ||
+		address2 !== (data.address2 ?? "") ||
+		postcode !== data.postcode ||
+		city !== data.city ||
+		day !== "" + birthDate.getDate() ||
+		month !== birthDate.getMonth() ||
+		year !== "" + birthDate.getFullYear() ||
+		gender !== ((data.gender as Gender) ?? "") ||
+		phone !== (data.phoneNumber ?? "");
+
 	async function saveChanges() {
 		const birthDate = new Date(parseInt(year), month, parseInt(day));
 		if (birthDate instanceof Date && isNaN(birthDate.valueOf()))
@@ -108,7 +123,6 @@ export const BasicInfo = ({
 		if (res.status >= 400) return setErrorMessage(await res.text());
 
 		const newData = await res.json();
-		console.log(newData);
 		// override the changes
 		setData({ ...data, ...newData });
 	}
@@ -359,7 +373,7 @@ export const BasicInfo = ({
 									// TODO: does this even do anything useful?
 									// window.sessionStorage.setItem("month", true);
 									HandleAllCheck(e);
-									setMonth(e.target.value as number);
+									setMonth(parseInt(e.target.value as string));
 								}}
 								id="month-select"
 								onBlur={HandleSelectOnBlur}
@@ -424,10 +438,11 @@ export const BasicInfo = ({
 					Discard Changes
 				</Button>
 				<Button
+					isHighlighted={areThereChanges}
 					style={{
 						backgroundColor: "transparent",
 						color: "#333",
-						borderColor: "#484848",
+						borderColor: areThereChanges ? "" : "#484848",
 					}}
 					className="skill_save_one"
 					onClick={() => saveChanges()}

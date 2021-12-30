@@ -59,7 +59,11 @@ export function cleanStylisedText(text: string, keepMinimal?: true) {
 		.replaceAll("<b>", "")
 		.replaceAll("</b>", "");
 }
-export function handleStylisedTextRender(text: string, keepMinimal?: true) {
+export function handleStylisedTextRender(
+	text: string,
+	keepMinimal?: true,
+	divClassName?: string
+) {
 	text = cleanStylisedText(text, keepMinimal);
 	return (
 		<>
@@ -68,10 +72,9 @@ export function handleStylisedTextRender(text: string, keepMinimal?: true) {
 				.map((t, i) => {
 					// TODO: also do bold tags
 					return (
-						<span key={i}>
+						<div key={i} className={divClassName}>
 							{t}
-							<br />
-						</span>
+						</div>
 					);
 				})}
 		</>
