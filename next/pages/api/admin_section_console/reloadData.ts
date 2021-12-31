@@ -23,7 +23,7 @@ type Data = {
 	name: string;
 };
 
-type ListingType = {};
+type RawListing = ListingServer & { orgId: number };
 
 const handlers: HandlerCollection = {
 	POST: async function (req, res) {
@@ -40,16 +40,16 @@ const handlers: HandlerCollection = {
 			"server.admin_section_console.reloadListings.ts:reloading listings"
 		);
 
-		const listingsRaw: (ListingServer & { orgId: number })[] = JSON.parse(
+		const listingsRaw: RawListing[] = JSON.parse(
 			(
 				await promisify(readFile)(
 					"/data/dataFromOldServer/listingsNewVersion.json"
 				)
 			).toString()
 		);
-		let listingsWithCustomImages: (ListingServer & { orgId: number })[] = [];
-		let listingsWithLogosNotScraped: (ListingServer & { orgId: number })[] = [];
-		let listingsScraped: (ListingServer & { orgId: number })[] = [];
+		let listingsWithCustomImages: RawListing[] = [];
+		let listingsWithLogosNotScraped: RawListing[] = [];
+		let listingsScraped: RawListing[] = [];
 
 		listingsRaw.forEach((l) => {
 			if (l.orgId === 0) return listingsScraped.push(l);
@@ -58,15 +58,12 @@ const handlers: HandlerCollection = {
 			return listingsWithLogosNotScraped.push(l);
 		});
 
-		listingsWithCustomImages = separateByCharity(listingsWithCustomImages);
-		listingsWithLogosNotScraped = separateByCharity(
-			listingsWithLogosNotScraped
-		);
-		listingsScraped = separateByCharity(listingsScraped);
+		listingsWithCustomImages = pickOneByOne(listingsWithCustomImages);
+		listingsWithLogosNotScraped = pickOneByOne(listingsWithLogosNotScraped);
+		listingsScraped = pickOneByOne(listingsScraped);
 
 		// make sure that the first + the last pages of "searchListings" have the listings with custom images
-		const listings: (ListingServer & { orgId: number })[] =
-			listingsWithCustomImages.splice(0, 12);
+		const listings: RawListing[] = listingsWithCustomImages.splice(0, 12);
 
 		listings.push(...listingsWithLogosNotScraped);
 		listings.push(...listingsScraped);
@@ -145,20 +142,70 @@ export default async function ReloadListing(
 	)(req, res);
 }
 
-function separateByCharity(
-	oldListingsArray: (ListingServer & { orgId: number })[]
-) {
-	const listingsByOrgId: Map<number, (ListingServer & { orgId: number })[]> =
-		new Map();
+function separateByOrg(listingsArray: RawListing[]) {
+	const listingsByOrgId: Map<number, RawListing[]> = new Map();
 
-	oldListingsArray.forEach((l) => {
+	listingsArray.forEach((l) => {
 		const arr = listingsByOrgId.get(l.orgId);
 		if (arr === undefined) {
 			listingsByOrgId.set(l.orgId, [l]);
 		} else arr.push(l);
 	});
+	return listingsByOrgId;
+}
 
-	const newListingsArray: (ListingServer & { orgId: number })[] = [];
+// tries to make sure that all listings of a given charity are spread evenly,
+// so if A has twice as many listings as B, we might get something similar to AABAABAAB
+function pickEvenly(oldListingsArray: RawListing[]) {
+	const listingsByOrgId = separateByOrg(oldListingsArray);
+
+	const extendedListingsByOrgId: Map<
+		number,
+		(RawListing & { counter: number })[]
+	> = new Map();
+
+	listingsByOrgId.forEach((listingSet, key) => {
+		extendedListingsByOrgId.set(
+			key,
+			listingSet.map((l, i) => {
+				return {
+					counter: i / listingSet.length,
+					...l,
+				};
+			})
+		);
+	});
+
+	const newListingsArray: RawListing[] = [];
+
+	// imagine that as a point on a 0-1 number line and keep on moving from 0 to 1, always selecting the closest point in that order
+	let counter = 0;
+	while (extendedListingsByOrgId.size > 0) {
+		let smallestKey = 0;
+		let smallestGap = 2;
+		extendedListingsByOrgId.forEach((listingSet, key) => {
+			const currentGap = listingSet[0].counter - counter;
+			if (currentGap < smallestGap) {
+				smallestKey = key;
+				smallestGap = currentGap;
+			}
+		});
+
+		const listingSet = extendedListingsByOrgId.get(smallestKey);
+		const newListing = listingSet?.shift?.();
+		if (newListing !== undefined) newListingsArray.push(newListing);
+
+		if (listingSet?.length === 0) extendedListingsByOrgId.delete(smallestKey);
+	}
+
+	return newListingsArray;
+}
+
+// Tries to pick charities in this order: ABCDABCDABCD...ABCABCABABAAAAA
+// if a charity is missing, skip it
+function pickOneByOne(oldListingsArray: RawListing[]) {
+	const listingsByOrgId = separateByOrg(oldListingsArray);
+	const newListingsArray: RawListing[] = [];
 
 	while (listingsByOrgId.size > 0) {
 		const orgIdsToDelete: number[] = [];

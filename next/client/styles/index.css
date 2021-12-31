@@ -554,3 +554,33 @@
 		width: 180px !important;
 	}
 }
+
+@media screen and (max-width: 520px) {
+	.top-navigation-area .icon-wrapper.left,
+	.request-navigation-area .icon-wrapper.left {
+		transform: translate(-43px, -50%);
+		left: 0;
+	}
+	.top-navigation-area .icon-wrapper.right,
+	.request-navigation-area .icon-wrapper.right {
+		transform: translate(43px, -50%);
+		right: 0;
+	}
+}
+
+@media screen and (max-width: 460px) {
+	.reel-wrapper {
+		margin: auto;
+		width: 90%;
+	}
+	.top-navigation-area .icon-wrapper.left,
+	.request-navigation-area .icon-wrapper.left {
+		transform: translate(-30px, -50%);
+		left: 0;
+	}
+	.top-navigation-area .icon-wrapper.right,
+	.request-navigation-area .icon-wrapper.right {
+		transform: translate(30px, -50%);
+		right: 0;
+	}
+}

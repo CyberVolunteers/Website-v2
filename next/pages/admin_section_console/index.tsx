@@ -17,6 +17,11 @@ export default function Console(): ReactElement {
 					<p>Make post request</p>
 				</a>
 			</Link>
+			<Link href="/admin_section_console/test_errors" passHref>
+				<a>
+					<p>Test errors</p>
+				</a>
+			</Link>
 		</div>
 	);
 }

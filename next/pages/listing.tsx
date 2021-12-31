@@ -1,7 +1,7 @@
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
-import { ReactElement } from "react";
+import { ReactElement, useRef } from "react";
 
 import Head from "../client/components/Head";
 import styles from "../client/styles/listing.module.css";
@@ -18,13 +18,25 @@ import { getMongo } from "../server/mongo";
 import { LinkTwoTone } from "@material-ui/icons";
 import { categoryNames } from "../client/utils/const";
 import { handleStylisedTextRender } from "../client/utils/misc";
+import { NextRouter, useRouter } from "next/router";
+import { useViewerType } from "../client/utils/userState";
+import { ViewerType } from "../client/types";
+
+const onVolunteerButtonClick = (router: NextRouter, userType: ViewerType) => {
+	const isLoggedIn = (
+		["user", "org", "unverified_user", "unverified_org"] as ViewerType[]
+	).includes(userType);
+	if (isLoggedIn) router.push("/volunteeringSuccessful");
+	else router.push("/login");
+};
 
 export default function ListingPage({
 	listing,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const userType = useViewerType();
+	const router = useRouter();
 	const screenWidth = useWindowSize().width ?? 1000;
 	const isSmallScreenVersion = screenWidth <= 768;
-	// useViewProtection(["org", "user"]);
 
 	if (listing === null)
 		return (
@@ -192,7 +204,10 @@ export default function ListingPage({
 			</div>
 			<footer className={styles["footer-b"]}>
 				<a href="#" className={styles.link}>
-					<button className={styles["Opportunities-button3"]}>
+					<button
+						className={styles["Opportunities-button3"]}
+						onClick={() => onVolunteerButtonClick(router, userType)}
+					>
 						I want to help
 					</button>
 				</a>
@@ -202,6 +217,9 @@ export default function ListingPage({
 }
 
 function InfoBox({ listing }: { listing: ListingType }) {
+	const router = useRouter();
+	const userType = useViewerType();
+
 	return (
 		<div className={styles["info-box"]}>
 			<div className={styles["fixed-f"]}>
@@ -277,7 +295,10 @@ function InfoBox({ listing }: { listing: ListingType }) {
 						)}
 					</p>
 					<a href="#" className={`${styles["link"]}`}>
-						<button className={`${styles["Opportunities-button2"]}`}>
+						<button
+							className={`${styles["Opportunities-button2"]}`}
+							onClick={() => onVolunteerButtonClick(router, userType)}
+						>
 							I want to help
 						</button>
 					</a>

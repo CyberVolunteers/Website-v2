@@ -78,15 +78,18 @@ export function useViewerType(): ViewerType {
 	useEffect(() => {
 		setViewerType(getPureViewerType());
 
-		const bc = new BroadcastChannel("loginEvents"); //TODO: a channel specifically for verifying
-		bc.onmessage = function () {
-			setViewerType(getPureViewerType());
-		};
+		try {
+			const bc = new BroadcastChannel("loginEvents"); //TODO: a channel specifically for verifying
+			bc.onmessage = function () {
+				setViewerType(getPureViewerType());
+			};
+			// cleanup
+			return function () {
+				bc.close();
+			};
 
-		// cleanup
-		return function () {
-			bc.close();
-		};
+			// eslint-disable-next-line
+		} catch {}
 	}, []);
 
 	if (viewerType === "server" || viewerType === "hydrating") return viewerType; // do not set up broadcast channels

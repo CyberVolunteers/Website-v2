@@ -1,0 +1,17 @@
+.card_wrapper {
+	min-width: 330px;
+}
+
+.description {
+	height: 62px;
+	font-weight: bold;
+}
+
+@media screen and (max-width: 385px) {
+	.card_wrapper {
+		min-width: 280px;
+	}
+	.description {
+		height: 80px;
+	}
+}

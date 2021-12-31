@@ -1,0 +1,10 @@
+.overall_container {
+	margin: auto;
+	/* width: 1200px; */
+}
+
+@media screen and (max-width: 1200px) {
+	.main-page {
+		width: 90vw;
+	}
+}

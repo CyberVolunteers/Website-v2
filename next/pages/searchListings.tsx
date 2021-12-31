@@ -104,6 +104,11 @@ function SearchListings({
 
 	const queryKeywords: null | string =
 		typeof router.query.keywords === "string" ? router.query.keywords : null;
+	const queryCategory: null | string =
+		typeof router.query.category === "string" &&
+		categoryNames.includes(router.query.category)
+			? router.query.category
+			: null;
 
 	const [errorMessage, setErrorMessage] = useState("");
 	const [warningMessage, setWarningMessage] = useState("");
@@ -112,7 +117,9 @@ function SearchListings({
 	const pagesNum = Math.ceil(listings.length / MAX_LISTINGS_PER_PAGE);
 
 	const [selectedPage, setSelectedPage] = useState(0);
-	const [showFilter, setShowFilter] = useState(queryKeywords !== null);
+	const [showFilter, setShowFilter] = useState(
+		queryCategory !== null || queryKeywords !== null
+	);
 
 	const [categories, setCategories] = useState([] as string[]);
 	const [keywords, setKeywords] = useState([] as string[]);
@@ -124,16 +131,20 @@ function SearchListings({
 	const [areHoursFlexible, setAreHoursFlexible] = useState(false);
 
 	useEffect(() => {
-		if (queryKeywords === null) return;
-		setShowFilter(true);
-		setKeywords([queryKeywords]);
-	}, [queryKeywords]);
+		if (queryKeywords !== null) {
+			setKeywords([queryKeywords]);
+		}
+		if (queryCategory !== null) {
+			setCategories([queryCategory]);
+		}
+	}, [queryKeywords, queryCategory]);
 
 	const featuredListing: ListingType | undefined = !showFilter
 		? listings.find((l) => l.title === "Home from Hospital Volunteers")
 		: undefined;
 
 	useEffect(() => {
+		if (!isMobile) return;
 		setCategories([]);
 		setKeywords([]);
 		setLocation("");
@@ -337,7 +348,7 @@ function SearchListings({
 					</div>
 				)}
 
-				<div className={`${styles["cards-grid"]} w-1000`}>
+				<div className={styles["cards-grid"]}>
 					{(() => {
 						const out = [];
 						const listingsBefore = selectedPage * MAX_LISTINGS_PER_PAGE;

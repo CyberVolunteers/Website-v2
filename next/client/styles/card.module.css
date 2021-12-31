@@ -1,9 +1,10 @@
 .Card {
 	border: 1px solid #ddd;
+	width: 358px;
 }
 .card-image-container {
 	width: 100%;
-	height: 250px;
+	height: 200px;
 	object-fit: cover;
 }
 .bottom {
@@ -80,4 +81,10 @@
 	height: 100%;
 	outline: none;
 	border: 1px solid #ddd;
+}
+
+@media screen and (max-width: 360px) {
+	.Card {
+		width: 310px;
+	}
 }

@@ -50,8 +50,6 @@ export const BasicInfo = ({
 		setGender((data.gender as Gender) ?? "");
 	}, []);
 
-	console.log(month);
-
 	useEffect(() => {
 		setErrorMessage("");
 	}, [

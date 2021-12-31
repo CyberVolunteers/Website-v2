@@ -1,6 +1,14 @@
 .header_image_container {
 	position: relative;
 	background-color: #000;
+	height: 100vh;
+
+	transform: translateY(-68px);
+}
+@media screen and (max-width: 600px) {
+	.header_image_container {
+		transform: translateY(-51px);
+	}
 }
 .header_text {
 	position: absolute;
@@ -18,10 +26,22 @@
 }
 .partners_logos {
 	display: block;
-	width: 80%;
+	width: 45vw;
 	margin: auto;
 	margin-top: 2rem;
 }
+
+@media screen and (max-width: 1000px) {
+	.partners_logos {
+		width: 75vw;
+	}
+}
+@media screen and (max-width: 500px) {
+	.partners_logos {
+		width: 100vw;
+	}
+}
+
 .header_image {
 	width: 100%;
 	opacity: 0.7;

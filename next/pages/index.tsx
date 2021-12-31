@@ -28,8 +28,6 @@ import { Listing } from "../server/mongo/mongoModels";
 import { getMongo } from "../server/mongo";
 import IdeaShowcase from "../client/components/IdeaShowcase";
 
-const touchDelay = 150;
-
 export default function Home({
 	indexListings,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -65,7 +63,7 @@ export default function Home({
 	const catsNumToSkip = 1;
 
 	return (
-		<div style={{ overflow: "hidden" }}>
+		<div style={{ overflow: "hidden", touchAction: "pan-y pinch-zoom" }}>
 			<Head title="Cybervolunteers" />
 
 			<div className="main-page">
@@ -73,6 +71,7 @@ export default function Home({
 				<div className="video-section">
 					<video
 						src="/video/cybervolunteers-intro.mp4"
+						poster="/img/cybervolunteers_video_thumbnail.webp"
 						muted
 						controls
 						style={{ width: "100%" }}
@@ -120,6 +119,7 @@ export default function Home({
 								/>
 							</svg>
 						</div>
+
 						<div className="reel-wrapper">
 							<div
 								className="reel first-reel reel-h3"
@@ -239,7 +239,11 @@ export default function Home({
 													padding: "3rem 1.5rem",
 												}}
 											>
-												<Link href="#">
+												<Link
+													href={`searchListings?category=${encodeURIComponent(
+														categoryNamesToShow[categoryIndex]
+													)}`}
+												>
 													{categoryIndex === 4
 														? `View all listings about ${categoryNamesToShow[categoryIndex]}` // Make sure nothing weird happens
 														: `View all ${categoryNamesToShow[categoryIndex]} listings`}
@@ -297,32 +301,18 @@ function CarouselHeader({
 	firstCatRef: RefObject<HTMLDivElement>;
 	name: string;
 }) {
-	const [touchTime, setTouchTime] = useState(null as null | number);
-	const _selfRef: RefObject<HTMLDivElement> = useRef(null);
-	const selfRef = i === 0 ? firstCatRef : _selfRef;
-
 	return (
 		<h3
 			className={`${categoryIndex === i ? "active" : ""} reel-h3`}
 			id="top-nav-1"
 			key={i}
 			onPointerDown={(e) => {
-				setTouchTime(Date.now());
-
-				// make sure that the carousel doesn't get the event
-				selfRef?.current?.setPointerCapture?.(e.pointerId);
-			}}
-			onPointerUp={(e) => {
-				selfRef?.current?.releasePointerCapture?.(e.pointerId);
-
-				if (touchTime === null || Date.now() - touchTime > touchDelay)
-					return setTouchTime(null);
 				setFirstVisibleCard(0);
 				setCategoryIndex(i);
 
-				return setTouchTime(null);
+				return false;
 			}}
-			ref={selfRef}
+			ref={i === 0 ? firstCatRef : undefined}
 		>
 			<div className="cat-text-container">
 				<p>{name}</p>
@@ -390,39 +380,44 @@ function Carousel({
 		}
 	}
 
-	// handle dragging
-	if (selfRef.current) {
-		selfRef.current.onpointerdown = (e) => {
-			e.preventDefault();
-			if (selfRef.current) {
-				setInitX(e.x);
-				setNewX(e.x);
-				setProposedTransformOnClick(proposedTransform);
-				selfRef.current.setPointerCapture(e.pointerId);
-			}
-		};
-		selfRef.current.onpointermove = (e) => {
-			setNewX(e.x);
-		};
-		selfRef.current.onpointerup = (e) => {
-			if (selfRef.current) {
-				selfRef.current.onpointermove = null;
-				selfRef.current.releasePointerCapture(e.pointerId);
-				setInitX(null);
-
-				if (elementWidth !== undefined) {
-					// determine which slide to show
-					// proposedTransform = firstVisibleElement * elementWidth;
-					firstVisibleElement = proposedTransform / elementWidth;
-					// Do not scroll past 0; get the closest one
-					setFirstVisibleElement(Math.max(0, Math.round(firstVisibleElement)));
-				}
-			}
-		};
-	}
-
 	return (
 		<div
+			onPointerDown={(e) => {
+				e.preventDefault();
+				if (selfRef.current) {
+					setInitX(e.clientX);
+					setNewX(e.clientX);
+					setProposedTransformOnClick(proposedTransform);
+
+					selfRef.current.setPointerCapture(e.pointerId);
+				}
+			}}
+			onPointerMove={
+				initX === null
+					? undefined
+					: (e) => {
+							e.preventDefault();
+
+							setNewX(e.clientX);
+					  }
+			}
+			onPointerUp={(e) => {
+				if (selfRef.current) {
+					// selfRef.current.onpointermove = null;
+					selfRef.current.releasePointerCapture(e.pointerId);
+					setInitX(null);
+
+					if (elementWidth !== undefined) {
+						// determine which slide to show
+						// proposedTransform = firstVisibleElement * elementWidth;
+						firstVisibleElement = proposedTransform / elementWidth;
+						// Do not scroll past 0; get the closest one
+						setFirstVisibleElement(
+							Math.max(0, Math.round(firstVisibleElement))
+						);
+					}
+				}
+			}}
 			ref={selfRef}
 			className={`carousel ${className}`}
 			style={{

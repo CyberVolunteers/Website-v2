@@ -46,11 +46,7 @@ export default function AboutUs(): ReactElement {
 				Volunteers
 			</h3>
 
-			<img
-				style={{ width: "45vw" }}
-				className={styles.partners_logos}
-				src="/img/supporter_logos.png"
-			/>
+			<img className={styles.partners_logos} src="/img/supporter_logos.png" />
 
 			<IdeaShowcase />
 		</div>

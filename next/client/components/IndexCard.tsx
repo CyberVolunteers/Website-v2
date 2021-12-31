@@ -4,6 +4,8 @@ import Button from "./Button";
 import Link from "next/link";
 import { useRouter } from "next/router";
 
+import styles from "../styles/indexCard.module.css";
+
 const StyleSheet = {
 	SubTitle: {
 		color: "rgb(117, 108, 108)",
@@ -40,10 +42,6 @@ const StyleSheet = {
 		marginBottom: "8px",
 		minHeight: "3rem",
 	},
-	Desc: {
-		height: "62px",
-		fontWeight: "bold",
-	},
 };
 function IndexCard({
 	uuid,
@@ -70,7 +68,7 @@ function IndexCard({
 	return (
 		<div
 			ref={divRef}
-			className="card-wrapper"
+			className={styles.card_wrapper}
 			style={{ padding: "3rem 1.5rem" }}
 		>
 			<div
@@ -80,17 +78,35 @@ function IndexCard({
 					borderRadius: "10px",
 				}}
 			>
-				<img
-					src={img}
-					style={{
-						height: "160px",
-						width: "100%",
-						borderTopLeftRadius: "10px",
-						borderTopRightRadius: "10px",
-					}}
-				/>
 				<div
-					className="bottom"
+					style={{
+						position: "relative",
+					}}
+				>
+					{/* Make a div so that it is not selectable */}
+					<div
+						style={{
+							position: "absolute",
+							top: "0px",
+							left: "0px",
+							zIndex: "2",
+							height: "100%",
+							width: "100%",
+						}}
+					/>
+					<img
+						src={img}
+						style={{
+							height: "160px",
+							width: "100%",
+							borderTopLeftRadius: "10px",
+							borderTopRightRadius: "10px",
+						}}
+					/>
+				</div>
+
+				<div
+					className={`bottom ${styles.bottom}`}
 					style={{
 						borderBottomLeftRadius: "10px",
 						borderBottomRightRadius: "10px",
@@ -113,12 +129,13 @@ function IndexCard({
 							style={{ width: `${meternow}%`, ...StyleSheet.MeterCome }}
 						></div>
 					</div> */}
-					<p className="description" style={StyleSheet.Desc}>
+					<p className={`description ${styles.description}`}>
 						{desc}{" "}
 						<Link href={`/listing?uuid=${uuid}`} passHref>
 							<a
 								style={{ color: "#F85220" }}
-								onPointerDown={() => {
+								onPointerDown={(e) => {
+									e.stopPropagation();
 									router.push(`/listing?uuid=${uuid}`);
 								}}
 							>
@@ -128,7 +145,9 @@ function IndexCard({
 					</p>
 
 					<div
-						onPointerDown={() => {
+						onPointerDown={(e) => {
+							e.stopPropagation();
+
 							router.push(`/listing?uuid=${uuid}`);
 						}}
 						className="submittion-area dflex-align-center"

@@ -7,9 +7,11 @@ import Link from "next/link";
 
 import CommunityCard from "./CommunityCard";
 
+import styles from "../styles/ideaShowcase.module.css";
+
 export default function IdeaShowcase() {
 	return (
-		<>
+		<div className={styles.overall_container}>
 			{/* how it works */}
 
 			<div className="how-it-works-section">
@@ -171,6 +173,6 @@ export default function IdeaShowcase() {
 			{/* <div className="image-wrapper" style={{ margin: "4rem auto" }}>
 					<img src="/img/student.jpg" style={{ width: "100%" }} />
 				</div> */}
-		</>
+		</div>
 	);
 }
