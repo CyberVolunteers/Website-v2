@@ -9,8 +9,7 @@
 }
 
 .Header .header-content .header_links > ul li a p {
-	margin: 0rem 0.5rem;
-	font-size: 1.25rem;
+	margin: 1.5rem 0.5rem;
 }
 .Header .header-content .header_links > ul li a {
 	display: inline-block;
@@ -249,6 +248,7 @@
 }
 
 .header_links {
+	width: 100%;
 	display: flex;
 	align-items: center;
 }
@@ -269,6 +269,7 @@
 	}
 
 	.header_links {
+		width: unset;
 		margin-left: auto;
 	}
 }
@@ -295,6 +296,7 @@
 	}
 	.bottomButton p {
 		color: #fff !important;
+		margin: 0px !important;
 	}
 	.Header {
 		padding: 0rem 0rem;

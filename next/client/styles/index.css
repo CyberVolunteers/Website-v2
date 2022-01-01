@@ -579,3 +579,9 @@
 		width: 75%;
 	}
 }
+
+@media screen and (max-width: 330px) {
+	.reel-wrapper {
+		width: 95%;
+	}
+}
