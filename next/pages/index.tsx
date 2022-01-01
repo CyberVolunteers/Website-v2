@@ -28,9 +28,14 @@ import { Listing } from "../server/mongo/mongoModels";
 import { getMongo } from "../server/mongo";
 import IdeaShowcase from "../client/components/IdeaShowcase";
 
+import indexCardStyles from "../client/styles/indexCard.module.css";
+import { useRouter } from "next/router";
+
 export default function Home({
 	indexListings,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const router = useRouter();
+
 	const categoryNamesToShow = rawCategoryNames.slice(0, 5);
 	// if (useIsAfterRehydration()) HandleSliderMovement();
 	const [categoryIndex, setCategoryIndex] = useState(0);
@@ -120,7 +125,7 @@ export default function Home({
 							</svg>
 						</div>
 
-						<div className="reel-wrapper">
+						<div className="reel-wrapper category-reel-wrapper">
 							<div
 								className="reel first-reel reel-h3"
 								ref={catReelViewWindowRef}
@@ -233,21 +238,27 @@ export default function Home({
 										.concat(
 											<div
 												key="final card"
-												className="card-wrapper link-box"
+												className={`${indexCardStyles.card_wrapper} link-box`}
 												style={{
 													textAlign: "center",
 													padding: "3rem 1.5rem",
 												}}
 											>
-												<Link
-													href={`searchListings?category=${encodeURIComponent(
-														categoryNamesToShow[categoryIndex]
-													)}`}
+												<a
+													href="#"
+													onPointerDown={(e) => {
+														e.preventDefault();
+														router.push(
+															`searchListings?category=${encodeURIComponent(
+																categoryNamesToShow[categoryIndex]
+															)}`
+														);
+													}}
 												>
 													{categoryIndex === 4
 														? `View all listings about ${categoryNamesToShow[categoryIndex]}` // Make sure nothing weird happens
 														: `View all ${categoryNamesToShow[categoryIndex]} listings`}
-												</Link>
+												</a>
 											</div>
 										)}
 								</Carousel>

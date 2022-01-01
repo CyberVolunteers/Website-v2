@@ -280,7 +280,7 @@ function Header() {
 										"/userSignup",
 										"/listing",
 									].includes(router.pathname) ? (
-										<li className={`${styles["bottomButton"]}`}>
+										<li className={styles.bottomButton}>
 											<Link href="/login" passHref>
 												<a>
 													<p>Sign in</p>

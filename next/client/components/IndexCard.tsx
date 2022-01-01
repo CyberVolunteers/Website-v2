@@ -38,10 +38,6 @@ const StyleSheet = {
 		top: "0",
 	},
 	Card: {},
-	Title: {
-		marginBottom: "8px",
-		minHeight: "3rem",
-	},
 };
 function IndexCard({
 	uuid,
@@ -114,9 +110,7 @@ function IndexCard({
 						paddingTop: "1rem",
 					}}
 				>
-					<h3 className="title bold" style={StyleSheet.Title}>
-						{title}
-					</h3>
+					<h3 className={`title bold ${styles.title}`}>{title}</h3>
 					<p className="subtitle" style={StyleSheet.SubTitle}>
 						{subtitle}{" "}
 						{/* <span className="total-go" style={StyleSheet.TotalGo}>
