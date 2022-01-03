@@ -1,0 +1,30 @@
+.organization_logo_desc {
+  margin-top: 2rem;
+}
+.organization_logo_desc > p {
+  font-size: 15px;
+}
+.desc_wrapper {
+  display: flex;
+  align-items: center;
+  margin-top: 1rem;
+}
+.desc_wrapper > * + * {
+  margin-left: 20px;
+}
+
+.profile_img_area {
+  margin-bottom: 1rem;
+  margin-top: 2rem;
+}
+.profile_img_pure {
+  height: 250px;
+  width: 100%;
+  background-color: #e9eef1;
+  color: #babec1;
+  display: flex;
+  margin-bottom: 1rem;
+  align-items: center;
+  font-size: 50px;
+  justify-content: center;
+}

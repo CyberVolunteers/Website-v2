@@ -88,3 +88,13 @@ export async function wait(time: number): Promise<void> {
 		}, time);
 	});
 }
+
+export function generateErrorResetter(
+	setter: React.Dispatch<React.SetStateAction<string>>
+) {
+	return () => setter("");
+}
+
+export function cleanPostcode(p: string) {
+	return p.replaceAll(/[^0-9a-zA-Z]/g, "");
+}

@@ -11,6 +11,7 @@ export const pagesWithReducedHeaderAndFooter = [
 	"/confirmEmail",
 	"/login",
 	"/userSignup",
+	"/charitySignup",
 ];
 
 export const maxSearchDistanceMeters = 30 * 1000;

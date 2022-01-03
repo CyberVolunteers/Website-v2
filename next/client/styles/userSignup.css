@@ -162,6 +162,9 @@
 	font-size: 12px;
 	color: #fff;
 }
+.checkbox-wrapper .custom-checkbox-box svg {
+	color: #fff;
+}
 .checkbox-wrapper > label .custom-checkbox-box + label:hover {
 	color: rgb(105, 102, 103) !important;
 	/* color: rgb(116, 112, 113); */

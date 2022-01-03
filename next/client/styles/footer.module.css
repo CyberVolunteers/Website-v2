@@ -84,3 +84,8 @@
 		text-align: center;
 	}
 }
+
+.reduced_footer p {
+	text-align: center;
+	color: rgb(148, 148, 148);
+}

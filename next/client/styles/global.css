@@ -111,9 +111,6 @@ select:-webkit-autofill {
 }
 
 /*
-.select-box .MuiFormControl-root label {
-	top: 8px !important;
-}
 .skill_save_one,
 .skill_save_two {
 	pointer-events: none !important;

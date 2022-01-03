@@ -276,7 +276,7 @@ function Header() {
 									!isLoggedIn &&
 									![
 										"/login",
-										"/organisationSignup",
+										"/charitySignup",
 										"/userSignup",
 										"/listing",
 									].includes(router.pathname) ? (

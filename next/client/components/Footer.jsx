@@ -9,7 +9,18 @@ import { pagesWithReducedHeaderAndFooter } from "../utils/const";
 function Footer() {
 	const router = useRouter();
 
-	if (pagesWithReducedHeaderAndFooter.includes(router.pathname)) return <></>;
+	const copyrightEl = (
+		<p className={`${styles["copy-right"]}`}>
+			© {new Date().getFullYear()} Cybervolunteers. All rights reserved.
+		</p>
+	);
+
+	if (pagesWithReducedHeaderAndFooter.includes(router.pathname))
+		return (
+			<div className={`${styles["Footer"]} ${styles.reduced_footer} w-1000`}>
+				{copyrightEl}
+			</div>
+		);
 	return (
 		<div className={`${styles["Footer"]} w-1000`}>
 			<div className={`${styles["top-area"]}`}>
@@ -86,9 +97,7 @@ function Footer() {
 				</ul>
 			</div>
 
-			<p className={`${styles["copy-right"]}`}>
-				© {new Date().getFullYear()} Cybervolunteers. All rights reserved.
-			</p>
+			{copyrightEl}
 		</div>
 	);
 }

@@ -1,0 +1,140 @@
+.SignIn .body-area form,
+.SignUp .body-area form {
+	background-color: #fff;
+	width: 440px;
+	border: 1px solid #ddd;
+	padding: 2rem 2rem;
+}
+.create-account-message {
+	text-align: center;
+	font-size: 1.5rem;
+	line-height: 2.25rem;
+}
+.SignIn .body-area form > p:first-child,
+.SignUp .body-area form > p:nth-child(2) {
+	text-align: center;
+	font-size: 1.5rem;
+	line-height: 2.25rem;
+}
+.SignIn .body-area form > p:first-child a,
+.SignUp .body-area form > p:first-child a {
+	color: #f85220;
+}
+.helper {
+	text-align: center;
+	margin-top: 10px;
+	font-size: 0.875rem;
+	line-height: 1.2rem;
+	color: #484848;
+	margin-bottom: 1.5rem;
+}
+.input-collection {
+	margin-top: 2rem;
+}
+.SignIn .body-area form .remeber-me-container,
+.SignUp .body-area form .remeber-me-container {
+	margin-top: 1.25rem;
+}
+.SignIn .body-area form .remeber-me-container,
+.SignUp .body-area form .remember-me-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.custom-checkbox-container {
+	margin-left: 8px !important;
+}
+.remember-me-wrapper .custom-checkbox-container label {
+	font-size: 1rem;
+}
+.button-wrapper {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	grid-gap: 1rem;
+	align-items: center;
+}
+.button-wrapper .MuiButton-containedPrimary {
+	height: 45px !important;
+	background-color: #f85220;
+	width: 130px !important;
+}
+.button-wrapper .MuiButton-containedPrimary:hover {
+	background-color: #f85220;
+}
+.button-wrapper .MuiButton-contained {
+	box-shadow: none !important;
+}
+.button-wrapper .MuiButton-contained:hover {
+	box-shadow: 0px 3px 1px -2px rgb(0 0 0 / 20%),
+		0px 2px 2px 0px rgb(0 0 0 / 14%), 0px 1px 5px 0px rgb(0 0 0 / 12%) !important;
+}
+
+.button-wrapper .MuiButton-containedPrimary.disable {
+	color: #949494;
+	background-color: #e0e0e0;
+	pointer-events: none;
+}
+.button-wrapper a {
+	color: #949494;
+}
+.button-wrapper a:first-child {
+	padding: 0.3rem 0.5rem;
+	display: inline-block;
+}
+form .button-wrapper a:first-child:hover {
+	background-color: rgb(243, 242, 242);
+
+	border-radius: 5px;
+}
+
+form .question-mark-area {
+	margin-top: 7px;
+	margin-left: 6px;
+	position: relative;
+}
+form .question-mark-area:hover > *:nth-child(2) {
+	display: block;
+}
+form .question-mark-answer {
+	position: absolute;
+	left: 50%;
+	top: 115%;
+	transform: translate(-50%, -115%);
+	width: 252px;
+	text-align: center;
+
+	background-color: #ddfff4;
+	padding: 1rem;
+	font-size: 1rem;
+	display: none;
+	line-height: 1.4rem;
+	z-index: 88888;
+	border: 1px solid #ddd;
+}
+
+#Day-label,
+#year-label {
+	top: -1.6px !important;
+}
+.MuiInputBase-root {
+	height: 50px;
+}
+
+.SignIn .sign-in-header,
+.SignUp .sign-in-header {
+	height: 5rem;
+	background-color: #f8f9fb;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+.SignIn .sign-in-header img,
+.SignUp .sign-in-header img {
+	width: 230px;
+}
+
+.width_100_button.button-wrapper .MuiButton-containedPrimary {
+	width: 100% !important;
+}
