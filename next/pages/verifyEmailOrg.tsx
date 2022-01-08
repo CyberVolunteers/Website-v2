@@ -25,7 +25,7 @@ export default function WelcomeOrg() {
 					Please verify your email to continue creating your Organisation’s
 					Cyber Volunteers profile.
 				</p>
-				<Button onClick={() => {}} style={{ width: 220 }}>
+				<Button onClick={undefined} style={{ width: 220 }}>
 					RESEND THE EMAIL
 				</Button>
 			</div>

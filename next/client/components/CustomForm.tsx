@@ -24,6 +24,8 @@ function CustomForm({
 					<Link href={headingLinkHref}>{headingLinkText}</Link>
 				)}
 			</p>
+			{/* Can not be touched or it will break css */}
+			<p className="welcom-message" style={{ display: "none" }}></p>
 			<p className="helper">{subheadingText}</p>
 
 			{children}

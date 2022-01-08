@@ -263,7 +263,7 @@
 }
 .how-it-works-section > h1 {
 	color: #444444;
-	margin-bottom: 15px;
+	margin-bottom: 1.5rem;
 	font-size: 2.3rem;
 }
 .how-it-works-section > p {
@@ -272,7 +272,7 @@
 }
 
 .volenteer-area {
-	padding: 4rem 0rem;
+	padding: 7.5rem 0rem;
 	position: relative;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -341,7 +341,7 @@
 	grid-template-columns: 1fr 1fr 1fr 1fr;
 	width: 90%;
 	grid-gap: 4rem;
-	margin: 3rem auto;
+	margin: 1.5rem auto;
 }
 .steps-area .step {
 	display: flex;

@@ -16,7 +16,7 @@ export default function IdeaShowcase() {
 
 			<div className="how-it-works-section">
 				<h1 className="bold">How it works</h1>
-				<p style={{ fontWeight: "bold", fontSize: "18px" }}>
+				<p style={{ fontWeight: "bold", fontSize: "20px" }}>
 					Easily find volunteering opportunities on Cyber Volunteers to support
 					causes that you care about and have a real impact.
 				</p>
@@ -130,7 +130,7 @@ export default function IdeaShowcase() {
 					Volunteer for nonprofits.
 				</h1>
 
-				<img src="/img/child1.jpg" />
+				<img src="/img/volunteering_illustration1.jpg" />
 			</div>
 
 			<ul>

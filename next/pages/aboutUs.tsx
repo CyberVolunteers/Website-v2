@@ -23,22 +23,21 @@ export default function AboutUs(): ReactElement {
 						objectFit: "cover",
 					}}
 					className={styles.header_image}
-					src="/img/about-us-header.png"
+					src="/img/volunteering_illustration3.png"
+					// src="/img/about-us-header.png"
 				/>
 			</div>
 			<div className={styles.desc_block}>
 				<p className={styles.desc}>
-					Our mission at Cyber Volunteers is to empower people to get involved
-					with meaningful community causes and enable charities to do
+					Our mission at Cyber Volunteers is to empower young people to get
+					involved with meaningful community causes and enable charities to do
 					extraordinary work by connecting them with passionate volunteers.
-					Through our platform, we aim to provide people with life-changing
-					opportunities and to connect communities and people with purpose.
-				</p>
-				<p className={styles.desc}>
-					Cyber Volunteers was created because of the difficulties people face
-					in finding ways to volunteer, and because too often young people are
-					forgotten about. So we started Cyber Volunteers, which aims to allow
-					everyone to volunteer and gain valuable skills.
+					Through our platform, we aim to provide young people with
+					life-changing opportunities and to connect communities and people with
+					purpose. Cyber Volunteers was created because of the difficulties
+					young people face in finding ways to volunteer, and because too often
+					young people are forgotten about. So we started Cyber Volunteers, to
+					ensure that everyone can volunteer and gain valuable skills.
 				</p>
 			</div>
 			<h3 className={`${styles.subsection_header} bold`}>
