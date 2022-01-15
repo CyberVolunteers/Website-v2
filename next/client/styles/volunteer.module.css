@@ -12,7 +12,8 @@
 .buttonWrapper {
 	display: flex;
 	align-items: center;
-	justify-content: space-between;
+	justify-content: center;
+	/* justify-content: space-between; */
 	width: 60%;
 	margin: 1.5rem auto 0px auto;
 }

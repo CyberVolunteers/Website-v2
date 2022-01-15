@@ -19,11 +19,12 @@ export default function AboutUs(): ReactElement {
 				<h1 className={styles.header_text}>Connecting People with Purpose</h1>
 				<img
 					style={{
-						height: "100vh",
+						// height: "100vh",
+						height: "100%",
 						objectFit: "cover",
 					}}
 					className={styles.header_image}
-					src="/img/volunteering_illustration3.png"
+					src="/img/volunteering_illustration3.jpg"
 					// src="/img/about-us-header.png"
 				/>
 			</div>

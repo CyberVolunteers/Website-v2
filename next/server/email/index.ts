@@ -56,8 +56,8 @@ export async function sendEmailConfirmationEmail(
 			subject: "Please verify your email",
 			attachments: [
 				{
-					filename: "logo.svg",
-					path: `/usr/app/public/img/logo.svg`,
+					filename: "logo.png",
+					path: `/usr/app/public/img/logo.png`,
 					cid: "logo",
 				},
 			],
@@ -85,8 +85,8 @@ export async function sendPasswordResetEmail(email: string) {
 			subject: "Password reset",
 			attachments: [
 				{
-					filename: "logo.svg",
-					path: `/usr/app/public/img/logo.svg`,
+					filename: "logo.png",
+					path: `/usr/app/public/img/logo.png`,
 					cid: "logo",
 				},
 			],

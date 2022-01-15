@@ -15,7 +15,6 @@ export const Volunteer = ({
 			<div
 				className={styles.buttonWrapper}
 				// NOTE: remove this if you are bringing the "volunteering stats" button back to center them.
-				style={{ width: "30%" }}
 			>
 				<Button href="/searchListings">Find an opportunity</Button>
 				{/* <Button

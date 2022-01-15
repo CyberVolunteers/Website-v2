@@ -90,7 +90,7 @@ form .button-wrapper a:first-child:hover {
 }
 
 form .question-mark-area {
-	margin-top: 7px;
+	/* margin-top: 7px; */
 	margin-left: 6px;
 	position: relative;
 }

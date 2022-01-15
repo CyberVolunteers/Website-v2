@@ -252,7 +252,7 @@ function Header() {
 																setIsDropdownUp(!isDropdownUp);
 															}}
 														>
-															<p>Sign Up</p>
+															<p style={{ marginTop: "0px" }}>Sign Up</p>
 															<ArrowDropDownIcon />
 														</div>
 														<ul

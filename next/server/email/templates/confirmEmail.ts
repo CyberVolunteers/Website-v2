@@ -48,6 +48,10 @@ export default function createTemplate(
 		-moz-text-size-adjust: 100%;
 		-ms-text-size-adjust: 100%;
 		}
+		img.logo-img {
+		max-width: 240px !important;
+		width: 240px !important;
+		}
 		img.max-width {
 		max-width: 100% !important;
 		width: 100% !important;
@@ -168,7 +172,7 @@ export default function createTemplate(
 																												<tbody>
 																													<tr>
 																														<td style="font-size:6px; line-height:10px; padding:0px 0px 0px 0px; height: 60px;" valign="top" align="center">
-																															<img class="max-width" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px;" width="95" alt="" data-proportionally-constrained="true" data-responsive="false" src="cid:logo" height="50">
+																															<img class="logo-img" border="0" style="display:block; color:#000000; text-decoration:none; font-family:Helvetica, arial, sans-serif; font-size:16px;" width="240" alt="" data-proportionally-constrained="true" data-responsive="false" src="cid:logo" height="50">
 																														</td>
 																													</tr>
 																												</tbody>
