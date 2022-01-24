@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { accountInfoCookieName } from "../../serverAndClient/cookiesConfig";
 import { ViewerType } from "../types";
+import { BroadcastChannel } from "broadcast-channel";
 
 export function getCookie(name: string) {
 	if (isServer()) return undefined;
@@ -66,7 +67,6 @@ export function updateLoginState() {
 	const bc = new BroadcastChannel("loginEvents");
 	const out = isLoggedIn();
 	bc.postMessage(out);
-	return out;
 }
 
 // hooks
