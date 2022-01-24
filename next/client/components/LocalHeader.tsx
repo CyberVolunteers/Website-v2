@@ -33,7 +33,7 @@ export const LocalHeader = ({
 					<li className={styles.li} key={i}>
 						{Item === undefined && (
 							<div
-								onClick={(e) => HandleDropDown()}
+								onClick={() => setIsDropdownActive(!isDropdownActive)}
 								className={`${styles.item_link} ${
 									active === Item && styles.active
 								}`}
@@ -52,7 +52,6 @@ export const LocalHeader = ({
 												? "rotate(180deg)"
 												: undefined,
 										}}
-										onClick={() => setIsDropdownActive(!isDropdownActive)}
 										icon={faChevronDown}
 									/>
 								</div>
