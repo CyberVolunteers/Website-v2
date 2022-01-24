@@ -15,6 +15,7 @@ body {
 	background-color: #ffffff;
 	font-family: PostGroteskLight, Arial, Helvetica, sans-serif;
 	letter-spacing: -0.042rem;
+	-webkit-text-size-adjust: none;
 }
 
 .bold {

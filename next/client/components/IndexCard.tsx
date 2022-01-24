@@ -55,6 +55,8 @@ function IndexCard({
 	desc: string;
 	divRef?: RefObject<HTMLDivElement>;
 }) {
+	// TODO: Instead of using "isSafari", fix the underlying issue
+	// let isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
 	const router = useRouter();
 
 	title = doEllipsis(cleanStylisedText(title, true), 60);

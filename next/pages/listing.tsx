@@ -26,6 +26,7 @@ const onVolunteerButtonClick = (router: NextRouter, userType: ViewerType) => {
 	const isLoggedIn = (
 		["user", "org", "unverified_user", "unverified_org"] as ViewerType[]
 	).includes(userType);
+	// TODO: let them volunteer, fetch joinListing
 	if (isLoggedIn) router.push("/volunteeringSuccessful");
 	else router.push("/login");
 };
