@@ -23,6 +23,13 @@ const { publicRuntimeConfig } = getConfig();
 
 function MyApp({ Component, pageProps }: AppProps): ReactElement {
 	const router = useRouter();
+	// TODO: solve the underlying issue instead of doing this
+	if (typeof document !== "undefined" && typeof navigator !== "undefined") {
+		const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+		// make the letters look better on Safari
+		if (isSafari)
+			document.getElementsByTagName("body")[0].style.fontSynthesis = "none";
+	}
 
 	const out = (
 		<>
