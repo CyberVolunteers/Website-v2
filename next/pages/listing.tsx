@@ -60,8 +60,7 @@ export default function ListingPage({
 
 	return (
 		<>
-			{/* TODO: add the title of the listing here  */}
-			<Head title="Listing - cybervolunteers" />
+			<Head title={`${listing.title} - cybervolunteers`} />
 
 			<div
 				className={styles.page_container}

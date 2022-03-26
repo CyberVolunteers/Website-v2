@@ -234,7 +234,7 @@ export default function OrgLogo({ setActiveTab }) {
 							}}
 							id="fname"
 							label="Facebook URL"
-							autocomplete="on"
+							autoComplete="on"
 							variant="outlined"
 							style={{ width: "100%" }}
 						/>
@@ -258,7 +258,7 @@ export default function OrgLogo({ setActiveTab }) {
 							}}
 							id="lname"
 							label="Linkdin URL"
-							autocomplete="on"
+							autoComplete="on"
 							variant="outlined"
 							style={{ width: "100%" }}
 						/>
@@ -282,7 +282,7 @@ export default function OrgLogo({ setActiveTab }) {
 							}}
 							id="tname"
 							label="Twitter URL"
-							autocomplete="on"
+							autoComplete="on"
 							variant="outlined"
 							style={{ width: "100%" }}
 						/>

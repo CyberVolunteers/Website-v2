@@ -17,7 +17,7 @@ import CustomButton from "../client/components/Button";
 
 import { csrfFetch } from "../client/utils/csrf";
 import isEmail from "validator/lib/isEmail";
-import { months, postcodeRE } from "../client/utils/const";
+import { months } from "../client/utils/const";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
@@ -262,59 +262,77 @@ function SecondPage({
 
 	const [hasUserAcceptedPolicies, setHasUserAcceptedPolicies] = useState(false);
 
-	const allFields = {
-		addressLine1,
-		addressLine2,
-		postcode,
-		month,
-		city,
-		day,
-		year,
-		hasUserAcceptedPolicies,
-	};
-	const allFieldVals = Object.values(allFields);
+	const [isAddressDataValid, setIsAddressDataValid] = useState(false);
 
-	useEffect(() => {
-		setSecondPageData(allFields);
-		setIsSecondPageDataValid(
-			Object.entries(allFields).every(
-				([k, v]) => k === "addressLine2" || v !== ""
-			) &&
-				hasUserAcceptedPolicies &&
-				dayErrorMessage === "" &&
-				yearErrorMessage === "" &&
-				postcodeRE.test(cleanPostcode(postcode))
-		);
-	}, [
-		...allFieldVals,
-		hasUserAcceptedPolicies,
-		dayErrorMessage,
-		yearErrorMessage,
-		postcode,
-	]);
-
-	function checkDay() {
-		if (!visitedFields.includes("day")) return;
+	function checkDayAndShowErrors(): boolean {
+		if (!visitedFields.includes("day")) return false;
 		const parsedDay = parseInt(day);
-		if (day === "" || parsedDay > 31 || parsedDay === 0)
+		if (day === "" || parsedDay > 31 || parsedDay === 0) {
 			setDayErrorMessage("Please enter a valid day");
-		else setDayErrorMessage("");
+			return false;
+		} else {
+			setDayErrorMessage("");
+			return true;
+		}
 	}
 
-	function checkYear() {
-		if (!visitedFields.includes("year")) return;
+	function checkYearAndShowErrors(): boolean {
+		if (!visitedFields.includes("year")) return false;
 		const parsedYear = parseInt(year);
 		if (
 			year === "" ||
 			parsedYear > new Date().getFullYear() ||
 			parsedYear < 1900
-		)
+		) {
 			setYearErrorMessage("Please enter a valid year");
-		else setYearErrorMessage("");
+			return false;
+		} else {
+			setYearErrorMessage("");
+			return true;
+		}
 	}
 
-	useEffect(checkDay, [day]);
-	useEffect(checkYear, [year]);
+	useEffect(() => {
+		checkDayAndShowErrors;
+	}, [day]);
+	useEffect(() => {
+		checkYearAndShowErrors;
+	}, [year]);
+	useEffect(() => {
+		setSecondPageData({
+			addressLine1,
+			addressLine2,
+			city,
+			postcode,
+			day,
+			hasUserAcceptedPolicies,
+			month,
+			year,
+		});
+		setIsSecondPageDataValid(
+			isAddressDataValid &&
+				hasUserAcceptedPolicies &&
+				month !== "" &&
+				day !== "" &&
+				year !== "" &&
+				dayErrorMessage === "" &&
+				yearErrorMessage === "" &&
+				checkDayAndShowErrors() &&
+				checkYearAndShowErrors()
+		);
+	}, [
+		isAddressDataValid,
+		addressLine1,
+		addressLine2,
+		city,
+		postcode,
+		day,
+		hasUserAcceptedPolicies,
+		month,
+		year,
+		dayErrorMessage,
+		yearErrorMessage,
+	]);
 
 	return (
 		<>
@@ -329,6 +347,7 @@ function SecondPage({
 					setCity,
 					setPostcode,
 					setRequestErrorMessage,
+					setIsDataValid: setIsAddressDataValid,
 				}}
 			/>
 			{/* <div className="country-select select-box">
@@ -372,7 +391,7 @@ function SecondPage({
 						onFocus={generateErrorResetter(setDayErrorMessage)}
 						onBlur={() => {
 							addVisitedField("day", visitedFields, setVisitedFields);
-							checkDay();
+							checkDayAndShowErrors();
 						}}
 					/>
 					<span
@@ -435,7 +454,7 @@ function SecondPage({
 						onFocus={generateErrorResetter(setYearErrorMessage)}
 						onBlur={() => {
 							addVisitedField("year", visitedFields, setVisitedFields);
-							checkYear();
+							checkYearAndShowErrors();
 						}}
 					/>
 

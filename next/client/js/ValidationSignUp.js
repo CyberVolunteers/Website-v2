@@ -47,28 +47,6 @@ const HandleSecondStepValidation = () => {
 	}
 };
 
-const HandleOrganizationInformationValidation = () => {
-	// let CountrySelect = document.querySelector("#country-select");
-
-	let AddressLine1Value = document.querySelector("#address1");
-	let URL = document.querySelector("#URL");
-	let phone = document.querySelector("#PHONE");
-	let PostCode = document.querySelector("#postcode");
-	let TownCity = document.querySelector("#town");
-	if (
-		AddressLine1Value.value != "" &&
-		phone.value != "" &&
-		// CountrySelect.value != "" &&
-		URL.value != "" &&
-		PostCode.value != "" &&
-		TownCity.value != ""
-	) {
-		document.querySelector(".create-account-label").classList.remove("disable");
-	} else {
-		document.querySelector(".create-account-label").classList.add("disable");
-	}
-};
-
 export const HandleSecondStepTextInfomation = (e) => {
 	if (e.target.id == "address") {
 		AddressStreet = e.target.value;
@@ -107,52 +85,6 @@ export const HandleSecondStepTextInfomation = (e) => {
 	} else if (e.target.id == "year") {
 		year = e.target.value;
 	}
-
-	HandleOrganizationInformationValidation();
-};
-
-export const HandleSecondStepText = (e) => {
-	if (e.target.id == "address") {
-		AddressStreet = e.target.value;
-		document.querySelector(
-			".result-wrapper .typing-start-result"
-		).style.display = "block";
-
-		if (e.target.value == 0) {
-			document.querySelector(".result-wrapper > p").style.display = "block";
-			document.querySelector(".result-wrapper > div").style.display = "none";
-		} else {
-			document.querySelector(".result-wrapper > p").style.display = "none";
-			document.querySelector(".result-wrapper > div").style.display = "block";
-		}
-	} else if (e.target.id == "address1") {
-		Address1 = e.target.value;
-	} else if (e.target.id == "postcode") {
-		postcode = e.target.value;
-	} else if (e.target.id == "town") {
-		city = e.target.value;
-	} else if (e.target.id == "country-select") {
-		country = e.target.value;
-
-		let BorderElement = e.target.parentNode;
-		BorderElement.style.border = "1px solid #000 ";
-	} else if (e.target.id == "Day") {
-		day = e.target.value;
-	} else if (e.target.id == "month-select") {
-		month = e.target.value;
-		let BorderElement = e.target.parentNode;
-		BorderElement.style.border = "1px solid #000 ";
-	} else if (e.target.id == "AggrementCheckbox") {
-		if (e.target.checked == true) {
-			checkbhoxAggrement = "on";
-		} else {
-			checkbhoxAggrement = "off";
-		}
-	} else if (e.target.id == "year") {
-		year = e.target.value;
-	}
-
-	HandleSecondStepValidation();
 };
 
 const PasswordBarsWorking = (e) => {

@@ -112,7 +112,7 @@ export async function updateSession(
 	csrf?: CsrfObject
 ) {
 	// TODO: check for the shape of data
-	//NOTE: keeping "null"
+	//NOTE: keeping the "null" values
 	let newData:
 		| {
 				[key: string]: any;

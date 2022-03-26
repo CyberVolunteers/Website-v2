@@ -3,7 +3,7 @@ import { cleanPostcode, generateErrorResetter, wait } from "../utils/misc";
 
 import TextField from "@material-ui/core/TextField";
 import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { postcodeRE } from "../utils/const";
 
 export default function AddressInput({
@@ -16,6 +16,7 @@ export default function AddressInput({
 	city,
 	setCity,
 	setRequestErrorMessage,
+	setIsDataValid,
 }: {
 	addressLine1: string;
 	addressLine2: string;
@@ -26,6 +27,7 @@ export default function AddressInput({
 	setCity: React.Dispatch<React.SetStateAction<string>>;
 	setPostcode: React.Dispatch<React.SetStateAction<string>>;
 	setRequestErrorMessage: React.Dispatch<React.SetStateAction<string>>;
+	setIsDataValid: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
 	const [isSimpleAddressInputShown, setIsSimpleAddressInputShown] =
 		useState(true);
@@ -35,6 +37,27 @@ export default function AddressInput({
 	const [cityErrorMessage, setCityErrorMessage] = useState("");
 
 	const [visitedFields, setVisitedFields] = useState([] as string[]);
+
+	const isValid =
+		addressLine1 !== "" &&
+		postcode !== "" &&
+		city !== "" &&
+		addressLine1ErrorMessage === "" &&
+		postcodeErrorMessage === "" &&
+		cityErrorMessage === "" &&
+		postcodeRE.test(cleanPostcode(postcode));
+
+	useEffect(() => {
+		setIsDataValid(isValid);
+	}, [
+		addressLine1,
+		addressLine2,
+		postcode,
+		city,
+		addressLine1ErrorMessage,
+		postcodeErrorMessage,
+		cityErrorMessage,
+	]);
 
 	return (
 		<div className="full-address-container">

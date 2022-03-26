@@ -3,21 +3,87 @@ import Button from "@material-ui/core/Button";
 import React, { useEffect, useState } from "react";
 import styles from "../styles/skillsAndInterests.module.css";
 import { HandleTextValidation } from "../js/ValidationOrganizationInfo";
-import { ValidateValue } from "../js/ValidateOrganizationMisson";
 
 import { faCheck } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 
 import stylesLogo from "../styles/organisationLogo.module.css";
+import isURL from "validator/lib/isURL";
+import isEmail from "validator/lib/isEmail";
 
-export default function OrgMission({ setActiveTab }) {
+let orgDesc = "",
+	orgMission = "";
+
+let isForUnder18 = null;
+let safeguardingPolicyLink = "";
+let hasSafeguarding = null;
+
+let trainingType = null; // true, false or "other"
+let trainingTypeExplanation = "";
+
+let hasSafeguardingLead = null;
+let safeguardingLeadName = "";
+let safeguardingLeadEmail = "";
+
+let hasConcernReportingSystem = null;
+let hasDBSPolicy = null;
+
+export default function OrgMission({
+	setActiveTab,
+	setOrganisationDescription,
+	setMissionDescription,
+	setIsForUnder18,
+	setTrainingTypeExplanation, // "" if not applicable
+	setSafeguardingPolicyLink, // "" if not applicable
+	setSafeguardingLeadName, // "" if not applicable
+	setSafeguardingLeadEmail, // "" if not applicable
+}) {
 	const [TextAreaActive, setTextAreaActive] = useState(false);
 	const [TextAreaActive2, setTextAreaActive2] = useState(false);
 	const [TextAreaActive3, setTextAreaActive3] = useState(false);
-	const [safeguarding, setsafeguarding] = useState(false);
-	const [trainingExp, settrainingExp] = useState(false);
-	const [adults, setadults] = useState(false);
 
+	// NOTE: this is so janky, but I don't have time or will to do it the proper way
+	let [stateToRerenderThePage, setStateToRerenderThePage] = useState(true);
+
+	const isValid =
+		orgDesc !== "" &&
+		orgMission !== "" &&
+		isForUnder18 !== null && // require an explicit selection
+		(!isForUnder18 ||
+			(hasSafeguarding &&
+				safeguardingPolicyLink !== "" &&
+				isURL(safeguardingPolicyLink) &&
+				(trainingType === true ||
+					(trainingType === "other" && trainingTypeExplanation !== "")) &&
+				hasSafeguardingLead &&
+				safeguardingLeadName !== "" &&
+				safeguardingLeadEmail !== "" &&
+				isEmail(safeguardingLeadEmail) &&
+				hasConcernReportingSystem &&
+				hasDBSPolicy));
+
+	useEffect(() => {
+		setOrganisationDescription(orgDesc);
+		setMissionDescription(orgMission);
+		setIsForUnder18(isForUnder18);
+		setTrainingTypeExplanation(trainingTypeExplanation);
+		setSafeguardingLeadName(safeguardingLeadName);
+		setSafeguardingLeadEmail(safeguardingLeadEmail);
+		setSafeguardingPolicyLink(safeguardingPolicyLink);
+	}, [
+		orgDesc,
+		orgMission,
+		isForUnder18,
+		hasSafeguarding,
+		safeguardingPolicyLink,
+		trainingType,
+		trainingTypeExplanation,
+		hasSafeguardingLead,
+		hasConcernReportingSystem,
+		hasDBSPolicy,
+		safeguardingLeadName,
+		safeguardingLeadEmail,
+	]);
 	useEffect(() => {
 		document
 			.querySelectorAll(".typing-start-result .firstpart .row")
@@ -70,6 +136,51 @@ export default function OrgMission({ setActiveTab }) {
 				});
 			});
 	}, []);
+	const ValidateValue = (e) => {
+		let id = e.target.id;
+
+		if (id == "Description") {
+			orgDesc = e.target.value;
+		} else if (id == "mission_statement") {
+			orgMission = e.target.value;
+		} else if (id == "yes-charity") {
+			isForUnder18 = true;
+		} else if (id == "No-charity") {
+			isForUnder18 = false;
+		} else if (id == "yes-organisation") {
+			hasSafeguarding = true;
+		} else if (id == "No-organisation") {
+			hasSafeguarding = false;
+		} else if (id == "link") {
+			safeguardingPolicyLink = e.target.value;
+		} else if (id == "yes-training") {
+			trainingType = true;
+		} else if (id == "No-training") {
+			trainingType = false;
+		} else if (e.target.id == "Other-training") {
+			trainingType = "other";
+		} else if (id == "explain") {
+			trainingTypeExplanation = e.target.value;
+		} else if (id == "yes-appointed") {
+			hasSafeguardingLead = true;
+		} else if (id == "No-appointed") {
+			hasSafeguardingLead = false;
+		} else if (id == "yes-system") {
+			hasConcernReportingSystem = true;
+		} else if (id == "No-system") {
+			hasConcernReportingSystem = false;
+		} else if (id == "yes-Disclosure") {
+			hasDBSPolicy = true;
+		} else if (id == "No-Disclosure") {
+			hasDBSPolicy = false;
+		} else if (id == "safeguarding-lead") {
+			safeguardingLeadName = e.target.value;
+		} else if (id == "email_name") {
+			safeguardingLeadEmail = e.target.value;
+		}
+
+		setStateToRerenderThePage(!stateToRerenderThePage);
+	};
 
 	const RemoveMessages = (e) => {
 		let BorderElement = e.target.nextElementSibling;
@@ -81,7 +192,7 @@ export default function OrgMission({ setActiveTab }) {
 		BorderElement.style.border = "1px solid rgba(0, 0, 0, 0.23)";
 		Label.style.color = "rgba(0, 0, 0, 0.23)";
 
-		if (e.target.id == "fname" || e.target.id == "lname") {
+		if (e.target.id == "link") {
 			HelperElement.style.marginBottom = "10px";
 		}
 
@@ -91,10 +202,6 @@ export default function OrgMission({ setActiveTab }) {
 	const CheckIsValid = (e) => {
 		let BorderElement = e.target.nextElementSibling;
 		let Label = e.target.parentNode.previousElementSibling;
-		let ParentElement = e.target.parentNode.parentNode;
-		let email =
-			/^([a-zA-Z\d\.-]+)@([a-z\d-]+)\.([a-z]{1,8})(\.[a-z]{1,8})?(\.[a-z]{1,8})?$/;
-		let password = /^[\d\w\$#@&%!^*-]{8,26}$/i;
 		let HelperElement = "";
 
 		HelperElement = e.target.parentNode.parentNode.nextElementSibling;
@@ -103,7 +210,7 @@ export default function OrgMission({ setActiveTab }) {
 			BorderElement.style.border = "1px solid red";
 			Label.style.color = "red";
 
-			if (e.target.id == "fname" || e.target.id == "lname") {
+			if (e.target.id == "link") {
 				HelperElement.style.marginBottom = "20px";
 			}
 
@@ -125,10 +232,8 @@ export default function OrgMission({ setActiveTab }) {
 			let ElementId = e.target.id;
 			BorderElement.style.border = "1px solid red";
 			Label.style.color = "red";
-			if (ElementId == "fname") {
+			if (ElementId == "link") {
 				HelperElement.textContent = "Invalid Link";
-			} else if (ElementId == "lname") {
-				HelperElement.textContent = "Invalid Name";
 			} else if (ElementId == "email_name") {
 				HelperElement.textContent = "Invalid Email";
 			} else if (ElementId == "Description") {
@@ -159,6 +264,7 @@ export default function OrgMission({ setActiveTab }) {
 						HelperElement.textContent = "";
 						e.target.nextElementSibling.style.color = "#212121";
 					}}
+					value={orgDesc}
 					onChange={(e) => {
 						if (e.target.value != "") {
 							setTextAreaActive(true);
@@ -204,6 +310,7 @@ export default function OrgMission({ setActiveTab }) {
 					id="mission_statement"
 					cols="30"
 					rows="10"
+					value={orgMission}
 					onFocus={(e) => {
 						let HelperElement = e.target.nextElementSibling.nextElementSibling;
 						HelperElement.textContent = "";
@@ -261,8 +368,6 @@ export default function OrgMission({ setActiveTab }) {
 								name="charity"
 								id="yes-charity"
 								onClick={(e) => {
-									setadults(true);
-
 									ValidateValue(e);
 								}}
 								style={{ display: "none" }}
@@ -286,7 +391,6 @@ export default function OrgMission({ setActiveTab }) {
 								name="charity"
 								id="No-charity"
 								onClick={(e) => {
-									setadults(false);
 									ValidateValue(e);
 								}}
 								style={{ display: "none" }}
@@ -303,7 +407,7 @@ export default function OrgMission({ setActiveTab }) {
 						</div>
 					</div>
 				</div>
-				{adults && (
+				{isForUnder18 && (
 					<>
 						<div
 							className="organization_logo_desc"
@@ -387,9 +491,10 @@ export default function OrgMission({ setActiveTab }) {
 								HandleTextValidation(e);
 								ValidateValue(e);
 							}}
-							id="fname"
+							value={safeguardingPolicyLink}
+							id="link"
 							label="Link"
-							autocomplete="on"
+							autoComplete="on"
 							variant="outlined"
 							style={{ width: "100%" }}
 						/>
@@ -423,8 +528,6 @@ export default function OrgMission({ setActiveTab }) {
 										name="training"
 										id="yes-training"
 										onClick={(e) => {
-											settrainingExp(false);
-
 											ValidateValue(e);
 										}}
 										style={{ display: "none" }}
@@ -450,7 +553,6 @@ export default function OrgMission({ setActiveTab }) {
 										type="radio"
 										name="training"
 										onClick={(e) => {
-											settrainingExp(false);
 											ValidateValue(e);
 										}}
 										id="No-training"
@@ -478,8 +580,6 @@ export default function OrgMission({ setActiveTab }) {
 										type="radio"
 										name="training"
 										onClick={(e) => {
-											settrainingExp(true);
-
 											ValidateValue(e);
 										}}
 										id="Other-training"
@@ -500,7 +600,7 @@ export default function OrgMission({ setActiveTab }) {
 								</div>
 							</div>
 						</div>
-						{trainingExp && (
+						{trainingType === "other" && (
 							<>
 								<p
 									style={{
@@ -523,6 +623,7 @@ export default function OrgMission({ setActiveTab }) {
 										id="explain"
 										cols="30"
 										rows="10"
+										value={trainingTypeExplanation}
 										onFocus={(e) => {
 											let HelperElement =
 												e.target.nextElementSibling.nextElementSibling;
@@ -586,8 +687,6 @@ export default function OrgMission({ setActiveTab }) {
 										name="appointed"
 										id="yes-appointed"
 										onClick={(e) => {
-											setsafeguarding(true);
-
 											ValidateValue(e);
 										}}
 										style={{ display: "none" }}
@@ -614,7 +713,6 @@ export default function OrgMission({ setActiveTab }) {
 										name="appointed"
 										id="No-appointed"
 										onClick={(e) => {
-											setsafeguarding(false);
 											ValidateValue(e);
 										}}
 										style={{ display: "none" }}
@@ -634,7 +732,7 @@ export default function OrgMission({ setActiveTab }) {
 								</div>
 							</div>
 						</div>
-						{safeguarding && (
+						{hasSafeguardingLead && (
 							<>
 								<p
 									style={{
@@ -654,9 +752,10 @@ export default function OrgMission({ setActiveTab }) {
 										HandleTextValidation(e);
 										ValidateValue(e);
 									}}
+									value={safeguardingLeadName}
 									id="safeguarding-lead"
 									label="Name"
-									autocomplete="on"
+									autoComplete="on"
 									variant="outlined"
 									style={{ width: "100%" }}
 								/>
@@ -690,9 +789,10 @@ export default function OrgMission({ setActiveTab }) {
 										HandleTextValidation(e);
 										ValidateValue(e);
 									}}
+									value={safeguardingLeadEmail}
 									id="email_name"
 									label="Email"
-									autocomplete="on"
+									autoComplete="on"
 									variant="outlined"
 									style={{ width: "100%" }}
 								/>
@@ -856,8 +956,9 @@ export default function OrgMission({ setActiveTab }) {
 					<Button
 						variant="contained"
 						color="primary"
-						className={`disable next_button`}
+						className={`${isValid ? "" : "disable"} next_button`}
 						onClick={() => {
+							if (!isValid) return;
 							setActiveTab("orgLogo");
 						}}
 					>
@@ -868,5 +969,3 @@ export default function OrgMission({ setActiveTab }) {
 		</>
 	);
 }
-
-// export default OrganizationMission;

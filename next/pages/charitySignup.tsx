@@ -18,17 +18,24 @@ export type CharitySignupTabType =
 export default function CharitySignup() {
 	const router = useRouter();
 
-	const [activeTab, setActiveTab] = useState(
-		"orgNameType" as CharitySignupTabType
-	);
+	const [activeTab, setActiveTab] = useState("orgLogo" as CharitySignupTabType);
 
 	const [orgName, setOrgName] = useState("");
 	const [orgType, setOrgType] = useState("");
 	const [addressLine1, setAddressLine1] = useState("");
 	const [addressLine2, setAddressLine2] = useState("");
+	const [websiteUrl, setWebsiteUrl] = useState("");
 	const [postcode, setPostcode] = useState("");
 	const [city, setCity] = useState("");
 	const [phone, setPhone] = useState("");
+
+	const [orgDescription, setOrgDescription] = useState("");
+	const [orgMission, setOrgMission] = useState("");
+	const [isForUnder18, setIsForUnder18] = useState(null as boolean | null);
+	const [safeguardingPolicyLink, setSafeguardingPolicyLink] = useState("");
+	const [trainingTypeExplanation, setTrainingTypeExplanation] = useState("");
+	const [safeguardingLeadName, setSafeguardingLeadName] = useState("");
+	const [safeguardingLeadEmail, setSafeguardingLeadEmail] = useState("");
 
 	const [adminAccountData, setAdminAccountData] = useState(
 		{} as {
@@ -73,12 +80,25 @@ export default function CharitySignup() {
 								city,
 								phone,
 								setPhone,
+								websiteUrl,
+								setWebsiteUrl,
 							}}
 							setActiveTab={setActiveTab}
 							setRequestErrorMessage={setRequestErrorMessage}
 						/>
 					) : activeTab === "orgMission" ? (
-						<OrgMission setActiveTab={setActiveTab} />
+						<OrgMission
+							setActiveTab={setActiveTab}
+							setMissionDescription={setOrgMission}
+							setOrganisationDescription={setOrgDescription}
+							{...{
+								setSafeguardingPolicyLink,
+								setIsForUnder18,
+								setTrainingTypeExplanation,
+								setSafeguardingLeadName,
+								setSafeguardingLeadEmail,
+							}}
+						/>
 					) : activeTab === "orgLogo" ? (
 						<OrgLogo setActiveTab={setActiveTab} />
 					) : activeTab === "orgAdminAccount" ? (

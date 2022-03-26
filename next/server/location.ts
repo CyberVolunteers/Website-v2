@@ -33,7 +33,6 @@ export async function rawGetPlaceAutocomplete(query: string) {
 	const placeAutocompleteResults = await client.placeAutocomplete({
 		params: {
 			input: query,
-			// TODO: location in the UK + radius
 			key: geocodingKey ?? "",
 		},
 	});

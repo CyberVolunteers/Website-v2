@@ -3,11 +3,7 @@ import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
 import { HandlerCollection } from "../../server/types";
 import { createAjvJTDSchema } from "combined-validator";
-import {
-	getPostcode as _getPostcode,
-	rawGetPlaceAutocomplete,
-} from "../../server/location";
-import { logger } from "../../server/logger";
+import { getPostcode as _getPostcode } from "../../server/location";
 
 export const config = {
 	api: {
