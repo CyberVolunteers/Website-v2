@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { ReactElement, useState } from "react";
 import Head from "../client/components/Head";
 
 import OrgNameAndType from "../client/components/OrgNameAndType.jsx";
@@ -7,6 +7,9 @@ import OrgMission from "../client/components/OrgMission.jsx";
 import OrgLogo from "../client/components/OrgLogo.jsx";
 import OrgAdminAccount from "../client/components/OrgAdminAccount";
 import { useRouter } from "next/router";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { updateCsrf } from "../server/csrf";
+import { csrfFetch } from "../client/utils/csrf";
 
 export type CharitySignupTabType =
 	| "orgNameType"
@@ -15,7 +18,9 @@ export type CharitySignupTabType =
 	| "orgLogo"
 	| "orgAdminAccount";
 
-export default function CharitySignup() {
+export default function CharitySignup({
+	csrfToken,
+}: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
 
 	const [activeTab, setActiveTab] = useState("orgLogo" as CharitySignupTabType);
@@ -37,6 +42,11 @@ export default function CharitySignup() {
 	const [safeguardingLeadName, setSafeguardingLeadName] = useState("");
 	const [safeguardingLeadEmail, setSafeguardingLeadEmail] = useState("");
 
+	const [logoFile, setLogoFile] = useState(null as null | File);
+	const [facebookLink, setFacebookLink] = useState("");
+	const [linkedinLink, setLinkedinLink] = useState("");
+	const [twitterLink, setTwitterLink] = useState("");
+
 	const [adminAccountData, setAdminAccountData] = useState(
 		{} as {
 			firstName: string;
@@ -50,11 +60,82 @@ export default function CharitySignup() {
 	const [requestErrorMessage, setRequestErrorMessage] = useState("");
 
 	const submit = async () => {
-		router.push(
-			`/verifyEmailOrg?email=${encodeURIComponent(
-				adminAccountData.email ?? ""
-			)}`
-		);
+		// const chairtyData = {
+		// 	orgName,
+		// 	orgType,
+		// 	addressLine1,
+		// 	addressLine2,
+		// 	websiteUrl,
+		// 	postcode,
+		// 	city,
+		// 	phone,
+
+		// 	orgDescription,
+		// 	orgMission,
+		// 	isForUnder18,
+		// 	safeguardingPolicyLink,
+		// 	trainingTypeExplanation,
+		// 	safeguardingLeadName,
+		// 	safeguardingLeadEmail,
+
+		// 	facebookLink,
+		// 	linkedinLink,
+		// 	twitterLink,
+
+		// 		firstName: adminAccountData.firstName,
+		// 		lastName: adminAccountData.lastName,
+		// 		password: adminAccountData.password,
+		// 		email: adminAccountData.email,
+		// };
+
+		const charityData = {
+			addressLine1: "address line 1",
+			addressLine2: "address line 2",
+			email: "admin@admin.co",
+			firstName: "Admin name",
+			lastName: "Admin surname",
+			password: "abcd",
+			city: "London",
+			facebookLink: "https://face.bo",
+			isForUnder18: true,
+			linkedinLink: "https://link.in",
+			orgDescription: "Organization description",
+			orgMission: "Mission statement",
+			orgName: "org name",
+			orgType: "org type",
+			phone: "088",
+			postcode: "AB1 2CD",
+			safeguardingLeadEmail: "john@safeguarding.co",
+			safeguardingLeadName: "John McSafeguarding",
+			safeguardingPolicyLink: "https://safeguarding.com",
+			trainingTypeExplanation: "Some other training explanation",
+			twitterLink: "https://twtr.co",
+			websiteUrl: "https://websiteurl.com",
+		};
+
+		const formData = new FormData();
+		Object.entries(charityData).forEach(([k, v]) => {
+			const value = typeof v === "string" ? v : JSON.stringify(v);
+			formData.append(k, value);
+		}); // also remove the quotes when needed so that a string "abc" does not become "\"abc\""
+		formData.append("logoFile", logoFile as File);
+
+		const res = await csrfFetch(csrfToken, `/api/signupOrg`, {
+			method: "POST",
+			credentials: "same-origin", // only send cookies for same-origin requests
+			headers: {
+				accept: "application/json",
+			},
+			body: formData,
+		});
+		if (res.status >= 400)
+			return setRequestErrorMessage(`Error: ${await res.text()}`);
+
+		// router.push(
+		// 	`/verifyEmailOrg?email=${encodeURIComponent(
+		// 		adminAccountData.email ?? ""
+		// 	)}`
+		// );
 	};
 
 	return (
@@ -100,10 +181,21 @@ export default function CharitySignup() {
 							}}
 						/>
 					) : activeTab === "orgLogo" ? (
-						<OrgLogo setActiveTab={setActiveTab} />
+						<OrgLogo
+							setActiveTab={setActiveTab}
+							{...{
+								setLogoFile,
+								logoFile,
+								setFacebookLink,
+								setLinkedinLink,
+								setTwitterLink,
+								facebookLink,
+								linkedinLink,
+								twitterLink,
+							}}
+						/>
 					) : activeTab === "orgAdminAccount" ? (
 						<OrgAdminAccount
-							data={adminAccountData}
 							setData={setAdminAccountData}
 							submit={submit}
 							setRequestErrorMessage={setRequestErrorMessage}
@@ -122,3 +214,13 @@ export default function CharitySignup() {
 		</div>
 	);
 }
+
+export const getServerSideProps: GetServerSideProps<{
+	csrfToken: string;
+}> = async (context) => {
+	return {
+		props: {
+			csrfToken: await updateCsrf(context),
+		}, // will be passed to the page component as props
+	};
+};

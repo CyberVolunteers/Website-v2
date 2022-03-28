@@ -1,133 +1,51 @@
 import TextField from "@material-ui/core/TextField";
 import Button from "@material-ui/core/Button";
-import React, { useEffect, useState } from "react";
-
-import { HandleValidation } from "../js/HandleValidation";
+import React, { useEffect, useState, useRef } from "react";
 
 import styles from "../styles/organisationLogo.module.css";
 import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCheck, faFileContract } from "@fortawesome/free-solid-svg-icons";
+import { faCheck } from "@fortawesome/free-solid-svg-icons";
+import { allowedFileTypes } from "../../serverAndClient/staticDetails";
+import { generateErrorResetter } from "../../client/utils/misc";
+import { addVisitedField, getFieldClasses } from "../../client/utils/formUtils";
+import isURL from "validator/lib/isURL";
+import { getFileExtension } from "../../serverAndClient/utils";
 
-export default function OrgLogo({ setActiveTab }) {
+export default function OrgLogo({
+	setActiveTab,
+	setLogoFile,
+	logoFile,
+	setFacebookLink,
+	setLinkedinLink,
+	setTwitterLink,
+	facebookLink,
+	linkedinLink,
+	twitterLink,
+}) {
 	const [social, setSocial] = useState(false);
 
-	useEffect(() => {
-		document
-			.querySelectorAll(".typing-start-result .firstpart .row")
-			.forEach((Each) =>
-				Each.addEventListener("click", (e) => {
-					e.target.classList.add("blue_bg");
-					setTimeout(() => {
-						e.target.classList.remove("blue_bg");
-					}, 200);
+	const [imageErrorMessage, setLogoFileErrorMessage] = useState("");
 
-					setTimeout(() => {
-						document.querySelector(
-							".typing-start-result .firstpart"
-						).style.display = "none";
+	const [facebookLinkErrorMessage, setFacebookLinkErrorMessage] = useState("");
+	const [linkedinLinkErrorMessage, setLinkedinLinkErrorMessage] = useState("");
+	const [twitterLinkErrorMessage, setTwitterLinkErrorMessage] = useState("");
 
-						document.querySelector(
-							".typing-start-result .secondpart"
-						).style.display = "block";
+	const [acceptedTerms, setAcceptedTerms] = useState(false);
 
-						document.querySelector("#address").focus();
-					}, 500);
-				})
-			);
+	const [visitedFields, setVisitedFields] = useState([]);
 
-		document
-			.querySelectorAll(".typing-start-result .secondpart .row")
-			.forEach((Each) => {
-				Each.addEventListener("click", (e) => {
-					e.target.classList.add("blue_bg");
-					let location = e.target.querySelector("small");
-					let Address1 = document.querySelector("#address1");
-					let Adress = document.querySelector("#address");
-					let label = Address1.parentNode.previousElementSibling;
-					let BorderElement = Address1.nextElementSibling;
+	function isValidOptionalUrl(url) {
+		return url === "" || isURL(url);
+	}
 
-					label.style.color = "#000";
-					BorderElement.style.borderColor = "#000";
-					setTimeout(() => {
-						e.target.classList.remove("blue_bg");
-					}, 200);
-					setTimeout(() => {
-						document.querySelector(".address-wrapper").style.display = "none";
-						document.querySelector(".result-wrapper").style.display = "none";
-						document.querySelector(".expand-address").classList.add("active");
-						document.querySelector(".country-select").style.marginTop = "-16px";
-						document.querySelector(".personal-info-wrapper").style.marginTop =
-							"5px";
-					}, 500);
-					Address1.value = location.textContent;
-				});
-			});
-	}, []);
-
-	const RemoveMessages = (e) => {
-		let BorderElement = e.target.nextElementSibling;
-		let Label = e.target.parentNode.previousElementSibling;
-		let HelperElement = "";
-
-		HelperElement = e.target.parentNode.parentNode.nextElementSibling;
-
-		BorderElement.style.border = "1px solid rgba(0, 0, 0, 0.23)";
-		Label.style.color = "rgba(0, 0, 0, 0.23)";
-
-		if (e.target.id == "fname" || e.target.id == "lname") {
-			HelperElement.style.marginBottom = "10px";
-		}
-
-		HelperElement.classList.remove("day-active");
-	};
-
-	const CheckIsValid = (e) => {
-		let BorderElement = e.target.nextElementSibling;
-		let Label = e.target.parentNode.previousElementSibling;
-		let ParentElement = e.target.parentNode.parentNode;
-		let email =
-			/^([a-zA-Z\d\.-]+)@([a-z\d-]+)\.([a-z]{1,8})(\.[a-z]{1,8})?(\.[a-z]{1,8})?$/;
-		let password = /^[\d\w\$#@&%!^*-]{8,26}$/i;
-		let HelperElement = "";
-
-		HelperElement = e.target.parentNode.parentNode.nextElementSibling;
-
-		if (e.target.value == "") {
-			BorderElement.style.border = "1px solid red";
-			Label.style.color = "red";
-
-			if (e.target.id == "fname" || e.target.id == "lname") {
-				HelperElement.style.marginBottom = "20px";
-			}
-
-			if (HelperElement.classList[1] == "email-helper") {
-				HelperElement.textContent = "Please enter the email";
-			} else if (HelperElement.classList[1] == "password-helper") {
-				HelperElement.textContent = "Please enter the password";
-				if (e.target.id == "password") {
-				}
-			}
-		} else {
-			Label.style.color = "#000";
-			BorderElement.style.border = "1px solid #000";
-
-			HelperElement = e.target.parentNode.parentNode.nextElementSibling;
-			HelperElement.textContent = "";
-		}
-		if (e.target.value == "") {
-			let ElementId = e.target.id;
-			BorderElement.style.border = "1px solid red";
-			Label.style.color = "red";
-			if (ElementId == "fname") {
-				HelperElement.textContent = "Invalid Facebook URL";
-			} else if (ElementId == "lname") {
-				HelperElement.textContent = "Invalid Linkedin URL";
-			} else if (ElementId == "tname") {
-				HelperElement.textContent = "Invalid Twitter URL";
-			}
-		}
-	};
+	const isValid =
+		isValidOptionalUrl(facebookLink) &&
+		isValidOptionalUrl(linkedinLink) &&
+		isValidOptionalUrl(twitterLink) &&
+		logoFile !== null &&
+		imageErrorMessage === "" &&
+		acceptedTerms;
 
 	return (
 		<>
@@ -155,6 +73,28 @@ export default function OrgLogo({ setActiveTab }) {
 						UPLOAD
 					</label>
 					<input
+						onChange={(e) => {
+							const element = e.target;
+							const file = element?.files?.[0];
+							const fileExt = getFileExtension(file.name);
+
+							if (!allowedFileTypes.includes(fileExt)) {
+								const allowedFileTypesCopy = [...allowedFileTypes];
+								const lastAllowedFileType = allowedFileTypesCopy.pop();
+
+								const allowedFileExtString = `${allowedFileTypes.join(
+									", "
+								)} or a ${lastAllowedFileType}`;
+								setLogoFileErrorMessage(
+									`Unfortunately, we can not process ${fileExt} files. Please use a ${allowedFileExtString} file.`
+								);
+								setLogoFile(null);
+								return;
+							}
+
+							setLogoFileErrorMessage("");
+							setLogoFile(file);
+						}}
 						type="file"
 						name=""
 						id="file_upload"
@@ -162,6 +102,16 @@ export default function OrgLogo({ setActiveTab }) {
 					/>
 				</Button>
 			</div>
+			<span
+				className="helping-text password-helper"
+				style={{
+					marginBottom: "0px",
+					paddingLeft: "3px",
+					display: imageErrorMessage === "" ? "none" : undefined,
+				}}
+			>
+				{imageErrorMessage}
+			</span>
 			<div
 				className={`${styles.organization_logo_desc} organization_logo_desc`}
 				style={{ marginTop: "1rem" }}
@@ -178,7 +128,6 @@ export default function OrgLogo({ setActiveTab }) {
 							type="radio"
 							onClick={(e) => {
 								setSocial(true);
-								HandleValidation(e);
 							}}
 							name="selection"
 							id="yes-selection-checkbox"
@@ -207,7 +156,14 @@ export default function OrgLogo({ setActiveTab }) {
 							id="no-selection-checkbox"
 							onClick={(e) => {
 								setSocial(false);
-								HandleValidation(e);
+
+								setFacebookLink("");
+								setLinkedinLink("");
+								setTwitterLink("");
+
+								setFacebookLinkErrorMessage("");
+								setLinkedinLinkErrorMessage("");
+								setTwitterLinkErrorMessage("");
 							}}
 							style={{ display: "none" }}
 						/>
@@ -227,12 +183,21 @@ export default function OrgLogo({ setActiveTab }) {
 				{social === false ? null : (
 					<>
 						<TextField
-							onBlur={CheckIsValid}
-							onFocus={RemoveMessages}
-							onChange={(e) => {
-								HandleValidation(e);
+							className={`facebook ${getFieldClasses(
+								"facebook",
+								visitedFields
+							)}`}
+							onFocus={generateErrorResetter(setFacebookLinkErrorMessage)}
+							onBlur={(e) => {
+								addVisitedField("facebook", visitedFields, setVisitedFields);
+
+								if (facebookLink !== "" && !isURL(facebookLink))
+									setFacebookLinkErrorMessage("Invalid link");
 							}}
-							id="fname"
+							onChange={(e) => {
+								setFacebookLink(e.target.value);
+							}}
+							id="facebook"
 							label="Facebook URL"
 							autoComplete="on"
 							variant="outlined"
@@ -248,15 +213,26 @@ export default function OrgLogo({ setActiveTab }) {
 								paddingLeft: 12,
 								color: "#F65B4E",
 							}}
-						></span>
+						>
+							{facebookLinkErrorMessage}
+						</span>
 
 						<TextField
-							onBlur={CheckIsValid}
-							onFocus={RemoveMessages}
-							onChange={(e) => {
-								HandleValidation(e);
+							className={`linkedin ${getFieldClasses(
+								"linkedin",
+								visitedFields
+							)}`}
+							onFocus={generateErrorResetter(setLinkedinLinkErrorMessage)}
+							onBlur={(e) => {
+								addVisitedField("linkedin", visitedFields, setVisitedFields);
+
+								if (linkedinLink !== "" && !isURL(linkedinLink))
+									setLinkedinLinkErrorMessage("Invalid link");
 							}}
-							id="lname"
+							onChange={(e) => {
+								setLinkedinLink(e.target.value);
+							}}
+							id="linkedin"
 							label="Linkdin URL"
 							autoComplete="on"
 							variant="outlined"
@@ -272,15 +248,23 @@ export default function OrgLogo({ setActiveTab }) {
 								paddingLeft: 12,
 								color: "#F65B4E",
 							}}
-						></span>
+						>
+							{linkedinLinkErrorMessage}
+						</span>
 
 						<TextField
-							onBlur={CheckIsValid}
-							onFocus={RemoveMessages}
-							onChange={(e) => {
-								HandleValidation(e);
+							className={`twitter ${getFieldClasses("twitter", visitedFields)}`}
+							onFocus={generateErrorResetter(setTwitterLinkErrorMessage)}
+							onBlur={(e) => {
+								addVisitedField("twitter", visitedFields, setVisitedFields);
+
+								if (twitterLink !== "" && !isURL(twitterLink))
+									setTwitterLinkErrorMessage("Invalid link");
 							}}
-							id="tname"
+							onChange={(e) => {
+								setTwitterLink(e.target.value);
+							}}
+							id="twitter"
 							label="Twitter URL"
 							autoComplete="on"
 							variant="outlined"
@@ -296,7 +280,9 @@ export default function OrgLogo({ setActiveTab }) {
 								paddingLeft: 12,
 								color: "#F65B4E",
 							}}
-						></span>
+						>
+							{twitterLinkErrorMessage}
+						</span>
 					</>
 				)}
 
@@ -309,7 +295,7 @@ export default function OrgLogo({ setActiveTab }) {
 						name="aggreement"
 						id="aggreement"
 						onClick={(e) => {
-							HandleValidation(e);
+							setAcceptedTerms(!acceptedTerms);
 						}}
 						style={{ display: "none" }}
 					/>
@@ -357,7 +343,7 @@ export default function OrgLogo({ setActiveTab }) {
 						variant="contained"
 						color="primary"
 						id="create-account-button"
-						className="disable"
+						className={isValid ? "" : "disable"}
 						onClick={() => {
 							setActiveTab("orgAdminAccount");
 						}}

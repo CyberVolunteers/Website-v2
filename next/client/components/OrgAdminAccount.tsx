@@ -17,18 +17,10 @@ import { CharitySignupTabType } from "../../pages/charitySignup";
 export default function OrgAdminAccount({
 	setRequestErrorMessage,
 	submit,
-	data,
 	setData,
 }: {
 	setRequestErrorMessage: Dispatch<SetStateAction<string>>;
 	submit: () => Promise<void>;
-	data: {
-		firstName: string;
-		lastName: string;
-		password: string;
-		password2: string;
-		email: string;
-	};
 	setData: React.Dispatch<
 		React.SetStateAction<{
 			firstName: string;

@@ -1,18 +1,32 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
-import { createHandler, ajv } from "../../server/apiRequests";
+import {
+	createHandler,
+	ajv,
+	verifyJSONShape,
+	runMiddleware,
+} from "../../server/apiRequests";
 import { createAjvJTDSchema } from "combined-validator";
-import { organisations } from "../../serverAndClient/publicFieldConstants";
+import {
+	emailLengthField,
+	mediumField,
+	organisations,
+} from "../../serverAndClient/publicFieldConstants";
 import { signupOrg } from "../../server/auth/data";
-import { HandlerCollection } from "../../server/types";
+import { HandlerCollection, MulterReq } from "../../server/types";
 import { logger } from "../../server/logger";
 import { sendEmail } from "../../server/email/nodemailer";
-import { notificationsEmail } from "../../serverAndClient/staticDetails";
+import {
+	allowedFileTypes,
+	notificationsEmail,
+} from "../../serverAndClient/staticDetails";
 import { doAllRulesApply } from "../../server/validation";
 import {
 	clearServerSideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
+import multer from "multer";
+import { getFileExtension } from "../../serverAndClient/utils";
 
 export const config = {
 	api: {
@@ -23,8 +37,80 @@ type Data = {
 	name: string;
 };
 
+const logoStorage = multer.memoryStorage();
+
+const upload = multer({
+	storage: logoStorage,
+	limits: {
+		fields: 40,
+		fileSize: 512 * 1024 * 1024,
+		files: 1,
+	},
+});
+
+const bodyParser = ajv.compileParser(
+	createAjvJTDSchema({
+		required: {
+			string: {
+				orgName: { maxLength: mediumField },
+				orgType: { maxLength: mediumField },
+
+				addressLine1: { maxLength: mediumField },
+				addressLine2: { maxLength: mediumField },
+				websiteUrl: { maxLength: mediumField },
+				city: { maxLength: mediumField },
+				phone: { maxLength: mediumField },
+				postcode: { maxLength: mediumField },
+
+				isForUnder18: {},
+				orgDescription: { maxLength: mediumField },
+				orgMission: { maxLength: mediumField },
+				safeguardingLeadEmail: { maxLength: emailLengthField },
+				safeguardingLeadName: { maxLength: mediumField },
+				safeguardingPolicyLink: { maxLength: mediumField },
+				trainingTypeExplanation: { maxLength: mediumField },
+
+				twitterLink: { maxLength: mediumField },
+				facebookLink: { maxLength: mediumField },
+				linkedinLink: { maxLength: mediumField },
+
+				email: { maxLength: emailLengthField },
+				firstName: { maxLength: mediumField },
+				lastName: { maxLength: mediumField },
+				password: { maxLength: mediumField },
+			},
+		},
+	})
+);
+
 const handlers: HandlerCollection = {
-	POST: async function (req, res) {
+	// TODO: make sure that the state is correct, e.g. if the charity does not deal with u18s, don't store safeguarding lead name or similar
+
+	POST: async function (req: MulterReq, res) {
+		await runMiddleware(req, res, upload.single("logoFile") as any);
+
+		// make sure that we do not process the file as a part of json data
+		if (typeof req.body === "object" && req.body !== null)
+			delete req.body.logoFile;
+
+		const file = req.file;
+		if (file === undefined)
+			return res
+				.status(400)
+				.send("We could not receive an image file for your logo");
+
+		console.log(req.body);
+		//IMPORTANT: do not forget to check the json shape as well
+		if (verifyJSONShape(req, res, bodyParser) === false) return;
+
+		const fileExt = getFileExtension(file.originalname);
+		if (fileExt === null || !allowedFileTypes.includes(fileExt))
+			return res.status(400).send("Please upload a valid image file");
+
+		req.body.isForUnder18 = req.body.isForUnder18 === "true";
+
+		console.log(req.body, file);
+
 		// if (!doAllRulesApply(req.body, signupValidation))
 		// 	return res
 		// 		.status(400)
@@ -70,9 +156,8 @@ export default async function signupOrgRequest(
 		handlers,
 		{
 			useCsrf: true,
+			allowFiles: true,
 		},
-		{
-			POST: ajv.compileParser(createAjvJTDSchema(fields)),
-		}
+		{ POST: bodyParser }
 	)(req, res);
 }

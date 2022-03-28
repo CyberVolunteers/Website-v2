@@ -154,25 +154,25 @@ async function sanitize(
  * @param middleware the actual middleware
  * @returns
  */
-// export function runMiddleware(
-// 	req: ExtendedNextApiRequest,
-// 	res: ExtendedNextApiResponse,
-// 	middleware: (
-// 		req: ExtendedNextApiResponse,
-// 		res: ExtendedNextApiResponse,
-// 		next: (passedVal: any) => void
-// 	) => void
-// ) {
-// 	return new Promise((resolve, reject) => {
-// 		middleware(req, res, (result) => {
-// 			if (result instanceof Error) {
-// 				return reject(result);
-// 			}
+export function runMiddleware(
+	req: ExtendedNextApiRequest,
+	res: ExtendedNextApiResponse,
+	middleware: (
+		req: ExtendedNextApiRequest,
+		res: ExtendedNextApiResponse,
+		next: (passedVal: any) => void
+	) => void
+) {
+	return new Promise((resolve, reject) => {
+		middleware(req, res, (result) => {
+			if (result instanceof Error) {
+				return reject(result);
+			}
 
-// 			return resolve(result);
-// 		});
-// 	});
-// }
+			return resolve(result);
+		});
+	});
+}
 
 /**
  * Uses ajv to parse json and put it into req.body
@@ -201,23 +201,10 @@ export function verifyJSONShape(
 		req.body = null;
 		return req.body;
 	}
-	if (!!bodyParser && typeof req.body === "object" && req.body !== null) {
-		const isSuccess = Object.entries(req.body).every(([k, v]) => {
-			try {
-				req.body[k] = JSON.parse(v as any);
-				return true;
-			} catch {
-				return false;
-			}
-		});
-		if (!isSuccess) {
-			logger.info(
-				"server.apiRequests:req.body is an object and not all of its keys are valid json"
-			);
-			// dispose of the tampered json
-			req.body = undefined;
-		} else req.body = JSON.stringify(req.body); // convert to a JSON string
-	}
+	if (typeof req.body === "object" && req.body !== null)
+		// NOTE: if it has been tampered with, we will catch it with the bodyParser
+		req.body = JSON.stringify(req.body); // convert to a JSON string
+
 	// parse
 	if (req.body !== undefined)
 		// sets the new json OR sets the req body to null if parsing it was disabled

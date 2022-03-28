@@ -16,11 +16,9 @@ import CustomForm from "../client/components/CustomForm";
 import CustomButton from "../client/components/Button";
 
 import { csrfFetch } from "../client/utils/csrf";
-import isEmail from "validator/lib/isEmail";
 import { months } from "../client/utils/const";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
-import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
 import { cleanPostcode, generateErrorResetter } from "../client/utils/misc";
 import AddressInput from "../client/components/AddressInput";
 import BasicUserSignup from "../client/components/BasicUserSignup";
