@@ -1,23 +1,19 @@
 // Next.js API route support: https://nextjs.org/docs/api-routes/introduction
 import type { NextApiRequest, NextApiResponse } from "next";
 import { createHandler, ajv } from "../../server/apiRequests";
-import { isResult, login, signupUser } from "../../server/auth/data";
+import { isResult, signupUser } from "../../server/auth/data";
 import { createAjvJTDSchema } from "combined-validator";
 import {
 	emailLengthField,
 	postcodeLengthField,
 	shortField,
-	users,
 } from "../../serverAndClient/publicFieldConstants";
 import { HandlerCollection } from "../../server/types";
 import { logger } from "../../server/logger";
-import { stringify } from "ajv";
-import { doAllRulesApply } from "../../server/validation";
 import {
 	clearServerSideSession,
 	updateSession,
 } from "../../server/auth/auth-cookie";
-import { schemaHasRules } from "ajv/dist/compile/util";
 import isEmail from "validator/lib/isEmail";
 import { postcodeRE } from "../../client/utils/const";
 import { sendEmailConfirmationEmail } from "../../server/email";

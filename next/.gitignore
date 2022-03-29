@@ -8,7 +8,7 @@
 /.pnp
 .pnp.js
 
-/public/userUploads
+/public/userUploads/**
 
 # testing
 /coverage
@@ -31,3 +31,5 @@ yarn-error.log*
 
 # vercel
 .vercel
+
+!/**/.gitkeep

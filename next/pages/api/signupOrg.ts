@@ -9,6 +9,7 @@ import {
 import { createAjvJTDSchema } from "combined-validator";
 import {
 	emailLengthField,
+	longField,
 	mediumField,
 	organisations,
 } from "../../serverAndClient/publicFieldConstants";
@@ -62,9 +63,9 @@ const bodyParser = ajv.compileParser(
 				phone: { maxLength: mediumField },
 				postcode: { maxLength: mediumField },
 
-				isForUnder18: {},
-				orgDescription: { maxLength: mediumField },
-				orgMission: { maxLength: mediumField },
+				orgDescription: { maxLength: longField },
+				orgMission: { maxLength: longField },
+				isForUnder18: { maxLength: 7 },
 				safeguardingLeadEmail: { maxLength: emailLengthField },
 				safeguardingLeadName: { maxLength: mediumField },
 				safeguardingPolicyLink: { maxLength: mediumField },
@@ -84,6 +85,7 @@ const bodyParser = ajv.compileParser(
 );
 
 const handlers: HandlerCollection = {
+	// TODO: check if some of the fields are empty strings
 	// TODO: make sure that the state is correct, e.g. if the charity does not deal with u18s, don't store safeguarding lead name or similar
 
 	POST: async function (req: MulterReq, res) {
@@ -109,38 +111,32 @@ const handlers: HandlerCollection = {
 
 		req.body.isForUnder18 = req.body.isForUnder18 === "true";
 
+		// TODO: check that all the data is correct
 		console.log(req.body, file);
 
-		// if (!doAllRulesApply(req.body, signupValidation))
-		// 	return res
-		// 		.status(400)
-		// 		.send(
-		// 			"This data does not seem correct. Could you please double-check it?"
-		// 		);
+		const signupResult = await signupOrg(req.body, file.buffer);
 
-		// const signupResult = await signupOrg(req.body);
+		if (signupResult === false) {
+			logger.info("server.signupOrg:Signup failed");
+			return res
+				.status(400)
+				.send(
+					"This did not seem to work. Can you please double-check that this email is not used?"
+				);
+		}
 
-		// if (signupResult === false) {
-		// 	logger.info("server.signupOrg:Signup failed");
-		// 	return res
-		// 		.status(400)
-		// 		.send(
-		// 			"This did not seem to work. Can you please double-check that this email is not used?"
-		// 		);
-		// }
+		// send a notification
+		// can be done out-of-sync, so no await here
+		sendEmail({
+			to: notificationsEmail,
+			subject: "<Notification> A charity just signed up",
+			text: `The charity is called "${req.body.orgName}", its email is "${req.body.email}" and it needs to be verified`,
+		});
 
-		// // send a notification
-		// // can be done out-of-sync, so no await here
-		// sendEmail({
-		// 	to: notificationsEmail,
-		// 	subject: "<Notification> A charity just signed up",
-		// 	text: `The charity is called "${req.body.orgName}", its email is "${req.body.email}" and it needs to be verified`,
-		// });
-
-		// // log in the poor soul
-		// // Delete the session cache so that the data does not persist
-		// clearServerSideSession(req);
-		// await updateSession(req, res, signupResult);
+		// log in the poor soul
+		// Delete the session cache so that the data does not persist
+		clearServerSideSession(req);
+		await updateSession(req, res, signupResult);
 
 		return res.end();
 	},

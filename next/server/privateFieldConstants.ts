@@ -1,4 +1,5 @@
 import { FieldConstraintsCollection } from "combined-validator";
+import { mediumField } from "../serverAndClient/publicFieldConstants";
 
 // NOTE: this file works together with ../shared/publicFieldConstants.ts!
 
@@ -43,6 +44,12 @@ export const organisations: FieldConstraintsCollection = {
 					},
 					boolean: {
 						isEmailVerified: { default: false },
+					},
+				},
+				optional: {
+					string: {
+						firstName: { maxLength: mediumField },
+						lastName: { maxLength: mediumField },
 					},
 				},
 			},

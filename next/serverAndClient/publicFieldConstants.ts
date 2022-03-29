@@ -62,17 +62,35 @@ export const organisations: FieldConstraintsCollection = {
 			orgType: { maxLength: shortField },
 			orgName: { maxLength: shortField },
 			orgDesc: { maxLength: longField },
-			orgLocation: { maxLength: mediumField, client_specialEdit: true },
 			//@ts-ignore
 			phoneNumber: { isPhoneNumber: true },
 		},
 	},
 	optional: {
 		string: {
+			orgMission: { maxLength: longField },
+
 			websiteUrl: { maxLength: mediumField },
+			twitterLink: { maxLength: mediumField },
+			facebookLink: { maxLength: mediumField },
+			linkedinLink: { maxLength: mediumField },
+
+			safeguardingLeadEmail: { maxLength: mediumField },
+			safeguardingLeadName: { maxLength: mediumField },
+			safeguardingPolicyLink: { maxLength: mediumField },
+			trainingTypeExplanation: { maxLength: mediumField },
+
+			logoImageName: { maxLength: mediumField },
+
+			city: { maxLength: mediumField },
+			postcode: { maxLength: mediumField },
+
+			orgLocation: { maxLength: mediumField },
+			address1: { maxLength: mediumField },
+			address2: { maxLength: mediumField },
 		},
 		boolean: {
-			hasSafeguarding: { default: false },
+			isForUnder18: { default: false },
 		},
 	},
 };

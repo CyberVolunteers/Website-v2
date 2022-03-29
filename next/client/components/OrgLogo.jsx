@@ -82,7 +82,7 @@ export default function OrgLogo({
 								const allowedFileTypesCopy = [...allowedFileTypes];
 								const lastAllowedFileType = allowedFileTypesCopy.pop();
 
-								const allowedFileExtString = `${allowedFileTypes.join(
+								const allowedFileExtString = `${allowedFileTypesCopy.join(
 									", "
 								)} or a ${lastAllowedFileType}`;
 								setLogoFileErrorMessage(

@@ -1,8 +1,11 @@
+import { v4 as uuidv4 } from "uuid";
 import { hash, verifyHash } from "./password";
 import { Listing, Org, User } from "../mongo/mongoModels";
 import getConfig from "next/config";
 import { logger } from "../logger";
 import { categoryNames } from "../../client/utils/const";
+import sharp from "sharp";
+import { baseOrganisationLogoImagePath } from "../../serverAndClient/staticDetails";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -262,26 +265,110 @@ export async function signupUser(_params: {
  * @param params data for the new organisation
  * @returns
  */
-export async function signupOrg(_params: { [key: string]: any }) {
-	// make a copy
-	const params = Object.assign({}, _params);
-	const email = params.email;
+export async function signupOrg(
+	{
+		addressLine1: address1,
+		addressLine2: address2,
+		city,
+		email,
+		facebookLink,
+		firstName,
+		imageFileExt,
+		isForUnder18,
+		lastName,
+		linkedinLink,
+		orgDescription: orgDesc,
+		orgMission,
+		orgName,
+		orgType,
+		password,
+		phone: phoneNumber,
+		postcode,
+		safeguardingLeadEmail,
+		safeguardingLeadName,
+		safeguardingPolicyLink,
+		trainingTypeExplanation,
+		twitterLink,
+		websiteUrl,
+	}: {
+		orgName: string;
+		orgType: string;
 
-	const passwordHash = await hash(params.password);
+		addressLine1: string;
+		addressLine2: string;
+		websiteUrl: string;
+		city: string;
+		phone: string;
+		postcode: string;
 
-	params.creds = [{ passwordHash, email }];
-	params.contactEmails = [email];
+		orgDescription: string;
+		orgMission: string;
+		isForUnder18: boolean;
+		safeguardingLeadEmail: string;
+		safeguardingLeadName: string;
+		safeguardingPolicyLink: string;
+		trainingTypeExplanation: string;
 
-	delete params.password;
-	delete params.email;
+		twitterLink: string;
+		facebookLink: string;
+		linkedinLink: string;
 
-	const newUser = new Org(params);
+		email: string;
+		firstName: string;
+		lastName: string;
+		password: string;
+
+		imageFileExt: string;
+	},
+	imageFileBuffer: Buffer
+) {
+	const passwordHash = await hash(password);
+
+	const uuid = uuidv4();
+	const imagePath = baseOrganisationLogoImagePath + uuid + imageFileExt;
+
+	const toStore = {
+		creds: [
+			{ email, passwordHash, isEmailVerified: false, firstName, lastName },
+		],
+		contactEmails: [email],
+		orgType,
+		orgName,
+		orgDesc,
+		orgLocation: `${address1},\n${address2}`,
+		address1,
+		address2,
+		phoneNumber,
+		orgMission,
+		websiteUrl,
+		twitterLink,
+		facebookLink,
+		linkedinLink,
+
+		safeguardingLeadEmail,
+		safeguardingLeadName,
+		safeguardingPolicyLink,
+		trainingTypeExplanation,
+
+		city,
+		postcode,
+		isForUnder18,
+
+		logoImageName: imagePath,
+	};
+
+	const newOrg = new Org(toStore);
 
 	if ((await isEmailFree(email)) === false) {
-		logger.info("server.auth.session:Email used for org");
+		logger.info("server.auth.session:Email already used for org");
 		return false;
 	}
-	const user = await newUser.save();
+
+	await sharp(imageFileBuffer)
+		.resize({ width: 1024 })
+		.toFile(process.env.baseDir + "/public" + imagePath);
+
+	const user = await newOrg.save();
 
 	return extractOrgData(user, email);
 }
