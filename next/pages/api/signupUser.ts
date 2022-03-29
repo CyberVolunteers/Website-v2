@@ -15,8 +15,8 @@ import {
 	updateSession,
 } from "../../server/auth/auth-cookie";
 import isEmail from "validator/lib/isEmail";
-import { postcodeRE } from "../../client/utils/const";
 import { sendEmailConfirmationEmail } from "../../server/email";
+import { isPostcode } from "../../serverAndClient/utils";
 
 export const config = {
 	api: {
@@ -77,7 +77,7 @@ const handlers: HandlerCollection = {
 				.status(400)
 				.send("Some data is missing. Could you please double-check it?");
 
-		if (!postcodeRE.test(postcode))
+		if (!isPostcode(postcode))
 			return res
 				.status(400)
 				.send("The postcode seems wrong. Could you please double-check it?");

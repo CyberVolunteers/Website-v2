@@ -19,9 +19,10 @@ import { csrfFetch } from "../client/utils/csrf";
 import { months } from "../client/utils/const";
 import { addVisitedField, getFieldClasses } from "../client/utils/formUtils";
 import { useRouter } from "next/router";
-import { cleanPostcode, generateErrorResetter } from "../client/utils/misc";
+import { generateErrorResetter } from "../client/utils/misc";
 import AddressInput from "../client/components/AddressInput";
 import BasicUserSignup from "../client/components/BasicUserSignup";
+import { cleanPostcode } from "../serverAndClient/utils";
 
 // TODO: make sure no text fields persist after a refresh on all pages
 // TODO: a loading spinner on other pages where applicable

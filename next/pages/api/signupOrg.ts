@@ -13,7 +13,7 @@ import {
 	mediumField,
 	organisations,
 } from "../../serverAndClient/publicFieldConstants";
-import { signupOrg } from "../../server/auth/data";
+import { signupOrg, verifyOrgData } from "../../server/auth/data";
 import { HandlerCollection, MulterReq } from "../../server/types";
 import { logger } from "../../server/logger";
 import { sendEmail } from "../../server/email/nodemailer";
@@ -86,8 +86,6 @@ const bodyParser = ajv.compileParser(
 
 const handlers: HandlerCollection = {
 	// TODO: check if some of the fields are empty strings
-	// TODO: make sure that the state is correct, e.g. if the charity does not deal with u18s, don't store safeguarding lead name or similar
-
 	POST: async function (req: MulterReq, res) {
 		await runMiddleware(req, res, upload.single("logoFile") as any);
 
@@ -101,7 +99,6 @@ const handlers: HandlerCollection = {
 				.status(400)
 				.send("We could not receive an image file for your logo");
 
-		console.log(req.body);
 		//IMPORTANT: do not forget to check the json shape as well
 		if (verifyJSONShape(req, res, bodyParser) === false) return;
 
@@ -109,12 +106,54 @@ const handlers: HandlerCollection = {
 		if (fileExt === null || !allowedFileTypes.includes(fileExt))
 			return res.status(400).send("Please upload a valid image file");
 
-		req.body.isForUnder18 = req.body.isForUnder18 === "true";
+		if (!verifyOrgData(req.body)) {
+			logger.info("server.signupOrg:Invalid data on signup: %s", req.body);
+			return res.status(400).send("Please supply valid data");
+		}
 
-		// TODO: check that all the data is correct
-		console.log(req.body, file);
+		const isForUnder18 = req.body.isForUnder18 === "true";
 
-		const signupResult = await signupOrg(req.body, file.buffer);
+		// make sure that the safeguarding is filled in properly
+		const under18RequiredFields = [
+			"safeguardingPolicyLink",
+			"safeguardingLeadName",
+			"safeguardingLeadEmail",
+		];
+		const under18OptionalFields = ["trainingTypeExplanation"];
+		if (isForUnder18) {
+			under18OptionalFields.forEach((f) => {
+				if (req.body[f] === "") delete req.body[f];
+			});
+
+			if (under18RequiredFields.some((f) => req.body.f === ""))
+				return res.status(400).send("Please supply valid safeguarding data");
+		} else {
+			under18RequiredFields
+				.concat(under18OptionalFields)
+				.forEach((f) => delete req.body[f]);
+		}
+
+		const optionalFields = ["twitterLink", "facebookLink", "linkedinLink"];
+
+		// make sure that the rest is filled in properly
+		if (
+			Object.values(req.body).some((v) => {
+				typeof v !== "string" || (!optionalFields.includes(v) && v === "");
+			})
+		) {
+			logger.info("server.signupOrg:Data missing on signup: %s", req.body);
+			return res
+				.status(400)
+				.send(
+					"We did not receive all your data. Please contact us as it is likely to be a bug with the website"
+				);
+		}
+
+		const signupResult = await signupOrg(
+			{ ...req.body, isForUnder18 },
+			fileExt,
+			file.buffer
+		);
 
 		if (signupResult === false) {
 			logger.info("server.signupOrg:Signup failed");

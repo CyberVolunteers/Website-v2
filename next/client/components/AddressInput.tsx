@@ -1,10 +1,10 @@
 import { addVisitedField, getFieldClasses } from "../utils/formUtils";
-import { cleanPostcode, generateErrorResetter, wait } from "../utils/misc";
+import { generateErrorResetter, wait } from "../utils/misc";
 
 import TextField from "@material-ui/core/TextField";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { postcodeRE } from "../utils/const";
+import { isPostcode } from "../../serverAndClient/utils";
 
 export default function AddressInput({
 	addressLine1,
@@ -45,7 +45,7 @@ export default function AddressInput({
 		addressLine1ErrorMessage === "" &&
 		postcodeErrorMessage === "" &&
 		cityErrorMessage === "" &&
-		postcodeRE.test(cleanPostcode(postcode));
+		isPostcode(postcode);
 
 	useEffect(() => {
 		setIsDataValid(isValid);
@@ -156,7 +156,7 @@ export default function AddressInput({
 											visitedFields,
 											setVisitedFields
 										);
-										if (!postcodeRE.test(cleanPostcode(e.target.value)))
+										if (!isPostcode(e.target.value))
 											setPostcodeErrorMessage("Please enter a valid postcode");
 									}}
 									onFocus={generateErrorResetter(setPostcodeErrorMessage)}

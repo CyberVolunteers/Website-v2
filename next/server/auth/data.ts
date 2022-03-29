@@ -6,6 +6,10 @@ import { logger } from "../logger";
 import { categoryNames } from "../../client/utils/const";
 import sharp from "sharp";
 import { baseOrganisationLogoImagePath } from "../../serverAndClient/staticDetails";
+import isEmail from "validator/lib/isEmail";
+import isURL from "validator/lib/isURL";
+import isMobilePhone from "validator/lib/isMobilePhone";
+import { isAllNonEmptyStrings, isPostcode } from "../../serverAndClient/utils";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -95,7 +99,7 @@ function extractOrgData(user: any, targetEmail: string) {
 		throw new Error(`server.data:Expected one email, found ${creds.length}`);
 
 	const out = {
-		...user,
+		...user._doc,
 		...creds[0]._doc,
 	};
 
@@ -260,6 +264,59 @@ export async function signupUser(_params: {
 	};
 }
 
+export function verifyOrgData(params: {
+	email: any;
+	facebookLink: any;
+	linkedinLink: any;
+	phone: any;
+	postcode: any;
+	safeguardingLeadEmail: any;
+	safeguardingPolicyLink: any;
+	twitterLink: any;
+	websiteUrl: any;
+}): boolean {
+	const {
+		facebookLink,
+		linkedinLink,
+		twitterLink,
+		websiteUrl,
+		safeguardingPolicyLink,
+
+		safeguardingLeadEmail,
+		email,
+
+		phone,
+		postcode,
+	} = params;
+
+	const paramsWithoutOtherFields = {
+		facebookLink,
+		linkedinLink,
+		twitterLink,
+		websiteUrl,
+		safeguardingPolicyLink,
+
+		safeguardingLeadEmail,
+		email,
+
+		phone,
+		postcode,
+	};
+
+	return (
+		[
+			facebookLink,
+			linkedinLink,
+			twitterLink,
+			websiteUrl,
+			safeguardingPolicyLink,
+		].every((l) => l === "" || isURL(l)) &&
+		[safeguardingLeadEmail, email].every((e) => e === "" || isEmail(e)) &&
+		isMobilePhone(phone) &&
+		isPostcode(postcode)
+	);
+}
+
 /**
  * Creates an account for an organisation and returns its data
  * @param params data for the new organisation
@@ -273,7 +330,6 @@ export async function signupOrg(
 		email,
 		facebookLink,
 		firstName,
-		imageFileExt,
 		isForUnder18,
 		lastName,
 		linkedinLink,
@@ -304,10 +360,10 @@ export async function signupOrg(
 		orgDescription: string;
 		orgMission: string;
 		isForUnder18: boolean;
-		safeguardingLeadEmail: string;
-		safeguardingLeadName: string;
-		safeguardingPolicyLink: string;
-		trainingTypeExplanation: string;
+		safeguardingLeadEmail?: string;
+		safeguardingLeadName?: string;
+		safeguardingPolicyLink?: string;
+		trainingTypeExplanation?: string;
 
 		twitterLink: string;
 		facebookLink: string;
@@ -317,9 +373,8 @@ export async function signupOrg(
 		firstName: string;
 		lastName: string;
 		password: string;
-
-		imageFileExt: string;
 	},
+	imageFileExt: string,
 	imageFileBuffer: Buffer
 ) {
 	const passwordHash = await hash(password);

@@ -94,7 +94,3 @@ export function generateErrorResetter(
 ) {
 	return () => setter("");
 }
-
-export function cleanPostcode(p: string) {
-	return p.replaceAll(/[^0-9a-zA-Z]/g, "");
-}

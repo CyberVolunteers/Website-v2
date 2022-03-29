@@ -23,7 +23,9 @@ export default function CharitySignup({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
 
-	const [activeTab, setActiveTab] = useState("orgLogo" as CharitySignupTabType);
+	const [activeTab, setActiveTab] = useState(
+		"orgNameType" as CharitySignupTabType
+	);
 
 	const [orgName, setOrgName] = useState("");
 	const [orgType, setOrgType] = useState("");
@@ -60,58 +62,59 @@ export default function CharitySignup({
 	const [requestErrorMessage, setRequestErrorMessage] = useState("");
 
 	const submit = async () => {
-		// const chairtyData = {
-		// 	orgName,
-		// 	orgType,
-		// 	addressLine1,
-		// 	addressLine2,
-		// 	websiteUrl,
-		// 	postcode,
-		// 	city,
-		// 	phone,
-
-		// 	orgDescription,
-		// 	orgMission,
-		// 	isForUnder18: "" + isForUnder18,
-		// 	safeguardingPolicyLink,
-		// 	trainingTypeExplanation,
-		// 	safeguardingLeadName,
-		// 	safeguardingLeadEmail,
-
-		// 	facebookLink,
-		// 	linkedinLink,
-		// 	twitterLink,
-
-		// 		firstName: adminAccountData.firstName,
-		// 		lastName: adminAccountData.lastName,
-		// 		password: adminAccountData.password,
-		// 		email: adminAccountData.email,
-		// };
-
 		const charityData = {
-			addressLine1: "address line 1",
-			addressLine2: "address line 2",
-			email: "admin@admin.co",
-			firstName: "Admin name",
-			lastName: "Admin surname",
-			password: "abcd",
-			city: "London",
-			facebookLink: "https://face.bo",
-			isForUnder18: "true",
-			linkedinLink: "https://link.in",
-			orgDescription: "Organization description",
-			orgMission: "Mission statement",
-			orgName: "org name",
-			orgType: "org type",
-			phone: "088",
-			postcode: "AB1 2CD",
-			safeguardingLeadEmail: "john@safeguarding.co",
-			safeguardingLeadName: "John McSafeguarding",
-			safeguardingPolicyLink: "https://safeguarding.com",
-			trainingTypeExplanation: "Some other training explanation",
-			twitterLink: "https://twtr.co",
-			websiteUrl: "https://websiteurl.com",
+			orgName,
+			orgType,
+			addressLine1,
+			addressLine2,
+			websiteUrl,
+			postcode,
+			city,
+			phone,
+
+			orgDescription,
+			orgMission,
+			isForUnder18: "" + isForUnder18,
+			safeguardingPolicyLink,
+			trainingTypeExplanation,
+			safeguardingLeadName,
+			safeguardingLeadEmail,
+
+			facebookLink,
+			linkedinLink,
+			twitterLink,
+
+			firstName: adminAccountData.firstName,
+			lastName: adminAccountData.lastName,
+			password: adminAccountData.password,
+			email: adminAccountData.email,
 		};
+
+		// test data
+		// const charityData = {
+		// 	addressLine1: "address line 1",
+		// 	addressLine2: "address line 2",
+		// 	email: "admin@admin.co",
+		// 	firstName: "Admin name",
+		// 	lastName: "Admin surname",
+		// 	password: "abcd",
+		// 	city: "London",
+		// 	facebookLink: "https://face.bo",
+		// 	isForUnder18: "true",
+		// 	linkedinLink: "https://link.in",
+		// 	orgDescription: "Organization description",
+		// 	orgMission: "Mission statement",
+		// 	orgName: "org name",
+		// 	orgType: "org type",
+		// 	phone: "088",
+		// 	postcode: "PO16 7GZ",
+		// 	safeguardingLeadEmail: "john@safeguarding.co",
+		// 	safeguardingLeadName: "John McSafeguarding",
+		// 	safeguardingPolicyLink: "https://safeguarding.com",
+		// 	trainingTypeExplanation: "Some other training explanation",
+		// 	twitterLink: "https://twtr.co",
+		// 	websiteUrl: "https://websiteurl.com",
+		// };
 
 		const formData = new FormData();
 		Object.entries(charityData).forEach(([k, v]) => {
@@ -131,11 +134,11 @@ export default function CharitySignup({
 		if (res.status >= 400)
 			return setRequestErrorMessage(`Error: ${await res.text()}`);
 
-		// router.push(
-		// 	`/verifyEmailOrg?email=${encodeURIComponent(
-		// 		adminAccountData.email ?? ""
-		// 	)}`
-		// );
+		router.push(
+			`/verifyEmailOrg?email=${encodeURIComponent(
+				adminAccountData.email ?? ""
+			)}`
+		);
 	};
 
 	return (

@@ -58,7 +58,7 @@ export default function OrgAdminAccount({
 							if (isDataValid) submit();
 						}}
 					>
-						VERIFY EMAIL
+						SIGN UP
 					</Button>
 				</div>
 			</div>
