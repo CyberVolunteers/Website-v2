@@ -12,8 +12,7 @@ export default function WelcomeOrg() {
 	const router = useRouter();
 	const _email = router.query.email;
 	const email = typeof _email === "string" ? _email : null;
-	// TODO: do this
-	// useViewProtection(["unverified_org", "unverified_user"]);
+	// TODO: use proper view protection
 	return (
 		<div>
 			<Head title="Verify your email - cybervolunteers" />

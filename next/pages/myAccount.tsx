@@ -43,9 +43,6 @@ export default function MyAccount({
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
 	const router = useRouter();
 	const [accountData, setAccountData] = useState(_accountData);
-	// TODO: technically, since we get the fields from the server, view protection isn't needed
-
-	// useViewProtection(["org", "user"]);
 
 	// const userType = useViewerType();
 	// const isOrg = getAccountInfo()?.isOrg;
@@ -84,7 +81,6 @@ export default function MyAccount({
 		targetId == "Password_link" && setPersonalInfoActive("Password_link");
 	};
 
-	// TODO: fail if the account data is not found
 	let shownSection: JSX.Element | null = null;
 	if (isAfterRehydration && accountData !== null) {
 		shownSection =
@@ -219,6 +215,7 @@ export default function MyAccount({
 				</div>
 			) : null;
 	}
+	//NOTE: we are redirecting them to login if we can not get the data
 	if (isAfterRehydration && accountData === null) router.push("/login");
 
 	return (
@@ -229,12 +226,9 @@ export default function MyAccount({
 				active={activeSection}
 				setActiveSection={setActiveSection}
 			/>
-			{/* TODO: show an error message if not showing anything here, i.e. there was no data sent */}
 			{shownSection}
 		</>
 	);
-
-	// TODO: a button to change the password
 }
 
 export const getServerSideProps: GetServerSideProps<{
@@ -259,7 +253,7 @@ export const getServerSideProps: GetServerSideProps<{
 				csrfToken: await updateCsrf(context),
 			},
 		};
-	// copy things over
+	// copy needed things over
 	const accountData: UserClient = {
 		firstName: session.firstName,
 		lastName: session.lastName,
@@ -286,27 +280,6 @@ export const getServerSideProps: GetServerSideProps<{
 		// isVerified: isVerifiedUser,
 		isOrg: false,
 	};
-
-	// let fields: AccountDataType = {};
-
-	// if (isLoggedIn(session)) {
-	// 	const isRequestByAnOrg = isVerifiedOrg(session);
-	// 	fieldNames = isRequestByAnOrg ? orgFieldNamesToShow : userFieldNamesToShow;
-
-	// 	editableFields = isRequestByAnOrg
-	// 		? flatten(orgDataUpdateSpec)
-	// 		: flatten(userDataUpdateSpec);
-
-	// 	allFields = isRequestByAnOrg ? flatten(organisations) : flatten(users);
-
-	// 	delete allFields.password;
-
-	// 	fields = Object.fromEntries(
-	// 		Object.entries(session).filter(([k, v]) => k in allFields)
-	// 	); // only show the ones which were selected
-	// }
-
-	// TODO: clean it and leave only the required fields - for security!
 
 	return {
 		props: {

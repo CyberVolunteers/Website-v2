@@ -15,6 +15,7 @@ export const postcodeLengthField = 8;
 
 // client_ prefix means that the option is for the client
 
+// TODO: reformat this to avoid using the same schema for everything (e.g. ajv validator, mongodb schema and others) as it makes everything much more complicated
 //TODO: separate into push and pull fields
 export const users: FieldConstraintsCollection = {
 	required: {

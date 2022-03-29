@@ -1,6 +1,4 @@
 import React from "react";
-// TODO: do this
-// import "../../Assets/styles/css/Community-Cards.module.css";
 function Card({
 	title,
 	subtitle,

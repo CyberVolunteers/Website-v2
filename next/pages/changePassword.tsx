@@ -213,6 +213,7 @@ export const getServerSideProps: GetServerSideProps<{
 	lastName: string;
 }> = async (context) => {
 	const session = await getSession(context.req as ExtendedNextApiRequest);
+	// instruct the page to redirect us to login
 	if (typeof session !== "object" || session === null)
 		return {
 			props: {
@@ -222,8 +223,8 @@ export const getServerSideProps: GetServerSideProps<{
 			},
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
+	// instruct the page to redirect us to login
 	if (!isVerifiedUser)
-		// TODO: tell them that only verified users can do that
 		return {
 			props: {
 				firstName: null,

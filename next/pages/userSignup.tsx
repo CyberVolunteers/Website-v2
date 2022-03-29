@@ -23,8 +23,8 @@ import { cleanPostcode, generateErrorResetter } from "../client/utils/misc";
 import AddressInput from "../client/components/AddressInput";
 import BasicUserSignup from "../client/components/BasicUserSignup";
 
-// TODO: make sure no text fields persist after a refresh
-// TODO: a loading spinner
+// TODO: make sure no text fields persist after a refresh on all pages
+// TODO: a loading spinner on other pages where applicable
 export default function UserSignup({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
@@ -421,8 +421,7 @@ function SecondPage({
 						<Select
 							native
 							id="month-select"
-							// TODO: change it to onFocus for others for consistency
-							onFocus={() => {
+							onBlur={() => {
 								addVisitedField("month", visitedFields, setVisitedFields);
 							}}
 							value={month}

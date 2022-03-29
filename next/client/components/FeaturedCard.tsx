@@ -70,7 +70,7 @@ function FeaturedCard({
 							<div
 								className={`${styles["meter"]}`}
 								style={{
-									width: (currentVolunteers / requestedVolunteers) * 100 + "%", //TODO: set this
+									width: (currentVolunteers / requestedVolunteers) * 100 + "%",
 								}}
 							></div>
 						</div>

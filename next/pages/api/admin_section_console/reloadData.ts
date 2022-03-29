@@ -114,7 +114,7 @@ const handlers: HandlerCollection = {
 		});
 
 		await Listing.insertMany(listings);
-		// TODO: fill in the "listings" array in Org
+		// TODO: fill in the "listings" array in Orgs
 
 		logger.info(
 			"Length after insert - listings: %s",

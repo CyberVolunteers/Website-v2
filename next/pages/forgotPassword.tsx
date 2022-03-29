@@ -206,7 +206,6 @@ export const getServerSideProps: GetServerSideProps<{
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
 	if (!isVerifiedUser)
-		// TODO: tell them that only verified users can do that
 		return {
 			props: {
 				email: session.email,

@@ -72,7 +72,7 @@ export default function CharitySignup({
 
 		// 	orgDescription,
 		// 	orgMission,
-		// 	isForUnder18,
+		// 	isForUnder18: "" + isForUnder18,
 		// 	safeguardingPolicyLink,
 		// 	trainingTypeExplanation,
 		// 	safeguardingLeadName,
@@ -97,7 +97,7 @@ export default function CharitySignup({
 			password: "abcd",
 			city: "London",
 			facebookLink: "https://face.bo",
-			isForUnder18: true,
+			isForUnder18: "true",
 			linkedinLink: "https://link.in",
 			orgDescription: "Organization description",
 			orgMission: "Mission statement",

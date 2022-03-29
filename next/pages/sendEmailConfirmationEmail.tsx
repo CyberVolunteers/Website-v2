@@ -17,9 +17,6 @@ import { contactEmail } from "../serverAndClient/staticDetails";
 function SendEmailConfirmationEmail({
 	email,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-	// TODO: fix the bug with viewProtection not detecting the correct user type (e.g. after a failed login)
-	// TODO: fix flashing on viewProtection redirect
-	// useViewProtection(["unverified_org", "unverified_user"]);
 	if (email === null)
 		return (
 			<div>
@@ -42,9 +39,8 @@ function SendEmailConfirmationEmail({
 			<div className={styles.container}>
 				<h1 className={styles.main_heading}>Please confirm your email</h1>
 				<p className={styles.main_para}>
-					A verification email has been sent to {email}
-					{/*TODO: test if this works*/}. Please verify your email to be able to
-					sign up for volunteering opportunities.
+					A verification email has been sent to {email}. Please verify your
+					email to be able to sign up for volunteering opportunities.
 				</p>
 				<Button href="/myAccount" style={{ width: 220 }}>
 					GO TO MY ACCOUNT
@@ -74,7 +70,6 @@ export const getServerSideProps: GetServerSideProps<{
 
 	const { isUser, isVerifiedUser } = getUserType(session);
 	if (!isUser)
-		// TODO: actually do something
 		return {
 			props: {
 				email: null,

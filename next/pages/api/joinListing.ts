@@ -20,7 +20,7 @@ const handlers: HandlerCollection = {
 		// if (!isVerifiedUser(session))
 		// 	return res.status(400).send("You need to be a user to do this");
 
-		// // TODO: check that all the fields are there
+		// // TODO: check that all the required fields are there
 		// const missingFields = session.missingFields;
 
 		// const newListingValue = await addUserToListing(session._id, req.body.uuid);

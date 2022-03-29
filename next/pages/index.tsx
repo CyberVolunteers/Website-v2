@@ -457,7 +457,6 @@ export const getServerSideProps: GetServerSideProps<{
 	await getMongo();
 	const listings = await Listing.find({});
 	const indexListings = indexCardListings.map((l) => {
-		// TODO: use a more appropriate, efficient way
 		const completeListing = listings.find(
 			(_l: any) => _l.uuid === l.uuid && !_l.categories.includes("scraped")
 		);

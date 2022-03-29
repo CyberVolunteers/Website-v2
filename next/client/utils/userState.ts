@@ -79,7 +79,7 @@ export function useViewerType(): ViewerType {
 		setViewerType(getPureViewerType());
 
 		try {
-			const bc = new BroadcastChannel("loginEvents"); //TODO: a channel specifically for verifying
+			const bc = new BroadcastChannel("loginEvents"); //TODO: a channel specifically for verifying (e.g. email)
 			bc.onmessage = function () {
 				setViewerType(getPureViewerType());
 			};

@@ -5,7 +5,7 @@ import { connection } from "mongoose";
 import { logger } from "./logger";
 import sharp from "sharp";
 
-// TODO: combine creating and updating a lsiting?
+// TODO: use the same function for creating and updating a listing?
 /**
  * creates a listing
  * @param params
@@ -50,7 +50,7 @@ import sharp from "sharp";
 // 			type: "Point",
 // 			coordinates: location,
 // 		},
-// 	}); //TODO: check if this leaks when listings are queried
+// 	});
 
 // 	try {
 // 		await connection.transaction(async () => {

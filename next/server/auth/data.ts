@@ -166,7 +166,7 @@ export type ListingServer = {
 	minHoursPerWeek: number;
 	maxHoursPerWeek: number;
 	requestedNumVolunteers: number;
-	organisation: string; // TODO: change it
+	organisation: string; // TODO: change this
 	__v?: number;
 };
 

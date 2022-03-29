@@ -13,7 +13,7 @@ import {
 } from "../serverAndClient/headersConfig";
 import { logger } from "./logger";
 
-// TODO: allow having two instances of the same page open at the same time
+// TODO: allow having two instances of the same page open at the same time from a csrf standpoint
 
 /**
  * Generates a random hex string of a specified length

@@ -135,10 +135,6 @@ export const BasicInfo = ({
 		// setcountry(countryCodes);
 		EventHandle();
 
-		// window.sessionStorage.removeItem("gender");
-		// window.sessionStorage.removeItem("month");
-		// window.sessionStorage.removeItem("country");
-
 		window.addEventListener("load", (e) => {
 			if (window.innerWidth < 500) {
 				setmonths(Object.values(months));
@@ -237,7 +233,6 @@ export const BasicInfo = ({
 								onChange={(e) => {
 									let BorderElement = (e.target as any).parentNode;
 									BorderElement.style.border = "1px solid #000 ";
-									// window.sessionStorage.setItem("gender", true);
 									HandleAllCheck();
 									setGender(e.target.value as Gender);
 								}}
@@ -317,7 +312,6 @@ export const BasicInfo = ({
 								onChange={(e) => {
 									let BorderElement = (e.target as any).parentNode;
 									BorderElement.style.border = "1px solid #000 ";
-									window.sessionStorage.setItem("country", true);
 									HandleAllCheck();
 								}}
 								id="country-select"
@@ -368,8 +362,6 @@ export const BasicInfo = ({
 								onChange={(e) => {
 									let BorderElement = (e.target as any).parentNode;
 									BorderElement.style.border = "1px solid #000 ";
-									// TODO: does this even do anything useful?
-									// window.sessionStorage.setItem("month", true);
 									HandleAllCheck(e);
 									setMonth(parseInt(e.target.value as string));
 								}}

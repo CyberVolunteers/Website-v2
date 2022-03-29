@@ -97,7 +97,6 @@ export async function cacheQuery(
 ): Promise<string> {
 	return new Promise((res, rej) => {
 		// prefix the key with the store name to prevent collisions
-		// TODO: see if there is a better way
 		let compoundKey = store + key;
 		compoundKey = isCaseInsensitive ? compoundKey.toLowerCase() : compoundKey;
 		client.get(compoundKey, (err, storedValue) => {

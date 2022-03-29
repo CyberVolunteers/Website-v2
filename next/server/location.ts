@@ -47,7 +47,6 @@ export async function geocode(
 	const res = await client.geocode({
 		params: {
 			address: place,
-			// TODO: location in the UK + radius
 			key: geocodingKey ?? "",
 		},
 	});

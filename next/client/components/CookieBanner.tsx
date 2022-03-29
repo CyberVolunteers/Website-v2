@@ -72,7 +72,7 @@ function CookieBanner() {
 	});
 
 	function rememberAllowedCookies() {
-		// TODO: respect the choices
+		// TODO: if we add such cookies, disable them based on the choices
 		// remember the accepted cookies in a cookie
 		const out: { [key: string]: boolean } = {};
 		cookieTypes

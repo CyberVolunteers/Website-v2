@@ -10,9 +10,7 @@ import { ExtendedNextApiRequest } from "../server/types";
 function Welcome({
 	email,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
-	// TODO: fix the bug with viewProtection not detecting the correct user type (e.g. after a failed login)
-	// TODO: fix flashing on viewProtection redirect
-	// useViewProtection(["unverified_org", "unverified_user"]);
+	// TODO: view protection
 	return (
 		<div>
 			<Head title="Welcome - cybervolunteers" />

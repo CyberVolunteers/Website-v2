@@ -12,7 +12,8 @@ function Welcome({
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
 	// TODO: fix the bug with viewProtection not detecting the correct user type (e.g. after a failed login)
 	// TODO: fix flashing on viewProtection redirect
-	// useViewProtection(["unverified_org", "unverified_user"]);
+	// TODO: add view protection on the pages where applicable
+
 	return (
 		<div>
 			<Head title="Registered to volunteer - cybervolunteers" />

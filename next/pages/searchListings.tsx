@@ -224,7 +224,7 @@ function SearchListings({
 		// TODO: have an error message there
 		if (res.status >= 400) return setErrorMessage(await res.text());
 
-		// TODO: show a warning if could not find the place
+		// TODO: show a warning if could not find the place specified in the search query
 
 		const resData = await res.json();
 
@@ -852,12 +852,12 @@ export const getServerSideProps: GetServerSideProps<{
 	minHours: number;
 }> = async (context: any) => {
 	await getMongo(); // connect
-	// TODO: there has to be a better way than this
+	// TODO: there has to be a better way than this, maybe use aggregate
 	const listings = await Listing.find({}).populate("organisation");
 
 	const processedListings: ListingType[] = listings.map(getCleanListingData);
 
-	// TODO: cache that?
+	// TODO: cache this
 
 	const maxHours = (
 		await Listing.find({}, "maxHoursPerWeek -_id")

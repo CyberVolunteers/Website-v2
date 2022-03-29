@@ -48,7 +48,6 @@
 .filter-textbox {
 	height: 40px;
 	padding: 0 0.5rem;
-	/* TODO: maybe we do need to show the border? */
 	border: hidden;
 }
 .filter-textbox:focus {

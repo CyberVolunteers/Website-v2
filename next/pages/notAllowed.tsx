@@ -57,7 +57,6 @@ export default function NotAllowed(): ReactElement {
 				}
 			})()}
 			{doesEmailHaveToBeVerified ? (
-				//TODO: change this page url
 				<Link
 					href={`/emailConfirmationEmailSent?redirect=${
 						router.query.redirect ?? ""
@@ -68,20 +67,18 @@ export default function NotAllowed(): ReactElement {
 						<p>Verify my email!</p>
 					</a>
 				</Link>
-			) : (
-				hasToLogIn ? (
-					<Link
-						href={`/emailConfirmationEmailSent?redirect=${
-							router.query.redirect ?? ""
-						}`}
-						passHref
-					>
-						<a>
-							<p>Log in!</p>
-						</a>
-					</Link>
-				) : null
-			)}
+			) : hasToLogIn ? (
+				<Link
+					href={`/emailConfirmationEmailSent?redirect=${
+						router.query.redirect ?? ""
+					}`}
+					passHref
+				>
+					<a>
+						<p>Log in!</p>
+					</a>
+				</Link>
+			) : null}
 		</div>
 	);
 }

@@ -50,10 +50,6 @@ export const HandleAllCheck = (e) => {
 		SevenInput.value != "" &&
 		EightInput.value != "" &&
 		NineInput.value != ""
-		// NOTE: these checks are not used because the values are placed there already and there is no way to "unset them"
-		// window.sessionStorage.getItem("gender") != null &&
-		// window.sessionStorage.getItem("month") != null &&
-		// window.sessionStorage.getItem("country") != null
 	) {
 		document.querySelector(".skill_save_one").classList.add("active");
 		return true;

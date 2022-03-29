@@ -43,6 +43,8 @@ export function useIsAfterRehydration() {
  * @param allow User types to allow
  * @returns whether the user is allowed
  */
+// TODO: fix the bug with viewProtection not detecting the correct user type (e.g. after a failed login)
+// TODO: fix flashing on viewProtection redirect
 export function useViewProtection(allow: ViewerType[]) {
 	const router = useRouter();
 	const currentViewType = useViewerType();

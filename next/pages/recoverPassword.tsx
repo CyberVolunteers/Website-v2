@@ -29,9 +29,6 @@ export default function ChangePassword({
 	firstName,
 	lastName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	// TODO: fix view protections
-	// useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
-
 	const router = useRouter();
 	const isAfterRehydration = useIsAfterRehydration();
 
@@ -44,9 +41,9 @@ export default function ChangePassword({
 	const [newPasswordErrorMessage, setNewPasswordErrorMessage] = useState("");
 	const [newPassword2ErrorMessage, setNewPassword2ErrorMessage] = useState("");
 
-	const [passwordStrengthNotes, setPasswordStrengthNotes] = useState("");
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
+	// NOTE: if we are not allowed to access this page, we are redirected to login
 	if (isAfterRehydration && firstName === null) router.push("/login");
 	return (
 		<div>
@@ -165,7 +162,6 @@ export const getServerSideProps: GetServerSideProps<{
 		};
 	const { isUser, isVerifiedUser } = getUserType(session);
 	if (!isVerifiedUser)
-		// TODO: tell them that only verified users can do that
 		return {
 			props: {
 				firstName: null,
