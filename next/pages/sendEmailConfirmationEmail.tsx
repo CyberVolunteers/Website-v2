@@ -68,19 +68,18 @@ export const getServerSideProps: GetServerSideProps<{
 			},
 		};
 
-	const { isUser, isVerifiedUser } = getUserType(session);
-	if (!isUser)
+	const email = session.email;
+	const firstName = session.firstName;
+	const lastName = session.lastName;
+
+	if ([email, firstName, lastName].some((f) => typeof f !== "string"))
 		return {
 			props: {
 				email: null,
 			},
 		};
 
-	await sendEmailConfirmationEmail(
-		session.email,
-		session.firstName,
-		session.lastName
-	);
+	await sendEmailConfirmationEmail(email, firstName, lastName);
 
 	return {
 		props: {

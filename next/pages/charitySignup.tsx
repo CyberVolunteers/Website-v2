@@ -94,7 +94,7 @@ export default function CharitySignup({
 		// const charityData = {
 		// 	addressLine1: "address line 1",
 		// 	addressLine2: "address line 2",
-		// 	email: "admin@admin.co",
+		// 	email: "admin@admin.com",
 		// 	firstName: "Admin name",
 		// 	lastName: "Admin surname",
 		// 	password: "abcd",
@@ -135,8 +135,8 @@ export default function CharitySignup({
 			return setRequestErrorMessage(`Error: ${await res.text()}`);
 
 		router.push(
-			`/verifyEmailOrg?email=${encodeURIComponent(
-				adminAccountData.email ?? ""
+			`/sendEmailConfirmationEmail?email=${encodeURIComponent(
+				adminAccountData.email
 			)}`
 		);
 	};

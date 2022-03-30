@@ -535,16 +535,14 @@ export async function manipulateDataByEmail(
 	// no such email
 	if (users.length === 0 && organisations.length === 0) return null;
 
-	const doesEmailBelongToUser = users.length !== 0;
+	const isUser = users.length !== 0;
 
-	const searchParams = doesEmailBelongToUser
-		? { email }
-		: { "creds.email": email };
+	const searchParams = isUser ? { email } : { "creds.email": email };
 
-	const model = doesEmailBelongToUser ? User : Org;
+	const model = isUser ? User : Org;
 
 	// make sure to put the modified data into the array if a charity
-	if (!doesEmailBelongToUser) {
+	if (!isUser) {
 		const perUserFields = ["email", "isEmailVerified", "passwordHash"];
 		if (typeof newData !== "undefined")
 			Object.entries(newData).forEach(([k, v]) => {
@@ -565,7 +563,7 @@ export async function manipulateDataByEmail(
 			  });
 
 	const out = extractData(newRes, latestEmail);
-	out.isOrg = !doesEmailBelongToUser;
+	out.isOrg = !isUser;
 	return out;
 }
 
