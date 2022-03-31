@@ -6,9 +6,7 @@ import { contactEmail } from "../serverAndClient/staticDetails";
 import styles from "../client/styles/simplePage.module.css";
 import { useRouter } from "next/router";
 
-export default function Error500({
-	email,
-}: InferGetStaticPropsType<typeof getStaticProps>): ReactElement {
+export default function Error500(): ReactElement {
 	const router = useRouter();
 	return (
 		<div>
@@ -19,7 +17,7 @@ export default function Error500({
 					We are sorry, something went wrong{" "}
 				</h1>
 				<p className={styles.main_para}>
-					Please email us at {email} and tell us what led to this issue
+					Please email us at {contactEmail} and tell us what led to this issue
 				</p>
 				<Button onClick={() => router.back()} style={{ width: 220 }}>
 					GO BACK
@@ -28,13 +26,3 @@ export default function Error500({
 		</div>
 	);
 }
-
-export const getStaticProps: GetStaticProps<{
-	email: string;
-}> = async () => {
-	return {
-		props: {
-			email: contactEmail,
-		},
-	};
-};

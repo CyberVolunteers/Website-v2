@@ -1,6 +1,6 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { useRouter } from "next/dist/client/router";
-import React, { ReactElement } from "react";
+import React, { ReactElement, useEffect } from "react";
 import { useState } from "react";
 import isEmail from "validator/lib/isEmail";
 import { updateCsrf } from "../server/csrf";
@@ -15,11 +15,16 @@ import Link from "next/link";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faEye, faEyeSlash } from "@fortawesome/free-solid-svg-icons";
 import { error } from "../client/utils/logger";
-import { updateLoginState } from "../client/utils/userState";
+import {
+	getAccountInfo,
+	updateLoginState,
+	useViewerType,
+} from "../client/utils/userState";
 
 export default function Login({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
+	const userType = useViewerType();
 	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -29,6 +34,23 @@ export default function Login({
 	const [loginErrorMessage, setLoginErrorMessage] = useState("");
 	const [emailErrorMessage, setEmailErrorMessage] = useState("");
 	const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
+
+	const showLoginRequirementMessage =
+		router.query.showLoginRequirementMessage === "true";
+	useEffect(() => {
+		if (showLoginRequirementMessage) {
+			const hasToBeVerified = router.query.hasToBeVerified === "true";
+
+			const verificationType = hasToBeVerified ? "verified " : "";
+			const targetUserType =
+				router.query.hasToBeUser === "true"
+					? `as a ${verificationType}user `
+					: "";
+			setLoginErrorMessage(
+				`You need to be logged in ${targetUserType}to do that.`
+			);
+		}
+	}, []);
 
 	const isAllDataValid =
 		email !== "" &&
@@ -55,7 +77,22 @@ export default function Login({
 
 		const firstDigit = ("" + res.status)[0];
 		updateLoginState();
-		if (res.status === 200) return router.push("/searchListings");
+		if (res.status === 200) {
+			if (showLoginRequirementMessage) return router.back();
+
+			if (userType === "unverified_user") return router.push("/myAccount");
+			if (userType === "user") return router.push("/searchListings");
+			if (userType === "unverified_org") {
+				const data = getAccountInfo();
+
+				console.log(data);
+
+				if (data.isEmailVerified !== true)
+					return router.push("/sendEmailConfirmationEmail");
+				return router.push("/organisationVerificationNotification");
+			}
+			if (userType === "org") return router.push("/manageListings");
+		}
 		error(
 			"login",
 			`failed with text "${errorText}", status: ${res.status}, statusText: ${res.statusText}`

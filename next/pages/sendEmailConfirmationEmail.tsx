@@ -1,4 +1,5 @@
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
+import { useRouter } from "next/router";
 import React from "react";
 import Button from "../client/components/Button";
 import Head from "../client/components/Head";
@@ -16,7 +17,25 @@ import { contactEmail } from "../serverAndClient/staticDetails";
 
 function SendEmailConfirmationEmail({
 	email,
+	isOrg,
+	isVerifiedAlready,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+	if (isVerifiedAlready)
+		return (
+			<div>
+				<Head title="Confirm your email - cybervolunteers" />
+
+				<div className={styles.container}>
+					<h1 className={styles.main_heading}>
+						Your email has been verified already
+					</h1>
+					<p className={styles.main_para}>Feel free to use the website!</p>
+					<Button href="/myAccount" style={{ width: 220 }}>
+						GO TO MY ACCOUNT
+					</Button>
+				</div>
+			</div>
+		);
 	if (email === null)
 		return (
 			<div>
@@ -40,7 +59,10 @@ function SendEmailConfirmationEmail({
 				<h1 className={styles.main_heading}>Please confirm your email</h1>
 				<p className={styles.main_para}>
 					A verification email has been sent to {email}. Please verify your
-					email to be able to sign up for volunteering opportunities.
+					email to{" "}
+					{isOrg
+						? "continue creating your Organisation's Cyber Volunteers profile."
+						: "be able to sign up for volunteering opportunities."}
 				</p>
 				<Button href="/myAccount" style={{ width: 220 }}>
 					GO TO MY ACCOUNT
@@ -54,6 +76,8 @@ export default SendEmailConfirmationEmail;
 
 export const getServerSideProps: GetServerSideProps<{
 	email: string | null;
+	isOrg: boolean;
+	isVerifiedAlready: boolean;
 }> = async (context: any) => {
 	let session = await getSession(context.req as ExtendedNextApiRequest);
 	if (session === null && typeof context.query.email === "string")
@@ -65,6 +89,17 @@ export const getServerSideProps: GetServerSideProps<{
 		return {
 			props: {
 				email: null,
+				isOrg: false,
+				isVerifiedAlready: false,
+			},
+		};
+
+	if (session.isEmailVerified === true)
+		return {
+			props: {
+				email: null,
+				isOrg: false,
+				isVerifiedAlready: true,
 			},
 		};
 
@@ -76,6 +111,8 @@ export const getServerSideProps: GetServerSideProps<{
 		return {
 			props: {
 				email: null,
+				isOrg: false,
+				isVerifiedAlready: false,
 			},
 		};
 
@@ -84,6 +121,8 @@ export const getServerSideProps: GetServerSideProps<{
 	return {
 		props: {
 			email: session.email,
+			isOrg: session.isOrg,
+			isVerifiedAlready: false,
 		}, // will be passed to the page component as props
 	};
 };

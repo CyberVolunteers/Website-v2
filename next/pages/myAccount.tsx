@@ -36,6 +36,7 @@ import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import { updateCsrf } from "../server/csrf";
 import { csrfFetch } from "../client/utils/csrf";
 import { useRouter } from "next/router";
+import { RedirectWithErrorMessage } from "../serverAndClient/utils";
 
 export default function MyAccount({
 	accountData: _accountData,
@@ -216,8 +217,7 @@ export default function MyAccount({
 			) : null;
 	}
 	//NOTE: we are redirecting them to login if we can not get the data
-	if (isAfterRehydration && accountData === null) router.push("/login");
-
+	if (accountData === null) return <RedirectWithErrorMessage hasToBeUser />;
 	return (
 		<>
 			<Head title="My account - cybervolunteers" />

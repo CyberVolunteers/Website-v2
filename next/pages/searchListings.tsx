@@ -27,7 +27,10 @@ import PlusIcon from "@material-ui/icons/Add";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Listing } from "../server/mongo/mongoModels";
 import { getMongo } from "../server/mongo";
-import { getCleanListingData } from "../server/mongo/util";
+import {
+	getCleanListingData,
+	processMongoDataForSendingToClient,
+} from "../server/mongo/util";
 import { wait } from "../client/utils/misc";
 import { useRouter } from "next/router";
 import { useWindowSize } from "../client/utils/otherHooks";
@@ -37,7 +40,6 @@ const minLocationSearchCooldownMillis = 500;
 type OrgType = {
 	contactEmails: string[];
 	isOrganisationVerified: boolean;
-	hasSafeguarding: boolean;
 	listings: []; // TODO: change that somehow?
 	type: string;
 	name: string;
@@ -853,7 +855,9 @@ export const getServerSideProps: GetServerSideProps<{
 }> = async (context: any) => {
 	await getMongo(); // connect
 	// TODO: there has to be a better way than this, maybe use aggregate
-	const listings = await Listing.find({}).populate("organisation");
+	let listings = await Listing.find({}).populate("organisation");
+
+	listings = processMongoDataForSendingToClient(listings);
 
 	const processedListings: ListingType[] = listings.map(getCleanListingData);
 

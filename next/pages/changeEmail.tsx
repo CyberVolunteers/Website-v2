@@ -13,18 +13,16 @@ import { updateCsrf } from "../server/csrf";
 import CustomForm from "../client/components/CustomForm";
 import { getSession } from "../server/auth/auth-cookie";
 import { ExtendedNextApiRequest } from "../server/types";
-import { getUserType } from "../server/auth/data";
+import { getUserType, isLoggedIn } from "../server/auth/data";
 import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import BackButton from "../client/components/BackButton";
+import { RedirectWithErrorMessage } from "../serverAndClient/utils";
 
 export default function ChangeEmail({
 	csrfToken,
 	firstName,
 	lastName,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	// TODO: fix view protections
-	// useViewProtection(["org", "user", "unverified_org", "unverified_user"]);
-
 	const router = useRouter();
 	const isAfterRehydration = useIsAfterRehydration();
 
@@ -62,7 +60,7 @@ export default function ChangeEmail({
 		else router.push("/myAccount");
 	}
 
-	if (isAfterRehydration && firstName === null) router.push("/login");
+	if (firstName === null) return <RedirectWithErrorMessage />;
 	return (
 		<div>
 			<Head title="Change email - cybervolunteers" />
@@ -166,8 +164,7 @@ export const getServerSideProps: GetServerSideProps<{
 				csrfToken: await updateCsrf(context),
 			},
 		};
-	const { isUser, isVerifiedUser } = getUserType(session);
-	if (!isUser)
+	if (!isLoggedIn(session))
 		return {
 			props: {
 				firstName: null,

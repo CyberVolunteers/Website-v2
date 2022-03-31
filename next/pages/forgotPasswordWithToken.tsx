@@ -21,6 +21,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { destroyUUID, verifyUUID } from "../server/email/redis";
 import { getMongo } from "../server/mongo";
 import { incorrectUUIDError } from "../client/utils/const";
+import { contactEmail } from "../serverAndClient/staticDetails";
 
 export default function ChangePassword({
 	csrfToken,
@@ -121,7 +122,20 @@ function MainPage({
 		router.push("/forgotPasswordFinal?isSuccessful=true");
 	}
 
-	if (isAfterRehydration && firstName === null) router.push("/login");
+	if (isAfterRehydration && firstName === null)
+		return (
+			<div>
+				<Head title="Could not change password - cybervolunteers" />
+				<div className={styles.container}>
+					<h1 className={styles.main_heading}>
+						We are sorry, we {"couldn't"} change your password
+					</h1>
+					<p className={styles.main_para}>
+						Try again or contact us at {contactEmail}
+					</p>
+				</div>
+			</div>
+		);
 	return (
 		<div>
 			<Head title="Change password - cybervolunteers" />

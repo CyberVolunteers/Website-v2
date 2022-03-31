@@ -23,6 +23,7 @@ import { useIsAfterRehydration } from "../client/utils/otherHooks";
 import BackButton from "../client/components/BackButton";
 import zxcvbn from "zxcvbn";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
+import { RedirectWithErrorMessage } from "../serverAndClient/utils";
 
 export default function ChangePassword({
 	csrfToken,
@@ -44,7 +45,8 @@ export default function ChangePassword({
 	const [passwordStrength, setPasswordStrength] = useState(0);
 
 	// NOTE: if we are not allowed to access this page, we are redirected to login
-	if (isAfterRehydration && firstName === null) router.push("/login");
+	if (firstName === null)
+		return <RedirectWithErrorMessage hasToBeVerified hasToBeUser />;
 	return (
 		<div>
 			<Head title="Change password - cybervolunteers" />

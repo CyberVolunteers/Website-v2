@@ -107,6 +107,8 @@ function extractOrgData(user: any, targetEmail: string) {
 
 	logger.info("server.auth.data: Extraction result: %s", out);
 
+	out.isOrg = true;
+
 	return out;
 }
 

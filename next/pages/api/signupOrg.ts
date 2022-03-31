@@ -24,6 +24,7 @@ import {
 import { doAllRulesApply } from "../../server/validation";
 import {
 	clearServerSideSession,
+	createSessionOutOfData,
 	updateSession,
 } from "../../server/auth/auth-cookie";
 import multer from "multer";
@@ -175,7 +176,7 @@ const handlers: HandlerCollection = {
 		// log in the poor soul
 		// Delete the session cache so that the data does not persist
 		clearServerSideSession(req);
-		await updateSession(req, res, signupResult);
+		await updateSession(req, res, createSessionOutOfData(signupResult));
 
 		return res.end();
 	},

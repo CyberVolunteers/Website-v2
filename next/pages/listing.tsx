@@ -1,7 +1,7 @@
 import { faHeart } from "@fortawesome/free-regular-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { GetServerSideProps, InferGetServerSidePropsType } from "next/types";
-import { ReactElement, useRef } from "react";
+import { ReactElement, useEffect, useRef } from "react";
 
 import Head from "../client/components/Head";
 import styles from "../client/styles/listing.module.css";
@@ -20,24 +20,24 @@ import { categoryNames } from "../client/utils/const";
 import { handleStylisedTextRender } from "../client/utils/misc";
 import { NextRouter, useRouter } from "next/router";
 import { useViewerType } from "../client/utils/userState";
-import { ViewerType } from "../client/types";
 
-const onVolunteerButtonClick = (router: NextRouter, userType: ViewerType) => {
-	const isLoggedIn = (
-		["user", "org", "unverified_user", "unverified_org"] as ViewerType[]
-	).includes(userType);
+const onVolunteerButtonClick = (canVolunteer: boolean, router: NextRouter) => {
 	// TODO: let them volunteer, fetch joinListing
-	if (isLoggedIn) router.push("/volunteeringSuccessful");
-	else router.push("/login");
+	if (canVolunteer) router.push("/volunteeringSuccessful");
+	// TODO: have a popup for "else", saying that you need to log into a volunteer account
+	alert(
+		"You have to be a volunteer with a verified email to do that. If you are a volunteer, go to your account page for instructions on verifying your email."
+	);
 };
 
 export default function ListingPage({
 	listing,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	const userType = useViewerType();
 	const router = useRouter();
 	const screenWidth = useWindowSize().width ?? 1000;
 	const isSmallScreenVersion = screenWidth <= 768;
+
+	const canVolunteer = useCanVolunteer();
 
 	if (listing === null)
 		return (
@@ -206,7 +206,7 @@ export default function ListingPage({
 				<a href="#" className={styles.link}>
 					<button
 						className={styles["Opportunities-button3"]}
-						onClick={() => onVolunteerButtonClick(router, userType)}
+						onClick={() => onVolunteerButtonClick(canVolunteer, router)}
 					>
 						I want to help
 					</button>
@@ -218,7 +218,8 @@ export default function ListingPage({
 
 function InfoBox({ listing }: { listing: ListingType }) {
 	const router = useRouter();
-	const userType = useViewerType();
+
+	const canVolunteer = useCanVolunteer();
 
 	return (
 		<div className={styles["info-box"]}>
@@ -297,7 +298,7 @@ function InfoBox({ listing }: { listing: ListingType }) {
 					<a href="#" className={`${styles["link"]}`}>
 						<button
 							className={`${styles["Opportunities-button2"]}`}
-							onClick={() => onVolunteerButtonClick(router, userType)}
+							onClick={() => onVolunteerButtonClick(canVolunteer, router)}
 						>
 							I want to help
 						</button>
@@ -378,3 +379,9 @@ export const getServerSideProps: GetServerSideProps<{
 		}, // will be passed to the page component as props
 	};
 };
+
+function useCanVolunteer(): boolean {
+	const userType = useViewerType();
+
+	return userType === "user";
+}

@@ -18,6 +18,18 @@ export function toStrippedObject(obj: any) {
 	});
 }
 
+export function processMongoDataForSendingToClient(obj: any): any {
+	if (typeof obj !== "object" || obj === null) return obj;
+	const out = obj._doc ?? (Array.isArray(obj) ? [...obj] : { ...obj });
+
+	Object.entries(out).forEach(([k, v]) => {
+		if (v === undefined) delete out[k];
+		if (k[0] !== "_") processMongoDataForSendingToClient(v);
+	});
+
+	return out;
+}
+
 export function getCleanListingData(l: any) {
 	const out: ListingType = {
 		duration: l.duration,
@@ -48,7 +60,6 @@ export function getCleanListingData(l: any) {
 		organisation: {
 			contactEmails: l.organisation.contactEmails,
 			isOrganisationVerified: l.organisation.isOrganisationVerified,
-			hasSafeguarding: l.organisation.hasSafeguarding,
 			listings: l.organisation.listings,
 			type: l.organisation.orgType,
 			name: l.organisation.orgName,
