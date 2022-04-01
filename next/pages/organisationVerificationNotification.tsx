@@ -18,7 +18,7 @@ export default function OrganisationVerificationNotification(): ReactElement {
 					organisation has been granted an account or inquiring about further
 					information
 				</p>
-				<Button href="/myAccount" style={{ width: 220 }}>
+				<Button href="/" style={{ width: 220 }}>
 					CONTINUE
 				</Button>
 			</div>

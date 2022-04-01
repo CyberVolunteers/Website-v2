@@ -16,6 +16,16 @@ export default function Console({
 	const [model, setModel] = useState("");
 	const [resText, setResText] = useState("");
 
+	function checkProperJson(s: string): boolean {
+		try {
+			JSON.parse(s);
+			return true;
+		} catch {
+			alert("Invalid JSON in one of the fields");
+			return false;
+		}
+	}
+
 	return (
 		<div>
 			<Head title="Admin" />
@@ -27,6 +37,9 @@ export default function Console({
 					evt.preventDefault();
 					if (type === "" || model === "")
 						return setResText("select a type and a model");
+
+					if (![query1, query2, query3].every(checkProperJson)) return;
+
 					const res = await csrfFetch(
 						csrfToken,
 						"/api/admin_section_console/mongo",
