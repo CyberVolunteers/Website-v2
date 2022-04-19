@@ -3,7 +3,17 @@ import redis from "redis";
 import { logger } from "../logger";
 import { cacheExpirationSeconds, expireTimeSecondsByStore } from "./config";
 
-const client = redis.createClient(6379, "redis");
+// To prevent connecting to the non-existing redis storage during build time
+class Client {
+	private static _instance: redis.RedisClient;
+
+	static instance() {
+		if (!Client._instance) {
+			Client._instance = redis.createClient(6379, "redis");
+		}
+		return Client._instance;
+	}
+}
 
 export type RedisUUIDStores = "emailConfirmUUID" | "passwordResetUUID";
 export type RedisCacheStores = "postcodeByStreet" | "streetByAddress";
@@ -17,26 +27,30 @@ export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
 
 async function setKey(k: string, v: string, store: RedisUUIDStores) {
 	const res = await new Promise<"OK">((res, rej) => {
-		client.set(store + k, v, resolver(res, rej));
+		Client.instance().set(store + k, v, resolver(res, rej));
 	});
 	return res === "OK";
 }
 
 async function expireKey(k: string, store: RedisUUIDStores) {
 	return new Promise<number>((res, rej) => {
-		client.expire(k, expireTimeSecondsByStore[store], resolver(res, rej));
+		Client.instance().expire(
+			k,
+			expireTimeSecondsByStore[store],
+			resolver(res, rej)
+		);
 	});
 }
 
 export async function getKey(k: string, store: RedisUUIDStores) {
 	return new Promise<string | null | undefined>((res, rej) => {
-		client.get(store + k, resolver(res, rej));
+		Client.instance().get(store + k, resolver(res, rej));
 	});
 }
 
 export async function deleteKey(k: string, store: RedisUUIDStores) {
 	return new Promise<void>((res, rej) => {
-		client.del(store + k, (err) => {
+		Client.instance().del(store + k, (err) => {
 			if (err) return rej(err);
 			return res();
 		});
@@ -99,7 +113,7 @@ export async function cacheQuery(
 		// prefix the key with the store name to prevent collisions
 		let compoundKey = store + key;
 		compoundKey = isCaseInsensitive ? compoundKey.toLowerCase() : compoundKey;
-		client.get(compoundKey, (err, storedValue) => {
+		Client.instance().get(compoundKey, (err, storedValue) => {
 			if (err !== null) throw err;
 			// if found, return the value
 			if (typeof storedValue === "string") return res(storedValue);
@@ -109,7 +123,7 @@ export async function cacheQuery(
 				const value = typeof rawValue === "string" ? rawValue : rawValue.ret;
 
 				function rawStore(k: string, v: string) {
-					client.setex(
+					Client.instance().setex(
 						isCaseInsensitive ? k.toLowerCase() : k,
 						cacheExpirationSeconds[store],
 						v,

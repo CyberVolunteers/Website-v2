@@ -131,7 +131,6 @@ export default function UserSignup({
 						{pageNum === 0 ? (
 							<FirstPage
 								{...{
-									firstPageData,
 									setFirstPageData,
 									isFirstPageDataValid,
 									setIsFirstPageDataValid,
@@ -167,7 +166,6 @@ export default function UserSignup({
 function FirstPage({
 	handleMovingToNextPage,
 	isFirstPageDataValid,
-	firstPageData,
 	setFirstPageData,
 	setIsFirstPageDataValid,
 	setRequestErrorMessage,
@@ -183,13 +181,6 @@ function FirstPage({
 			email: string;
 		}>
 	>;
-	firstPageData: {
-		firstName: string;
-		lastName: string;
-		password: string;
-		password2: string;
-		email: string;
-	};
 	setIsFirstPageDataValid: React.Dispatch<React.SetStateAction<boolean>>;
 	setRequestErrorMessage: React.Dispatch<React.SetStateAction<string>>;
 }) {
@@ -292,10 +283,10 @@ function SecondPage({
 	}
 
 	useEffect(() => {
-		checkDayAndShowErrors;
+		checkDayAndShowErrors();
 	}, [day]);
 	useEffect(() => {
-		checkYearAndShowErrors;
+		checkYearAndShowErrors();
 	}, [year]);
 	useEffect(() => {
 		setSecondPageData({

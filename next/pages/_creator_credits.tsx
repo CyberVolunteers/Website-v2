@@ -1,4 +1,3 @@
-import { GetStaticProps, InferGetStaticPropsType } from "next";
 import React, { ReactElement } from "react";
 import Button from "../client/components/Button";
 import Head from "../client/components/Head";

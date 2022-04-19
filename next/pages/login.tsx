@@ -85,8 +85,6 @@ export default function Login({
 			if (userType === "unverified_org") {
 				const data = getAccountInfo();
 
-				console.log(data);
-
 				if (data.isEmailVerified !== true)
 					return router.push("/sendEmailConfirmationEmail");
 				return router.push("/organisationVerificationNotification");

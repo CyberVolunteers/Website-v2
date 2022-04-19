@@ -18,12 +18,7 @@ import {
 	categoryNames as rawCategoryNames,
 	indexCardListings,
 } from "../client/utils/const";
-import {
-	GetServerSideProps,
-	GetStaticProps,
-	InferGetServerSidePropsType,
-	InferGetStaticPropsType,
-} from "next";
+import { GetServerSideProps, InferGetServerSidePropsType } from "next";
 import { Listing } from "../server/mongo/mongoModels";
 import { getMongo } from "../server/mongo";
 import IdeaShowcase from "../client/components/IdeaShowcase";
