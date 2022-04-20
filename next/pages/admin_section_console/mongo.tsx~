@@ -21,7 +21,7 @@ export default function Console({
 			JSON.parse(s);
 			return true;
 		} catch {
-			return prompt(`Invalid JSON in field ${index}, counting with the first field to being 0. Type 'PROCEED' to send the code anyways.`) === "PROCEED";
+			return prompt(`Invalid JSON in field ${index}, counting with the first field to being 0. Type 'PROCEED' to send the code anyways.`);
 		}
 	}
 
