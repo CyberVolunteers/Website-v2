@@ -21,8 +21,8 @@ export type RedisCacheStores = "postcodeByStreet" | "streetByAddress";
 //TODO: test if it is removed
 export async function addTempKey(k: string, v: string, store: RedisUUIDStores) {
 	await setKey(k, v, store);
-	// TODO: this is broken - fix timings
-	await expireKey(k, store);
+	// // TODO: this is broken - fix timings
+	// await expireKey(k, store);
 }
 
 async function setKey(k: string, v: string, store: RedisUUIDStores) {
@@ -32,15 +32,15 @@ async function setKey(k: string, v: string, store: RedisUUIDStores) {
 	return res === "OK";
 }
 
-async function expireKey(k: string, store: RedisUUIDStores) {
-	return new Promise<number>((res, rej) => {
-		Client.instance().expire(
-			k,
-			expireTimeSecondsByStore[store],
-			resolver(res, rej)
-		);
-	});
-}
+// async function expireKey(k: string, store: RedisUUIDStores) {
+// 	return new Promise<number>((res, rej) => {
+// 		Client.instance().expire(
+// 			k,
+// 			expireTimeSecondsByStore[store],
+// 			resolver(res, rej)
+// 		);
+// 	});
+// }
 
 export async function getKey(k: string, store: RedisUUIDStores) {
 	return new Promise<string | null | undefined>((res, rej) => {
@@ -77,7 +77,7 @@ export async function verifyUUID(
 	store: RedisUUIDStores
 ): Promise<boolean> {
 	const storedUUIDRaw = await getKey(key, store);
-	logger.warn("Retrieved key: %s", storedUUIDRaw);
+	logger.warn("server.redis.verifyUUID: Retrieved key: %s", storedUUIDRaw);
 	const storedUUID = storedUUIDRaw ?? "should not be matched";
 
 	// always do this so that the timing is the same
@@ -95,59 +95,59 @@ export async function destroyUUID(
 	await deleteKey(key, store);
 }
 
-export async function cacheQuery(
-	key: string,
-	store: RedisCacheStores,
-	isCaseInsensitive: boolean,
-	getValue: (key: string) => Promise<
-		| string
-		| {
-				// the return value for the specific key
-				ret: string;
-				// the other computed pairs.
-				otherPairs: { key: string; value: string }[];
-		  }
-	>
-): Promise<string> {
-	return new Promise((res, rej) => {
-		// prefix the key with the store name to prevent collisions
-		let compoundKey = store + key;
-		compoundKey = isCaseInsensitive ? compoundKey.toLowerCase() : compoundKey;
-		Client.instance().get(compoundKey, (err, storedValue) => {
-			if (err !== null) throw err;
-			// if found, return the value
-			if (typeof storedValue === "string") return res(storedValue);
+// export async function cacheQuery(
+// 	key: string,
+// 	store: RedisCacheStores,
+// 	isCaseInsensitive: boolean,
+// 	getValue: (key: string) => Promise<
+// 		| string
+// 		| {
+// 				// the return value for the specific key
+// 				ret: string;
+// 				// the other computed pairs.
+// 				otherPairs: { key: string; value: string }[];
+// 		  }
+// 	>
+// ): Promise<string> {
+// 	return new Promise((res, rej) => {
+// 		// prefix the key with the store name to prevent collisions
+// 		let compoundKey = store + key;
+// 		compoundKey = isCaseInsensitive ? compoundKey.toLowerCase() : compoundKey;
+// 		Client.instance().get(compoundKey, (err, storedValue) => {
+// 			if (err !== null) throw err;
+// 			// if found, return the value
+// 			if (typeof storedValue === "string") return res(storedValue);
 
-			// else, calculate the value and store it
-			getValue(key).then((rawValue) => {
-				const value = typeof rawValue === "string" ? rawValue : rawValue.ret;
+// 			// else, calculate the value and store it
+// 			getValue(key).then((rawValue) => {
+// 				const value = typeof rawValue === "string" ? rawValue : rawValue.ret;
 
-				function rawStore(k: string, v: string) {
-					Client.instance().setex(
-						isCaseInsensitive ? k.toLowerCase() : k,
-						cacheExpirationSeconds[store],
-						v,
-						(err) => {
-							if (err !== null) throw err;
-						}
-					);
-				}
-				// remember the value
-				rawStore(compoundKey, value);
+// 				function rawStore(k: string, v: string) {
+// 					Client.instance().setex(
+// 						isCaseInsensitive ? k.toLowerCase() : k,
+// 						cacheExpirationSeconds[store],
+// 						v,
+// 						(err) => {
+// 							if (err !== null) throw err;
+// 						}
+// 					);
+// 				}
+// 				// remember the value
+// 				rawStore(compoundKey, value);
 
-				if (typeof rawValue !== "string") {
-					rawValue.otherPairs.forEach((pair) => {
-						let newCompoundKey = store + pair.key;
-						newCompoundKey = isCaseInsensitive
-							? newCompoundKey.toLowerCase()
-							: newCompoundKey;
+// 				if (typeof rawValue !== "string") {
+// 					rawValue.otherPairs.forEach((pair) => {
+// 						let newCompoundKey = store + pair.key;
+// 						newCompoundKey = isCaseInsensitive
+// 							? newCompoundKey.toLowerCase()
+// 							: newCompoundKey;
 
-						rawStore(newCompoundKey, pair.value);
-					});
-				}
+// 						rawStore(newCompoundKey, pair.value);
+// 					});
+// 				}
 
-				return res(value);
-			});
-		});
-	});
-}
+// 				return res(value);
+// 			});
+// 		});
+// 	});
+// }

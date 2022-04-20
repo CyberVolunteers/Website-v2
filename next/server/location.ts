@@ -1,5 +1,4 @@
 import axios from "axios";
-import { cacheQuery, RedisCacheStores } from "./email/redis";
 import { logger } from "./logger";
 import { Client, PlaceInputType } from "@googlemaps/google-maps-services-js";
 

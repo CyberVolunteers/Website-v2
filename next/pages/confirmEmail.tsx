@@ -36,14 +36,6 @@ export default function EmailConfirmationEmailSent({
 					<h1 className={styles.main_heading}>
 						Your email has been verified successfully.
 					</h1>
-					{/* <p className={styles.main_para}>
-						Feel free to */}
-					{/* tweak{" "}
-						<Link href="/myAccount" passHref>
-							<a>your account</a>
-						</Link>{" "}
-						or to{" "} */}
-					{/* </p> */}
 					<Button
 						href="/searchListings"
 						style={{ width: 220, marginTop: "2rem", marginBottom: "2rem" }}

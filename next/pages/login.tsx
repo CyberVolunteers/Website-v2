@@ -78,10 +78,7 @@ export default function Login({
 		const firstDigit = ("" + res.status)[0];
 		updateLoginState();
 		if (res.status === 200) {
-			if (showLoginRequirementMessage) return router.back();
-
-			if (userType === "unverified_user") return router.push("/myAccount");
-			if (userType === "user") return router.push("/searchListings");
+			// force unverified org warning
 			if (userType === "unverified_org") {
 				const data = getAccountInfo();
 
@@ -89,6 +86,12 @@ export default function Login({
 					return router.push("/sendEmailConfirmationEmail");
 				return router.push("/organisationVerificationNotification");
 			}
+
+			// the rest
+			if (showLoginRequirementMessage) return router.back();
+
+			if (userType === "unverified_user") return router.push("/myAccount");
+			if (userType === "user") return router.push("/searchListings");
 			if (userType === "org") return router.push("/manageListings");
 		}
 		error(
