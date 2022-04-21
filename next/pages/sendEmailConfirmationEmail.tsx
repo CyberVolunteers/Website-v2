@@ -30,8 +30,11 @@ function SendEmailConfirmationEmail({
 						Your email has been verified already
 					</h1>
 					<p className={styles.main_para}>Feel free to use the website!</p>
-					<Button href="/myAccount" style={{ width: 220 }}>
-						GO TO MY ACCOUNT
+					<Button
+						href={isOrg ? "/manageListings" : "/myAccount"}
+						style={{ width: 220 }}
+					>
+						{isOrg ? "MANAGE LISTINGS" : "GO TO MY ACCOUNT"}
 					</Button>
 				</div>
 			</div>
@@ -98,7 +101,7 @@ export const getServerSideProps: GetServerSideProps<{
 		return {
 			props: {
 				email: null,
-				isOrg: false,
+				isOrg: session.isOrg,
 				isVerifiedAlready: true,
 			},
 		};

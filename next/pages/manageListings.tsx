@@ -1,3 +1,5 @@
+import { RedirectWithErrorMessage } from "../serverAndClient/utils";
+import { useRouter } from "next/dist/client/router";
 import { ReactElement } from "react";
 import { useViewProtection } from "../client/utils/otherHooks";
 import Link from "next/link";
@@ -13,7 +15,12 @@ import { toStrippedObject } from "../server/mongo/util";
 export default function ManageListings({
 	listings,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	return <></>;
+	return (
+		<>
+			<Head title="Manage listings - cybervolunteers" />
+			<RedirectWithErrorMessage hasToBeVerified />
+		</>
+	);
 	// useViewProtection(["org"]);
 
 	// return (

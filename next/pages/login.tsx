@@ -24,7 +24,6 @@ import {
 export default function Login({
 	csrfToken,
 }: InferGetServerSidePropsType<typeof getServerSideProps>): ReactElement {
-	const userType = useViewerType();
 	const router = useRouter();
 	const [email, setEmail] = useState("");
 	const [password, setPassword] = useState("");
@@ -37,15 +36,13 @@ export default function Login({
 
 	const showLoginRequirementMessage =
 		router.query.showLoginRequirementMessage === "true";
+	const hasToBeVerified = router.query.hasToBeVerified === "true";
+	const hasToBeUser = router.query.hasToBeUser === "true";
+
 	useEffect(() => {
 		if (showLoginRequirementMessage) {
-			const hasToBeVerified = router.query.hasToBeVerified === "true";
-
 			const verificationType = hasToBeVerified ? "verified " : "";
-			const targetUserType =
-				router.query.hasToBeUser === "true"
-					? `as a ${verificationType}user `
-					: "";
+			const targetUserType = hasToBeUser ? `as a ${verificationType}user ` : "";
 			setLoginErrorMessage(
 				`You need to be logged in ${targetUserType}to do that.`
 			);
@@ -76,7 +73,7 @@ export default function Login({
 		const errorText = await res.text();
 
 		const firstDigit = ("" + res.status)[0];
-		updateLoginState();
+		const userType = updateLoginState();
 		if (res.status === 200) {
 			// force unverified org warning
 			if (userType === "unverified_org") {
@@ -91,8 +88,10 @@ export default function Login({
 			if (showLoginRequirementMessage) return router.back();
 
 			if (userType === "unverified_user") return router.push("/myAccount");
-			if (userType === "user") return router.push("/searchListings");
 			if (userType === "org") return router.push("/manageListings");
+
+			// if a user
+			return router.push("/searchListings");
 		}
 		error(
 			"login",

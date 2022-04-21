@@ -67,6 +67,7 @@ export function updateLoginState() {
 	const bc = new BroadcastChannel("loginEvents");
 	const out = isLoggedIn();
 	bc.postMessage(out);
+	return getPureViewerType();
 }
 
 // hooks

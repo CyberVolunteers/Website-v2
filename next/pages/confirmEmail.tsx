@@ -68,17 +68,25 @@ export const getServerSideProps: GetServerSideProps<{
 	isSuccessful: boolean;
 }> = async (context) => {
 	const { uuid, email } = context.query;
-	logger.warn(
-		"Confirming email; the uuid is %s and the email is %s",
-		uuid,
-		email
-	);
-	if (typeof uuid !== "string" || typeof email !== "string")
+	if (typeof uuid !== "string" || typeof email !== "string") {
+		logger.error(
+			"server.confirmEmail: Invalid uuid or email: '%s' '%s', query: '%s'",
+			uuid,
+			email,
+			context.query
+		);
 		return {
 			props: {
 				isSuccessful: false,
 			},
 		};
+	}
+	logger.warn(
+		"Confirming email; the uuid is %s and the email is %s, query: %s",
+		uuid,
+		email,
+		context.query
+	);
 
 	let isSuccessful = await verifyUUID(email, uuid, "emailConfirmUUID");
 	if (!isSuccessful)

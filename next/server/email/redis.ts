@@ -84,7 +84,7 @@ export async function verifyUUID(
 	const comparisonResult = fixedTimeComparison(uuid, storedUUID);
 
 	// if there hasn't been a request to verify the email,
-	if (storedUUIDRaw === undefined) return false;
+	if (typeof storedUUIDRaw !== "string") return false;
 	else return comparisonResult;
 }
 
