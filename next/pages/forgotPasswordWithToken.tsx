@@ -18,7 +18,7 @@ import BackButton from "../client/components/BackButton";
 import zxcvbn from "zxcvbn";
 import PasswordStrengthBar from "../client/components/PasswordStrengthBar";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { destroyUUID, verifyUUID } from "../server/email/redis";
+import { verifyUUID } from "../server/email/redis";
 import { getMongo } from "../server/mongo";
 import { incorrectUUIDError } from "../client/utils/const";
 import { contactEmail } from "../serverAndClient/staticDetails";

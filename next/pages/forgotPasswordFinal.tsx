@@ -6,7 +6,7 @@ import {
 	NextApiResponse,
 } from "next";
 import { updateLoginState, useViewerType } from "../client/utils/userState";
-import { destroyUUID, verifyUUID } from "../server/email/redis";
+import { verifyUUID } from "../server/email/redis";
 import { setEmailAsVerified } from "../server/auth/data";
 import { getMongo } from "../server/mongo";
 import { updateSession } from "../server/auth/auth-cookie";

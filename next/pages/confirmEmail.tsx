@@ -5,7 +5,7 @@ import {
 	NextApiResponse,
 } from "next";
 import { updateLoginState, useViewerType } from "../client/utils/userState";
-import { destroyUUID, verifyUUID } from "../server/email/redis";
+import { verifyUUID } from "../server/email/redis";
 import { setEmailAsVerified } from "../server/auth/data";
 import { getMongo } from "../server/mongo";
 import { updateSession } from "../server/auth/auth-cookie";
@@ -95,7 +95,8 @@ export const getServerSideProps: GetServerSideProps<{
 				isSuccessful: false,
 			},
 		};
-	await destroyUUID(email, "emailConfirmUUID");
+
+	// NOTE: we are not destroying the UUID so that the subsequent visits to the page do not show an error.
 
 	// connect mongo
 	//TODO: somehow make it impossible to miss this?
